@@ -26,29 +26,47 @@ class Database(object):
             self._connection.rollback()
 
     def createUser(self, email, username, password):
-        # cursor.execute(
-        self._insert(
-            "INSERT INTO users (email, username, password) VALUES (%s, %s, %s)",
+        self._insert("""
+            INSERT INTO users (email, username, password)
+                VALUES (%s, %s, %s)""",
             (email, username, password)
         )
-        # connection.commit()
 
-    def createDevice(self, username, name, type):
-        # cursor.execute(
-        self._insert(
-            "INSERT INTO devices (username, name, type) VALUES (%s, %s, %s)",
-            (username, name, type)
+    def getUser(self, username):
+        self._cursor.execute("""
+            SELECT json_agg(u) FROM (
+                SELECT
+                    username,
+                    email,
+                    apikey,
+                    secret_token,
+                    is_deleted,
+                    created_at,
+                    updated_at
+                FROM users
+                WHERE username = %s
+            ) u;
+        """, (username,) )
+        return self._cursor.fetchone()[0]
+
+    def createDevice(self, username, name, dtype):
+        self._insert("""
+            INSERT INTO devices (username, name, type)
+                VALUES (%s, %s, %s)""",
+            (username, name, dtype)
         )
-        # connection.commit()
 
     def getDevices(self, username):
         self._cursor.execute("""
             SELECT json_agg(d) FROM (
                 SELECT
-                    *,
+                    devices.*,
                     (
                         SELECT json_agg(s) FROM (
-                            SELECT * FROM sensors WHERE device_id=devices.id
+                            SELECT
+                                sensors.*
+                            FROM sensors
+                            WHERE device_id=devices.id
                         ) s
                     ) AS sensors
                 FROM devices
@@ -58,19 +76,20 @@ class Database(object):
         return self._cursor.fetchone()[0]
 
     def createLocation(self, username, name, geojson):
-        # cursor.execute("""
         self._insert("""
             INSERT INTO locations (username, name, geom)
                 VALUES (%s, %s, ST_SetSRID(ST_GeomFromGeoJSON(%s::TEXT),4326));
             """,
             (username, name, json.dumps(geojson))
         )
-        # connection.commit()
 
     def getLocations(self, username):
         self._cursor.execute("""
             SELECT
-                json_build_object('type', 'FeatureCollection', 'features', json_agg(c) ) AS geojson
+                json_build_object(
+                    'type', 'FeatureCollection',
+                    'features', json_agg(c)
+                ) AS geojson
             FROM (
                 SELECT
                     'Feature' AS type,
@@ -91,18 +110,16 @@ class Database(object):
         """, (username,) )
         return self._cursor.fetchone()[0]
 
-    def createSensor(self, device_id, name, type):
-        # cursor.execute(
-        self._insert(
-            "INSERT INTO sensors (device_id, name, type) VALUES (%s, %s, %s)",
-            (device_id, name, type)
+    def createSensor(self, device_id, name, stype):
+        self._insert("""
+            INSERT INTO sensors (device_id, name, type)
+                VALUES (%s, %s, %s)""",
+            (device_id, name, stype)
         )
-        # connection.commit()
 
     def insertMeasurement(self, sensor_id, location_id, key, value):
-        # cursor.execute(
-        self._insert(
-            "INSERT INTO measurements (sensor_id, location_id, key, value) VALUES (%s, %s, %s, %s)",
+        self._insert("""
+            INSERT INTO measurements (sensor_id, location_id, key, value)
+                VALUES (%s, %s, %s, %s)""",
             (sensor_id, location_id, key, value)
         )
-        # connection.commit()

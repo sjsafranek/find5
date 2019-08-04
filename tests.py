@@ -1,28 +1,54 @@
+import os
+
 from pyfind import database
 finddb = database.Database(
-    dbname = "find5",
-    dbuser = "findadmin",
+    dbname = "finddb",
+    dbuser = "finduser",
     dbpass = "dev"
 )
 
+username = 'admin'
+location_name = 'bedroom'
 
-# finddb.createUser('sjsafranek@gmail.com','admin','dev')
+# get user
+user = finddb.getUser(username)
+if not user:
+    print("Creating {0} username".format(username))
+    email = input("email: ")
+    while True:
+        password1 = input("password: ")
+        password2 = input("password(again): ")
+        if password1 == password2:
+            break
+        print("passwords do not match")
+    finddb.createUser(email, username, password1)
+    user = finddb.getUser(username)
 
-# finddb.createDevice('admin','lenovo_laptop','computer')
-devices = finddb.getDevices('admin')
-device = devices[0]
+user = user[0]
 
-# finddb.createLocation('admin', 'bedroom', {"type":"Point","coordinates":[-122.389664,45.434208]})
+# get device
+devicename = "{0}-{1}".format(os.getlogin(), os.uname().sysname)
+devices = finddb.getDevices(username)
+if not devices or 0 == len([device for device in devices if device['name'] == devicename]):
+    finddb.createDevice(username, devicename,'computer')
+    devices = finddb.getDevices(username)
 
+device = [device for device in devices if device['name'] == devicename][0]
+
+# get sensor
+if not device['sensors'] or 0 == len([s for s in device['sensors'] if 'wifi_card' == s['name']]):
+    finddb.createSensor(device['id'], 'wifi_card', 'wifi')
+    devices = finddb.getDevices(username)
+    device = [device for device in devices if device['name'] == devicename][0]
+
+sensor = [s for s in device['sensors'] if 'wifi_card' == s['name']][0]
+
+# get location
 locations = finddb.getLocations('admin')
-location = locations['features'][0]['properties']
+if not locations['features'] or 0 == len([l for l in locations['features'] if l['properties']['name'] == location_name]):
+    longitude = float(input("longitude: "))
+    latitude = float(input("latitude: "))
+    finddb.createLocation('admin', location_name, {"type":"Point","coordinates":[longitude, latitude]})
+    locations = finddb.getLocations('admin')
 
-# finddb.createSensor(device['id'], 'wifi_card', 'wifi')
-devices = finddb.getDevices('admin')
-device = devices[0]
-sensor = device['sensors'][0]
-
-
-
-print('location', location['id'])
-print('sensor', sensor['id'])
+location = [l for l in locations['features'] if l['properties']['name'] == location_name]

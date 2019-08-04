@@ -1,8 +1,8 @@
 #!/bin/bash
 
-sudo -u postgres psql -c "CREATE USER findadmin WITH PASSWORD 'dev'"
-sudo -u postgres psql -c "CREATE DATABASE find5"
-sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE find5 to findadmin"
-sudo -u postgres psql -c "ALTER USER findadmin WITH SUPERUSER"
+sudo -u postgres psql -c "CREATE USER finduser WITH PASSWORD 'dev'"
+sudo -u postgres psql -c "CREATE DATABASE finddb"
+sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE finddb to finduser"
+sudo -u postgres psql -c "ALTER USER finduser WITH SUPERUSER"
 
-PGPASSWORD=dev psql -d find5 -U findadmin -f database.sql
+PGPASSWORD=dev psql -d finddb -U finduser -f database.sql
