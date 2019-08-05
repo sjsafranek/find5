@@ -161,8 +161,7 @@ CREATE TABLE IF NOT EXISTS location_history (
     probability             REAL,
     created_at              TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (device_id) REFERENCES devices(id) ON DELETE CASCADE,
-    FOREIGN KEY (location_id) REFERENCES locations(id) ON DELETE CASCADE,
-    PRIMARY KEY(id)
+    FOREIGN KEY (location_id) REFERENCES locations(id) ON DELETE CASCADE
 );
 
 COMMENT ON TABLE location_history IS 'location history of devices';
