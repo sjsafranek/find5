@@ -20,12 +20,6 @@ CREATE EXTENSION postgis_topology;
 
 
 
--- TODO
--- add constrains for "name" columns
--- devices and sensors tables
--- locations table
-
-
 CREATE OR REPLACE FUNCTION update_modified_column()
 RETURNS TRIGGER AS $$
     BEGIN
@@ -102,7 +96,8 @@ CREATE TABLE IF NOT EXISTS devices (
     created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     is_deleted      BOOLEAN DEFAULT false,
-    FOREIGN KEY (username) REFERENCES users(username) ON DELETE CASCADE
+    FOREIGN KEY (username) REFERENCES users(username) ON DELETE CASCADE,
+    UNIQUE(username, name)
 );
 
 COMMENT ON TABLE devices IS 'device info for data collection';
@@ -131,7 +126,8 @@ CREATE TABLE IF NOT EXISTS locations (
     created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     is_deleted      BOOLEAN DEFAULT false,
-    FOREIGN KEY (username) REFERENCES users(username) ON DELETE CASCADE
+    FOREIGN KEY (username) REFERENCES users(username) ON DELETE CASCADE,
+    UNIQUE(username, name)
 );
 
 -- add geometry column
@@ -186,7 +182,8 @@ CREATE TABLE IF NOT EXISTS sensors (
     created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     is_deleted      BOOLEAN DEFAULT false,
-    FOREIGN KEY (device_id) REFERENCES devices(id) ON DELETE CASCADE
+    FOREIGN KEY (device_id) REFERENCES devices(id) ON DELETE CASCADE,
+    UNIQUE(device_id, name)
 );
 
 COMMENT ON TABLE sensors IS 'device sensor info';
