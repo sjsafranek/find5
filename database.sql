@@ -31,10 +31,10 @@ $$ language 'plpgsql';
 
 
 CREATE TABLE IF NOT EXISTS users (
-    email           VARCHAR,
-    username        VARCHAR NOT NULL UNIQUE,
-    apikey          VARCHAR NOT NULL UNIQUE DEFAULT md5(random()::text),
-    secret_token    VARCHAR NOT NULL DEFAULT md5(random()::text),
+    email           VARCHAR(50),
+    username        VARCHAR(50) NOT NULL UNIQUE,
+    apikey          VARCHAR(25) NOT NULL UNIQUE DEFAULT md5(random()::text),
+    secret_token    VARCHAR(25) NOT NULL DEFAULT md5(random()::text),
     created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     is_deleted      BOOLEAN DEFAULT false,
@@ -78,7 +78,7 @@ CREATE TRIGGER users_password_update
 
 
 CREATE TABLE IF NOT EXISTS devices (
-    id              VARCHAR NOT NULL UNIQUE DEFAULT md5(random()::text || now()::text)::uuid,
+    id              VARCHAR(36) NOT NULL UNIQUE DEFAULT md5(random()::text || now()::text)::uuid,
     name            VARCHAR(50),
     type            VARCHAR(50),
     username        VARCHAR(50),
@@ -98,11 +98,12 @@ CREATE TRIGGER device_update
 
 
 CREATE TABLE IF NOT EXISTS locations (
-    id              VARCHAR NOT NULL UNIQUE DEFAULT md5(random()::text || now()::text)::uuid,
-    name            VARCHAR,
-    username        VARCHAR,
+    id              VARCHAR(36) NOT NULL UNIQUE DEFAULT md5(random()::text || now()::text)::uuid,
+    name            VARCHAR(50),
+    username        VARCHAR(50),
     created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    is_deleted      BOOLEAN DEFAULT false,
     FOREIGN KEY (username) REFERENCES users(username) ON DELETE CASCADE
 );
 COMMENT ON TABLE locations IS 'location info';
@@ -120,27 +121,28 @@ CREATE TRIGGER locations_update
 
 CREATE TABLE IF NOT EXISTS location_history (
     id                      SERIAL PRIMARY KEY,
-    device_id               VARCHAR,
-    location_id             VARCHAR,
+    device_id               VARCHAR(36),
+    location_id             VARCHAR(36),
+    probability             REAL,
     created_at              TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (device_id) REFERENCES devices(id) ON DELETE CASCADE,
     FOREIGN KEY (location_id) REFERENCES locations(id) ON DELETE CASCADE
 );
-COMMENT ON TABLE location_history IS 'stores location history of devices';
+COMMENT ON TABLE location_history IS 'location history of devices';
 
 
 
 CREATE TABLE IF NOT EXISTS sensors (
-    id              VARCHAR NOT NULL UNIQUE DEFAULT md5(random()::text || now()::text)::uuid,
-    device_id       VARCHAR,
-    name            VARCHAR,
+    id              VARCHAR(36) NOT NULL UNIQUE DEFAULT md5(random()::text || now()::text)::uuid,
+    device_id       VARCHAR(36),
+    name            VARCHAR(50),
     type            VARCHAR(50),
     created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     is_deleted      BOOLEAN DEFAULT false,
     FOREIGN KEY (device_id) REFERENCES devices(id) ON DELETE CASCADE
 );
-COMMENT ON TABLE sensors IS 'stores device sensor info';
+COMMENT ON TABLE sensors IS 'device sensor info';
 
 DROP TRIGGER IF EXISTS sensors_update ON sensors;
 CREATE TRIGGER sensors_update
@@ -153,19 +155,40 @@ CREATE TRIGGER sensors_update
 
 CREATE TABLE IF NOT EXISTS measurements (
     id SERIAL PRIMARY KEY,
-    -- event_timestamp INTEGER,
-    -- id              PRIMARY KEY SERIAL AUTOINCRIMENT,
-    location_id     VARCHAR,
-    sensor_id       VARCHAR,
-    key             VARCHAR,
+    location_id     VARCHAR(36),
+    sensor_id       VARCHAR(36),
+    key             VARCHAR(50),
     value           DOUBLE PRECISION,
     created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    -- updated_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    -- is_deleted      BOOLEAN DEFAULT false,
     FOREIGN KEY (sensor_id) REFERENCES sensors(id) ON DELETE CASCADE,
     FOREIGN KEY (location_id) REFERENCES locations(id) ON DELETE CASCADE
 );
-COMMENT ON TABLE measurements IS 'stores measurements collected by device sensors at a given location';
+COMMENT ON TABLE measurements IS 'measurements collected by device sensors at a given location';
+
+
+CREATE OR REPLACE FUNCTION measurements_insert()
+RETURNS TRIGGER AS $$
+BEGIN
+    -- INSERT INTO location_history (device_id, location_id) VALUES (NEW.device_id, NEW.location_id);
+    INSERT INTO location_history (device_id, location_id)
+        SELECT
+            devices.id,
+            NEW.location_id
+        FROM sensors
+            INNER JOIN devices
+                ON devices.id = sensors.device_id
+            WHERE
+                sensors.id = NEW.sensor_id
+            ;
+	RETURN NEW;
+END;
+$$ language 'plpgsql';
+
+DROP TRIGGER IF EXISTS measurements_insert ON measurements;
+CREATE TRIGGER measurements_insert AFTER INSERT ON measurements FOR EACH ROW EXECUTE PROCEDURE measurements_insert();
+
+
+
 
 
 

@@ -51,7 +51,7 @@ class Database(object):
 
     def createDevice(self, username, name, dtype):
         self._insert("""
-            INSERT INTO devices (username, name, type)
+            INSERT INTO devices(username, name, type)
                 VALUES (%s, %s, %s)""",
             (username, name, dtype)
         )
