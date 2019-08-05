@@ -1,6 +1,7 @@
 package database
 
 import (
+	"errors"
 	"time"
 )
 
@@ -12,7 +13,7 @@ type Device struct {
 	IsDeleted bool      `json:"is_deleted"`
 	CreatedAt time.Time `json:"created_at,string"`
 	UpdatedAt time.Time `json:"updated_at,string"`
-	Sensors   []Sensor  `json:"sensors"`
+	Sensors   []*Sensor `json:"sensors"`
 	db        *Database `json:"-"`
 	user      *User     `json:"-"`
 }
@@ -56,4 +57,21 @@ func (self *Device) Update() error {
 				is_deleted=$3
 			WHERE id=$4;`,
 		self.Name, self.Type, self.IsDeleted, self.Id)
+}
+
+func (self *Device) GetSensorByName(sensor_name string) (*Sensor, error) {
+	for _, sensor := range self.Sensors {
+		if sensor.Name == sensor_name {
+			return sensor, nil
+		}
+	}
+	return &Sensor{}, errors.New("Device not found")
+}
+func (self *Device) GetSensorById(sensor_id string) (*Sensor, error) {
+	for _, sensor := range self.Sensors {
+		if sensor.Id == sensor_id {
+			return sensor, nil
+		}
+	}
+	return &Sensor{}, errors.New("Device not found")
 }

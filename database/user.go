@@ -147,14 +147,10 @@ func (self *User) GetDevices() ([]*Device, error) {
 
 		// add database to objects
 		for i := range devices {
-			// devices[i].SetDatabase(self.db)
-			// devices[i].SetUser(self)
 			devices[i].db = self.db
 			devices[i].user = self
 			if nil != devices[i].Sensors {
 				for j := range devices[i].Sensors {
-					// devices[i].Sensors[j].SetDatabase(self.db)
-					// devices[i].Sensors[j].SetDevice(devices[i])
 					devices[i].Sensors[j].db = self.db
 					devices[i].Sensors[j].device = devices[i]
 				}
@@ -165,6 +161,31 @@ func (self *User) GetDevices() ([]*Device, error) {
 	})
 
 	return devices, err
+}
+
+func (self *User) GetDeviceByName(device_name string) (*Device, error) {
+	devices, err := self.GetDevices()
+	if nil != err {
+		return &Device{}, err
+	}
+	for _, device := range devices {
+		if device.Name == device_name {
+			return device, nil
+		}
+	}
+	return &Device{}, errors.New("Device not found")
+}
+func (self *User) GetDeviceById(device_id string) (*Device, error) {
+	devices, err := self.GetDevices()
+	if nil != err {
+		return &Device{}, err
+	}
+	for _, device := range devices {
+		if device.Id == device_id {
+			return device, nil
+		}
+	}
+	return &Device{}, errors.New("Device not found")
 }
 
 func (self *User) CreateLocation(lname string, lng, lat float64) error {

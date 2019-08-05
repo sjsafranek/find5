@@ -20,6 +20,12 @@ CREATE EXTENSION postgis_topology;
 
 
 
+-- TODO
+-- add constrains for "name" columns
+-- devices and sensors tables
+-- locations table
+
+
 CREATE OR REPLACE FUNCTION update_modified_column()
 RETURNS TRIGGER AS $$
     BEGIN

@@ -64,34 +64,34 @@ func main() {
 
 	// variables
 	var user *database.User
-	var devices []*database.Device
+	// var devices []*database.Device
 	var err error
 
 	// setup
-	user, err = db.CreateUser("sjsafranek@gmail.com", "stefan", "dev")
-	if nil != err {
-		panic(err)
-	}
-
-	err = user.CreateDevice("laptop", "computer")
-	if nil != err {
-		panic(err)
-	}
-
-	err = user.CreateLocation("office_desk", 0, 0)
-	if nil != err {
-		panic(err)
-	}
-
-	devices, err = user.GetDevices()
-	if nil != err {
-		panic(err)
-	}
-
-	err = devices[0].CreateSensor("wifi_card", "mac_addresses")
-	if nil != err {
-		panic(err)
-	}
+	// user, err = db.CreateUser("admin@find.com", "admin_user", "dev")
+	// if nil != err {
+	// 	panic(err)
+	// }
+	//
+	// err = user.CreateDevice("laptop", "computer")
+	// if nil != err {
+	// 	panic(err)
+	// }
+	//
+	// err = user.CreateLocation("office_desk", 0, 0)
+	// if nil != err {
+	// 	panic(err)
+	// }
+	//
+	// devices, err = user.GetDevices()
+	// if nil != err {
+	// 	panic(err)
+	// }
+	//
+	// err = devices[0].CreateSensor("wifi_card", "mac_addresses")
+	// if nil != err {
+	// 	panic(err)
+	// }
 
 	// test
 	user, err = db.GetUserFromUsername("stefan")
@@ -99,7 +99,7 @@ func main() {
 		panic(err)
 	}
 
-	devices, err = user.GetDevices()
+	device, err := user.GetDeviceByName("laptop")
 	if nil != err {
 		panic(err)
 	}
@@ -110,8 +110,19 @@ func main() {
 	}
 	location_id := fc.Features[0].Properties["id"].(string)
 
-	err = devices[0].Sensors[0].RecordMeasurement(location_id, "test", 23)
+	sensor, err := device.GetSensorByName("wifi_card")
 	if nil != err {
 		panic(err)
 	}
+
+	err = sensor.RecordMeasurementAtLocation(location_id, "test", 23)
+	if nil != err {
+		panic(err)
+	}
+
+	err = sensor.RecordMeasurement("test", 123)
+	if nil != err {
+		panic(err)
+	}
+
 }

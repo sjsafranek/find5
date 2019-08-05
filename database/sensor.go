@@ -16,22 +16,16 @@ type Sensor struct {
 	device    *Device   `json:"-"`
 }
 
-func (self *Sensor) RecordMeasurement(location_id, key string, value float64) error {
+func (self *Sensor) RecordMeasurementAtLocation(location_id, key string, value float64) error {
 	return self.db.Insert(`
 		INSERT INTO measurements (sensor_id, location_id, key, value)
 			VALUES ($1, $2, $3, $4)`, self.Id, location_id, key, value)
+}
 
-	// HANDLED BY DATABASE TRIGGER
-	// err := self.db.Insert(`
-	// 	INSERT INTO measurements (sensor_id, location_id, key, value)
-	// 		VALUES ($1, $2, $3, $4)`, self.Id, location_id, key, value)
-
-	// if nil != err {
-	// 	return err
-	// }
-
-	// add location history
-	// return self.device.SetLocation(location_id)
+func (self *Sensor) RecordMeasurement(key string, value float64) error {
+	return self.db.Insert(`
+		INSERT INTO measurements (sensor_id, key, value)
+			VALUES ($1, $2, $3)`, self.Id, key, value)
 }
 
 // SetPassword sets password
