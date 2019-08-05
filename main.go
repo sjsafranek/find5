@@ -67,30 +67,30 @@ func main() {
 	var err error
 
 	// setup
-	user, err = db.CreateUser("admin@find.com", "admin_user", "dev")
-	if nil != err {
-		panic(err)
-	}
-
-	err = user.CreateDevice("laptop", "computer")
-	if nil != err {
-		panic(err)
-	}
-
-	err = user.CreateLocation("office_desk", 0, 0)
-	if nil != err {
-		panic(err)
-	}
-
-	devices, err := user.GetDevices()
-	if nil != err {
-		panic(err)
-	}
-
-	err = devices[0].CreateSensor("wifi_card", "mac_addresses")
-	if nil != err {
-		panic(err)
-	}
+	// user, err = db.CreateUser("admin@find.com", "admin_user", "dev")
+	// if nil != err {
+	// 	panic(err)
+	// }
+	//
+	// err = user.CreateDevice("laptop", "computer")
+	// if nil != err {
+	// 	panic(err)
+	// }
+	//
+	// err = user.CreateLocation("office_desk", 0, 0)
+	// if nil != err {
+	// 	panic(err)
+	// }
+	//
+	// devices, err := user.GetDevices()
+	// if nil != err {
+	// 	panic(err)
+	// }
+	//
+	// err = devices[0].CreateSensor("wifi_card", "mac_addresses")
+	// if nil != err {
+	// 	panic(err)
+	// }
 
 	// test
 	user, err = db.GetUserFromUsername("admin_user")
