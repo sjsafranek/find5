@@ -62,31 +62,53 @@ func main() {
 	dbConnectionString := fmt.Sprintf("%v://%v:%v@%v:%v/%v?sslmode=disable", DATABASE_ENGINE, DATABASE_USERNAME, DATABASE_PASSWORD, DATABASE_HOST, DATABASE_PORT, DATABASE_DATABASE)
 	db := database.New(dbConnectionString)
 
-	user, err := db.GetUserFromUsername("testuser1")
+	// variables
+	var user *database.User
+	var devices []*database.Device
+	var err error
+
+	// setup
+	user, err = db.CreateUser("sjsafranek@gmail.com", "stefan", "dev")
 	if nil != err {
 		panic(err)
 	}
 
-	devices, err := user.GetDevices()
+	err = user.CreateDevice("laptop", "computer")
 	if nil != err {
 		panic(err)
 	}
 
-	// err = user.CreateLocation("bedroom", 0, 0)
-	// if nil != err {
-	// 	panic(err)
-	// }
+	err = user.CreateLocation("office_desk", 0, 0)
+	if nil != err {
+		panic(err)
+	}
+
+	devices, err = user.GetDevices()
+	if nil != err {
+		panic(err)
+	}
+
+	err = devices[0].CreateSensor("wifi_card", "mac_addresses")
+	if nil != err {
+		panic(err)
+	}
+
+	// test
+	user, err = db.GetUserFromUsername("stefan")
+	if nil != err {
+		panic(err)
+	}
+
+	devices, err = user.GetDevices()
+	if nil != err {
+		panic(err)
+	}
 
 	fc, err := user.GetLocations()
 	if nil != err {
 		panic(err)
 	}
 	location_id := fc.Features[0].Properties["id"].(string)
-
-	// err = devices[0].CreateSensor("wifi_card", "wifi")
-	// if nil != err {
-	// 	panic(err)
-	// }
 
 	err = devices[0].Sensors[0].RecordMeasurement(location_id, "test", 23)
 	if nil != err {
