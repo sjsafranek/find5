@@ -65,7 +65,7 @@ func (self *Device) GetSensorByName(sensor_name string) (*Sensor, error) {
 			return sensor, nil
 		}
 	}
-	return &Sensor{}, errors.New("Device not found")
+	return &Sensor{}, errors.New("Not found")
 }
 func (self *Device) GetSensorById(sensor_id string) (*Sensor, error) {
 	for _, sensor := range self.Sensors {
@@ -73,5 +73,5 @@ func (self *Device) GetSensorById(sensor_id string) (*Sensor, error) {
 			return sensor, nil
 		}
 	}
-	return &Sensor{}, errors.New("Device not found")
+	return &Sensor{}, errors.New("Not found")
 }

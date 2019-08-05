@@ -3,11 +3,11 @@ package database
 import (
 	// "context"
 	"database/sql"
+	"errors"
 	"fmt"
-	// "strings"
+	"time"
 
 	_ "github.com/lib/pq"
-
 	"github.com/sjsafranek/ligneous"
 )
 
@@ -16,28 +16,22 @@ var (
 )
 
 func New(connString string) *Database {
-	return &Database{connString: connString}
+	db, err := sql.Open("postgres", connString)
+	if nil != err {
+		panic(err)
+	}
+	db.SetMaxIdleConns(6)
+	db.SetConnMaxLifetime(30 * time.Minute)
+	return &Database{connString: connString, db: db}
 }
 
 type Database struct {
 	connString string
-}
-
-func (self *Database) GetConnection() (*sql.DB, error) {
-	// TODO
-	//  - use connection pool
-	return sql.Open("postgres", self.connString)
+	db         *sql.DB
 }
 
 func (self *Database) Exec(clbk func(*sql.DB) error) error {
-	// TODO
-	//  - use connection pool
-	db, err := sql.Open("postgres", self.connString)
-	defer db.Close()
-	if nil != err {
-		return err
-	}
-	return clbk(db)
+	return clbk(self.db)
 }
 
 func (self *Database) CreateUser(email, username, password string) (*User, error) {
@@ -60,13 +54,8 @@ func (self *Database) GetUserFromApikey(apikey string) (*User, error) {
 
 func (self *Database) getUser(column string, value string) (*User, error) {
 	var user User
-
-	db, err := self.GetConnection()
-	if nil != err {
-		return &User{}, err
-	}
-
-	query := fmt.Sprintf(`
+	return &user, self.Exec(func(db *sql.DB) error {
+		query := fmt.Sprintf(`
 				SELECT row_to_json(u)
 					FROM (
 					    SELECT
@@ -82,57 +71,53 @@ func (self *Database) getUser(column string, value string) (*User, error) {
 						AND is_deleted = false
 					) AS u ;`, column)
 
-	rows, err := db.Query(query, value)
-	if nil != err {
-		return &user, err
-	}
+		rows, err := db.Query(query, value)
+		if nil != err {
+			return err
+		}
 
-	c := 0
-	for rows.Next() {
-		var temp string
-		rows.Scan(&temp)
-		user.Unmarshal(temp)
-		c++
-	}
+		c := 0
+		for rows.Next() {
+			var temp string
+			rows.Scan(&temp)
+			user.Unmarshal(temp)
+			c++
+		}
 
-	if 0 == c {
-		return &user, fmt.Errorf("Not found")
-	}
+		if 0 == c {
+			return errors.New("Not found")
+		}
 
-	user.db = self
-	return &user, err
+		user.db = self
+		return nil
+	})
 }
 
 func (self *Database) Insert(query string, args ...interface{}) error {
+	return self.Exec(func(db *sql.DB) error {
+		tx, err := db.Begin()
+		if err != nil {
+			tx.Rollback()
+			logger.Error(err)
+			return err
+		}
 
-	db, err := self.GetConnection()
-	if nil != err {
-		return err
-	}
-	defer db.Close()
+		stmt, err := tx.Prepare(query)
+		if err != nil {
+			tx.Rollback()
+			logger.Error(err)
+			return err
+		}
+		defer stmt.Close()
 
-	tx, err := db.Begin()
-	if err != nil {
-		tx.Rollback()
-		logger.Error(err)
-		return err
-	}
+		_, err = stmt.Exec(args...)
+		if nil != err {
+			tx.Rollback()
+			logger.Error(err)
+			return err
+		}
 
-	stmt, err := tx.Prepare(query)
-	if err != nil {
-		tx.Rollback()
-		logger.Error(err)
-		return err
-	}
-	defer stmt.Close()
-
-	_, err = stmt.Exec(args...)
-	if nil != err {
-		tx.Rollback()
-		logger.Error(err)
-		return err
-	}
-
-	tx.Commit()
-	return nil
+		tx.Commit()
+		return nil
+	})
 }

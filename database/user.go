@@ -60,10 +60,8 @@ func (self *User) Unmarshal(data string) error {
 
 // IsPassword checks if provided password/hash matches database record
 func (self *User) IsPassword(password string) (bool, error) {
-
 	match := false
-
-	err := self.db.Exec(func(conn *sql.DB) error {
+	return match, self.db.Exec(func(conn *sql.DB) error {
 		rows, err := conn.Query(`
 		SELECT
 			-- back door for using hashed password for login
@@ -84,10 +82,8 @@ func (self *User) IsPassword(password string) (bool, error) {
 			return nil
 		}
 
-		return errors.New("User not found")
+		return errors.New("Not found")
 	})
-
-	return match, err
 }
 
 func (self *User) CreateDevice(dname, dtype string) error {
@@ -97,10 +93,8 @@ func (self *User) CreateDevice(dname, dtype string) error {
 }
 
 func (self *User) GetDevices() ([]*Device, error) {
-
 	var devices []*Device
-
-	err := self.db.Exec(func(conn *sql.DB) error {
+	return devices, self.db.Exec(func(conn *sql.DB) error {
 
 		rows, err := conn.Query(`
 		SELECT json_agg(d) FROM (
@@ -159,8 +153,6 @@ func (self *User) GetDevices() ([]*Device, error) {
 
 		return nil
 	})
-
-	return devices, err
 }
 
 func (self *User) GetDeviceByName(device_name string) (*Device, error) {
@@ -185,7 +177,7 @@ func (self *User) GetDeviceById(device_id string) (*Device, error) {
 			return device, nil
 		}
 	}
-	return &Device{}, errors.New("Device not found")
+	return &Device{}, errors.New("Not found")
 }
 
 func (self *User) CreateLocation(lname string, lng, lat float64) error {
@@ -197,10 +189,8 @@ func (self *User) CreateLocation(lname string, lng, lat float64) error {
 }
 
 func (self *User) GetLocations() (*geojson.FeatureCollection, error) {
-
 	var layer geojson.FeatureCollection
-
-	err := self.db.Exec(func(conn *sql.DB) error {
+	return &layer, self.db.Exec(func(conn *sql.DB) error {
 
 		rows, err := conn.Query(`
 		SELECT
@@ -243,6 +233,4 @@ func (self *User) GetLocations() (*geojson.FeatureCollection, error) {
 
 		return nil
 	})
-
-	return &layer, err
 }
