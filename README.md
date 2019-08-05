@@ -1,4 +1,4 @@
-# find5
+# FIND 5
 F.I.N.D. version 5
 
 ## Database setup
@@ -21,3 +21,13 @@ Usage of ./find:
   -port int
     	Server port (default 5555)
 ```
+
+### System Objects
+There are several types objects with in the FIND system: `Users`, `Devices`, `Locations`, `Sensors`, and `Measurements`. Each of these objects share relationship(s) with other object types. The basic relationship structure is as follows:
+
+ - Users
+   - Locations
+   - Devices
+     - Location History
+     - Sensors
+       - Measurements
