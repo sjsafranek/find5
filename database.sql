@@ -206,7 +206,7 @@ CREATE TRIGGER sensors_update
 -- @description stores measurements collected by sensors at a given location
 CREATE TABLE IF NOT EXISTS measurements (
     id SERIAL PRIMARY KEY,
-    location_id     VARCHAR(36) REFERENCES locations(id),
+    location_id     VARCHAR(36) REFERENCES locations(id) ON DELETE CASCADE,
     sensor_id       VARCHAR(36),
     key             VARCHAR(50),
     value           DOUBLE PRECISION,
