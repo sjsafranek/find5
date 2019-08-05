@@ -1,5 +1,5 @@
 # FIND 5
-F.I.N.D. version 5
+F.I.N.D. Version 5
 
 ## Database setup
 The `bootstrapper.sh` script will automatically create a PostGreSQL database and user for the FIND system. The database connection parameters can also be set via command line arguments:
@@ -31,3 +31,5 @@ There are several types objects with in the FIND system: `Users`, `Devices`, `Lo
      - Location History
      - Sensors
        - Measurements
+
+![](docs/database_diagram.png)
