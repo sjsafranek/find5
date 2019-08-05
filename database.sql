@@ -97,7 +97,8 @@ CREATE TABLE IF NOT EXISTS devices (
     updated_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     is_deleted      BOOLEAN DEFAULT false,
     FOREIGN KEY (username) REFERENCES users(username) ON DELETE CASCADE,
-    UNIQUE(username, name)
+    UNIQUE(username, name),
+    PRIMARY KEY(id)
 );
 
 COMMENT ON TABLE devices IS 'device info for data collection';
@@ -127,7 +128,8 @@ CREATE TABLE IF NOT EXISTS locations (
     updated_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     is_deleted      BOOLEAN DEFAULT false,
     FOREIGN KEY (username) REFERENCES users(username) ON DELETE CASCADE,
-    UNIQUE(username, name)
+    UNIQUE(username, name),
+    PRIMARY KEY(id)
 );
 
 -- add geometry column
@@ -159,7 +161,8 @@ CREATE TABLE IF NOT EXISTS location_history (
     probability             REAL,
     created_at              TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (device_id) REFERENCES devices(id) ON DELETE CASCADE,
-    FOREIGN KEY (location_id) REFERENCES locations(id) ON DELETE CASCADE
+    FOREIGN KEY (location_id) REFERENCES locations(id) ON DELETE CASCADE,
+    PRIMARY KEY(id)
 );
 
 COMMENT ON TABLE location_history IS 'location history of devices';
@@ -183,7 +186,8 @@ CREATE TABLE IF NOT EXISTS sensors (
     updated_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     is_deleted      BOOLEAN DEFAULT false,
     FOREIGN KEY (device_id) REFERENCES devices(id) ON DELETE CASCADE,
-    UNIQUE(device_id, name)
+    UNIQUE(device_id, name),
+    PRIMARY KEY(id)
 );
 
 COMMENT ON TABLE sensors IS 'device sensor info';
@@ -205,7 +209,7 @@ CREATE TRIGGER sensors_update
 -- @table measurements
 -- @description stores measurements collected by sensors at a given location
 CREATE TABLE IF NOT EXISTS measurements (
-    id SERIAL PRIMARY KEY,
+    id              SERIAL PRIMARY KEY,
     location_id     VARCHAR(36) REFERENCES locations(id) ON DELETE CASCADE,
     sensor_id       VARCHAR(36),
     key             VARCHAR(50),
