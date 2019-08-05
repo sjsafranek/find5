@@ -125,4 +125,18 @@ func main() {
 		panic(err)
 	}
 
+	data := make(map[string]float64)
+	data["thing1"] = 0.0
+	data["thing2"] = 4.2
+	data["thing3"] = 66.6
+	err = sensor.RecordMeasurementsAtLocation(location_id, data)
+	if nil != err {
+		panic(err)
+	}
+
+	err = sensor.RecordMeasurements(data)
+	if nil != err {
+		panic(err)
+	}
+
 }

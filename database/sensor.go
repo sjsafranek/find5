@@ -1,6 +1,8 @@
 package database
 
 import (
+	"fmt"
+	"strings"
 	"time"
 )
 
@@ -26,6 +28,42 @@ func (self *Sensor) RecordMeasurement(key string, value float64) error {
 	return self.db.Insert(`
 		INSERT INTO measurements (sensor_id, key, value)
 			VALUES ($1, $2, $3)`, self.Id, key, value)
+}
+
+func (self *Sensor) RecordMeasurementsAtLocation(location_id string, data map[string]float64) error {
+	sqlStr := `INSERT INTO measurements (sensor_id, location_id, key, value) VALUES `
+	values := []interface{}{}
+
+	for k, v := range data {
+		sqlStr += "(?,?,?,?),"
+		values = append(values, self.Id, location_id, k, v)
+	}
+
+	sqlStr = strings.TrimSuffix(sqlStr, ",")
+	count := strings.Count(sqlStr, "?")
+	for m := 1; m <= count; m++ {
+		sqlStr = strings.Replace(sqlStr, "?", fmt.Sprintf("$%v", m), 1)
+	}
+
+	return self.db.Insert(sqlStr, values...)
+}
+
+func (self *Sensor) RecordMeasurements(data map[string]float64) error {
+	sqlStr := `INSERT INTO measurements (sensor_id, key, value) VALUES `
+	values := []interface{}{}
+
+	for k, v := range data {
+		sqlStr += "(?,?,?),"
+		values = append(values, self.Id, k, v)
+	}
+
+	sqlStr = strings.TrimSuffix(sqlStr, ",")
+	count := strings.Count(sqlStr, "?")
+	for m := 1; m <= count; m++ {
+		sqlStr = strings.Replace(sqlStr, "?", fmt.Sprintf("$%v", m), 1)
+	}
+
+	return self.db.Insert(sqlStr, values...)
 }
 
 // SetPassword sets password

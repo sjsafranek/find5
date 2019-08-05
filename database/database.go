@@ -5,7 +5,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	"time"
+	// "time"
 
 	_ "github.com/lib/pq"
 	"github.com/sjsafranek/ligneous"
@@ -20,14 +20,15 @@ func New(connString string) *Database {
 	if nil != err {
 		panic(err)
 	}
+	// db.SetMaxOpenConns(6) // <- default is unlimited)
 	db.SetMaxIdleConns(6)
-	db.SetConnMaxLifetime(30 * time.Minute)
+	// db.SetConnMaxLifetime(2 * time.Minute)
 	return &Database{connString: connString, db: db}
 }
 
 type Database struct {
 	connString string
-	db         *sql.DB
+	db         *sql.DB // <- built in connection pool
 }
 
 func (self *Database) Exec(clbk func(*sql.DB) error) error {
