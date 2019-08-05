@@ -203,14 +203,12 @@ CREATE TRIGGER sensors_update
 -- @description stores measurements collected by sensors at a given location
 CREATE TABLE IF NOT EXISTS measurements (
     id SERIAL PRIMARY KEY,
-    -- location_id     VARCHAR(36),
     location_id     VARCHAR(36) REFERENCES locations(id),
     sensor_id       VARCHAR(36),
     key             VARCHAR(50),
     value           DOUBLE PRECISION,
     created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (sensor_id) REFERENCES sensors(id) ON DELETE CASCADE
-    -- FOREIGN KEY (location_id) REFERENCES locations(id) ON DELETE CASCADE
 );
 
 COMMENT ON TABLE measurements IS 'measurements collected by device sensors at a given location';
@@ -218,7 +216,7 @@ COMMENT ON COLUMN measurements.sensor_id IS 'sensor that created the measurement
 COMMENT ON COLUMN measurements.location_id IS 'location where the measurement was made';
 
 -- @method measurements__location_history__insert
--- @description stores location_history record for device making the measurement
+-- @description stores location_history record for sensor's device
 CREATE OR REPLACE FUNCTION measurements__location_history__insert()
 RETURNS TRIGGER AS $$
 BEGIN
