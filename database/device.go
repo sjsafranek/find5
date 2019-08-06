@@ -73,6 +73,10 @@ func (self *Device) Unmarshal(data string) error {
 	return json.Unmarshal([]byte(data), self)
 }
 
+func (self *Device) GetSensors() ([]*Sensor, error) {
+	return self.Sensors, nil
+}
+
 func (self *Device) GetSensorByName(sensor_name string) (*Sensor, error) {
 	for _, sensor := range self.Sensors {
 		if sensor.Name == sensor_name {

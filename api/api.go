@@ -15,10 +15,6 @@ var (
 	logger = ligneous.AddLogger("api", "trace", "./log/find5")
 )
 
-type User interface {
-	SetPassword(string) error
-}
-
 func New(dbConnStr string, redisAddr string) *Api {
 	return &Api{
 		db: database.New(dbConnStr),
@@ -37,126 +33,13 @@ type Api struct {
 	cache *ccache.LayeredCache
 }
 
-func (self *Api) Execute(query *Query) (string, error) {
-	switch query.Method {
-
-	case "ping":
-		return `{"status":"ok","message":"pong"}`, nil
-
-	case "create_user":
-		if "" == query.Email || "" == query.Username {
-			err := errors.New("Missing parameters")
-			return fmt.Sprintf(`{"status":"error","error":"%v"}`, err.Error()), err
-		}
-
-		user, err := self.CreateUser(query.Email, query.Username, query.Password)
-		if nil != err {
-			return fmt.Sprintf(`{"status":"error","error":"%v"}`, err.Error()), err
-		}
-
-		data, err := user.Marshal()
-		if nil != err {
-			return fmt.Sprintf(`{"status":"error","error":"%v"}`, err.Error()), err
-		}
-		return fmt.Sprintf(`{"status":"ok","data":{"user":%v}}`, data), nil
-
-	case "get_users":
-		return `{"status":"ok","message":"TODO"}`, nil
-
-	case "get_user":
-		user, err := self.fetchUser(query)
-		if nil != err {
-			return fmt.Sprintf(`{"status":"error","error":"%v"}`, err.Error()), err
-		}
-
-		data, err := user.Marshal()
-		if nil != err {
-			return fmt.Sprintf(`{"status":"error","error":"%v"}`, err.Error()), err
-		}
-
-		return fmt.Sprintf(`{"status":"ok","data":{"user":%v}}`, data), nil
-
-	case "delete_user":
-		user, err := self.fetchUser(query)
-		if nil != err {
-			return fmt.Sprintf(`{"status":"error","error":"%v"}`, err.Error()), err
-		}
-
-		err = user.Delete()
-		if nil != err {
-			return fmt.Sprintf(`{"status":"error","error":"%v"}`, err.Error()), err
-		}
-
-		return `{"status":"ok"}`, nil
-
-	case "set_password":
-		user, err := self.fetchUser(query)
-		if nil != err {
-			return fmt.Sprintf(`{"status":"error","error":"%v"}`, err.Error()), err
-		}
-
-		// TODO require to not be empty string...
-		err = user.SetPassword(query.Password)
-		if nil != err {
-			return fmt.Sprintf(`{"status":"error","error":"%v"}`, err.Error()), err
-		}
-		return `{"status":"ok"}`, nil
-
-	case "create_device":
-		user, err := self.fetchUser(query)
-		if nil != err {
-			return fmt.Sprintf(`{"status":"error","error":"%v"}`, err.Error()), err
-		}
-
-		device, err := user.CreateDevice(query.Name, query.Type)
-		if nil != err {
-			return fmt.Sprintf(`{"status":"error","error":"%v"}`, err.Error()), err
-		}
-
-		data, err := device.Marshal()
-		if nil != err {
-			return fmt.Sprintf(`{"status":"error","error":"%v"}`, err.Error()), err
-		}
-
-		return fmt.Sprintf(`{"status":"ok","data":{"device":%v}}`, data), nil
-
-	case "get_devices":
-		return `{"status":"ok","message":"TODO"}`, nil
-
-	case "get_device":
-		return `{"status":"ok","message":"TODO"}`, nil
-
-	case "create_sensor":
-		return `{"status":"ok","message":"TODO"}`, nil
-
-	case "get_sensors":
-		return `{"status":"ok","message":"TODO"}`, nil
-
-	case "get_sensor":
-		return `{"status":"ok","message":"TODO"}`, nil
-
-	case "get_locations":
-		return `{"status":"ok","message":"TODO"}`, nil
-
-	case "create_location":
-		return `{"status":"ok","message":"TODO"}`, nil
-
-	case "record_data":
-		return `{"status":"ok","message":"TODO"}`, nil
-
-	default:
-		return `{"status":"error","error":"method not found"}`, nil
-
-	}
-}
-
-func (self *Api) fetchUser(query *Query) (*database.User, error) {
+func (self *Api) fetchUser(request *Request) (*database.User, error) {
 	var user *database.User
 	var err error
-	if "" != query.Apikey {
-		user, err = self.GetUserByApikey(query.Apikey)
-	} else if "" != query.Username {
-		user, err = self.GetUserByUsername(query.Username)
+	if "" != request.Apikey {
+		user, err = self.GetUserByApikey(request.Apikey)
+	} else if "" != request.Username {
+		user, err = self.GetUserByUsername(request.Username)
 	} else {
 		err = errors.New("Missing parameters")
 	}
@@ -196,62 +79,273 @@ func (self *Api) GetUserByApikey(apikey string) (*database.User, error) {
 }
 
 // fetch device
-func (self *Api) fetchDeviceById(apikey, device_id string) (*database.Device, error) {
+func (self *Api) fetchDevice(request *Request) (*database.Device, error) {
 	var device *database.Device
 
-	item := self.cache.Get("device_id", device_id)
+	item := self.cache.Get("device_id", request.DeviceId)
 	if nil != item {
 		device = item.Value().(*database.Device)
 	} else {
-		user, err := self.GetUserByApikey(apikey)
+
+		user, err := self.fetchUser(request)
 		if nil != err {
 			return device, err
 		}
 
-		device, err := user.GetDeviceById(device_id)
+		device, err = user.GetDeviceById(request.DeviceId)
 		if nil != err {
 			return device, err
 		}
 
 		// cache device device_id pair
-		self.cache.Set("device", device_id, device, 5*time.Minute)
+		self.cache.Set("device", request.DeviceId, device, 5*time.Minute)
 	}
 
 	return device, nil
 }
 
+//
+func (self *Api) fetchSensor(request *Request) (*database.Sensor, error) {
+	var sensor *database.Sensor
+	device, err := self.fetchDevice(request)
+	if nil != err {
+		return sensor, nil
+	}
+	return device.GetSensorById(request.SensorId)
+}
+
 // RecordMeasurements
-func (self *Api) RecordMeasurements(apikey, device_id string, data map[string]map[string]float64) error {
-	device, err := self.fetchDeviceById(apikey, device_id)
+func (self *Api) RecordMeasurements(request *Request) error {
+	device, err := self.fetchDevice(request)
 	if nil != err {
 		return err
 	}
 
-	for sensor_id := range data {
+	for sensor_id := range request.Data {
 		sensor, err := device.GetSensorById(sensor_id)
 		if nil != err {
 			return err
 		}
-		sensor.RecordMeasurements(data[sensor_id])
+		if "" != request.LocationId {
+			sensor.RecordMeasurementsAtLocation(request.LocationId, request.Data[sensor_id])
+		} else {
+			sensor.RecordMeasurements(request.Data[sensor_id])
+		}
 	}
 
 	return nil
 }
 
-// RecordMeasurementsAtLocation
-func (self *Api) RecordMeasurementsAtLocation(apikey, device_id, location_id string, data map[string]map[string]float64) error {
-	device, err := self.fetchDeviceById(apikey, device_id)
-	if nil != err {
-		return err
-	}
+func (self *Api) Do(request *Request) (*Response, error) {
+	var response Response
 
-	for sensor_id := range data {
-		sensor, err := device.GetSensorById(sensor_id)
-		if nil != err {
-			return err
+	response.Status = "ok"
+
+	err := func() error {
+		switch request.Method {
+
+		case "ping":
+			// {"method":"ping"}
+			response.Message = "pong"
+			return nil
+
+		case "create_user":
+			// {"method":"create_user","username": "admin_user" "email":"admin@email.com","password":"1234"}
+			if "" == request.Email || "" == request.Username {
+				return errors.New("Missing parameters")
+			}
+
+			user, err := self.CreateUser(request.Email, request.Username, request.Password)
+			if nil != err {
+				return err
+			}
+
+			response.Data.User = user
+			return nil
+
+		case "get_users":
+			// {"method":"get_users"}
+			users, err := self.db.GetUsers()
+			if nil != err {
+				return err
+			}
+			response.Data.Users = users
+			return nil
+
+		case "get_user":
+			// {"method":"get_user","username":"admin_user"}
+			// {"method":"get_user","apikey":"<apikey>"}
+			user, err := self.fetchUser(request)
+			if nil != err {
+				return err
+			}
+
+			response.Data.User = user
+			return nil
+
+		case "delete_user":
+			// {"method":"delete_user","username":"admin_user"}
+			// {"method":"delete_user","apikey":"<apikey>"}
+			user, err := self.fetchUser(request)
+			if nil != err {
+				return err
+			}
+
+			err = user.Delete()
+			if nil != err {
+				return err
+			}
+
+			return nil
+
+		case "set_password":
+			// {"method":"set_password","username":"admin_user","password":"1234"}
+			// {"method":"set_password","apikey":"<apikey>","password":"1234"}
+			user, err := self.fetchUser(request)
+			if nil != err {
+				return err
+			}
+
+			// TODO require to not be empty string...
+			err = user.SetPassword(request.Password)
+			if nil != err {
+				return err
+			}
+
+			return nil
+
+		case "create_device":
+			// {"method":"create_device","username":"admin_user","name":"laptop","type":"computer"}
+			// {"method":"create_device","apikey":"<apikey>","name":"laptop","type":"computer"}
+			user, err := self.fetchUser(request)
+			if nil != err {
+				return err
+			}
+
+			device, err := user.CreateDevice(request.Name, request.Type)
+			if nil != err {
+				return err
+			}
+
+			// cache device
+			self.cache.Set("device", device.Id, device, 5*time.Minute)
+
+			response.Data.Device = device
+			return nil
+
+		case "get_devices":
+			// {"method":"get_devices","username":"admin_user"}
+			// {"method":"get_devices","apikey":"<apikey>"}
+			user, err := self.fetchUser(request)
+			if nil != err {
+				return err
+			}
+
+			devices, err := user.GetDevices()
+			if nil != err {
+				return err
+			}
+
+			response.Data.Devices = devices
+			return nil
+
+		case "get_device":
+			// {"method":"get_device","username":"admin_user","device_id":"<uuid>"}
+			// {"method":"get_device","apikey":"<apikey>","device_id":"<uuid>"}
+			device, err := self.fetchDevice(request)
+			if nil != err {
+				return err
+			}
+			fmt.Println(device)
+			response.Data.Device = device
+			return nil
+
+		case "create_sensor":
+			// {"method":"create_sensor","username":"admin_user","device_id":"<uuid>","name":"laptop","type":"computer"}
+			// {"method":"create_sensor","apikey":"<apikey>","device_id":"<uuid>","name":"laptop","type":"computer"}
+			device, err := self.fetchDevice(request)
+			if nil != err {
+				return err
+			}
+
+			err = device.CreateSensor(request.Name, request.Type)
+			if nil != err {
+				return err
+			}
+
+			return nil
+
+		case "get_sensors":
+			// {"method":"get_sensors","username":"admin_user","device_id":"<uuid>"}
+			// {"method":"get_sensors","apikey":"<apikey>","device_id":"<uuid>"}
+			device, err := self.fetchDevice(request)
+			if nil != err {
+				return err
+			}
+
+			sensors, err := device.GetSensors()
+			if nil != err {
+				return err
+			}
+
+			response.Data.Sensors = sensors
+			return nil
+
+		case "get_sensor":
+			// {"method":"get_sensor","username":"admin_user","sensor_id":"<uuid>"}
+			// {"method":"get_sensor","apikey":"<apikey>","sensor_id":"<uuid>"}
+			sensor, err := self.fetchSensor(request)
+			if nil != err {
+				return err
+			}
+
+			response.Data.Sensor = sensor
+			return nil
+
+		case "create_location":
+			// {"method":"create_location","username":"admin_user","name":"MyHouse","longitude":0.0,"latitude":0.0}
+			// {"method":"create_location","apikey":"<apikey>","name":"MyHouse","longitude":0.0,"latitude":0.0}
+			user, err := self.fetchUser(request)
+			if nil != err {
+				return err
+			}
+
+			err = user.CreateLocation(request.Name, request.Longitude, request.Latitude)
+			if nil != err {
+				return err
+			}
+
+			return nil
+
+		case "get_locations":
+			// {"method":"get_locations","username":"admin_user"}
+			// {"method":"get_locations","apikey":"<apikey>"}
+			user, err := self.fetchUser(request)
+			if nil != err {
+				return err
+			}
+
+			locations, err := user.GetLocations()
+			if nil != err {
+				return err
+			}
+
+			response.Data.Locations = locations
+			return nil
+
+		case "record_measurements":
+			// {"method":"record_measurements","username":"admin","device_id":"dada27ee-f57b-e9c0-4ac0-1b2eda8af6fb","data":{"5c434f17-3095-7f74-7688-9de7f7853c2d":{"thing1":1,"thing2":2, "thing3":3}}}
+			return self.RecordMeasurements(request)
+
+		default:
+			return errors.New("Method not found")
+
 		}
-		sensor.RecordMeasurementsAtLocation(location_id, data[sensor_id])
+	}()
+
+	if nil != err {
+		response.SetError(err)
 	}
 
-	return nil
+	return &response, err
 }

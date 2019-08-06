@@ -33,7 +33,7 @@ var (
 	DATABASE_PORT     int64  = DEFAULT_DATABASE_PORT
 	REDIS_PORT        int64  = DEFAULT_REDIS_PORT
 	REDIS_HOST        string = DEFAULT_REDIS_HOST
-	QUERY             string = ""
+	REQUEST           string = ""
 	logger                   = ligneous.AddLogger("server", "trace", "./log/find5")
 	findapi           *api.Api
 )
@@ -52,7 +52,7 @@ func init() {
 	flag.StringVar(&DATABASE_USERNAME, "dbuser", DEFAULT_DATABASE_USERNAME, "database username")
 	flag.Int64Var(&DATABASE_PORT, "dbport", DEFAULT_DATABASE_PORT, "Database port")
 	flag.StringVar(&REDIS_HOST, "redishost", DEFAULT_REDIS_HOST, "Redis host")
-	flag.StringVar(&QUERY, "c", "", "Api query to execute")
+	flag.StringVar(&REQUEST, "c", "", "Api query to execute")
 	flag.Int64Var(&REDIS_PORT, "redisport", DEFAULT_REDIS_PORT, "Redis port")
 	flag.BoolVar(&print_version, "V", false, "Print version and exit")
 	flag.Parse()
@@ -70,85 +70,19 @@ func main() {
 	redisAddr := fmt.Sprintf("%v:%v", REDIS_HOST, REDIS_PORT)
 	findapi = api.New(dbConnectionString, redisAddr)
 
-	if "" != QUERY {
-		query := api.Query{}
-		query.Unmarshal(QUERY)
-		fmt.Println(query)
-		results, err := findapi.Execute(&query)
+	if "" != REQUEST {
+		request := api.Request{}
+		request.Unmarshal(REQUEST)
+		response, err := findapi.Do(&request)
+		if nil != err {
+			panic(err)
+		}
+
+		results, err := response.Marshal()
 		if nil != err {
 			panic(err)
 		}
 		fmt.Println(results)
+		return
 	}
-
-	return
-
-	/*
-		// setup
-		user, err := findapi.CreateUser("admin@find.com", "admin_user", "dev")
-		if nil != err {
-			user, err = findapi.GetUserByUsername("admin_user")
-			if nil != err {
-				panic(err)
-			}
-		}
-
-		devices, err := user.GetDevices()
-		if nil != err {
-			err = user.CreateDevice("laptop", "computer")
-			if nil != err {
-				panic(err)
-			}
-			devices, err = user.GetDevices()
-			if nil != err {
-				panic(err)
-			}
-		}
-
-		_ = user.CreateLocation("office_desk", 0, 0)
-
-		_ = devices[0].CreateSensor("wifi_card", "mac_addresses")
-
-		// TEST INSERT
-		device, err := user.GetDeviceByName("laptop")
-		if nil != err {
-			panic(err)
-		}
-
-		fc, err := user.GetLocations()
-		if nil != err {
-			panic(err)
-		}
-		location_id := fc.Features[0].Properties["id"].(string)
-
-		sensor, err := device.GetSensorByName("wifi_card")
-		if nil != err {
-			panic(err)
-		}
-
-		err = sensor.RecordMeasurementAtLocation(location_id, "test", 23)
-		if nil != err {
-			panic(err)
-		}
-
-		err = sensor.RecordMeasurement("test", 123)
-		if nil != err {
-			panic(err)
-		}
-
-		data := make(map[string]float64)
-		data["thing1"] = 0.0
-		data["thing2"] = 4.2
-		data["thing3"] = 66.6
-		err = sensor.RecordMeasurementsAtLocation(location_id, data)
-		if nil != err {
-			panic(err)
-		}
-
-		err = sensor.RecordMeasurements(data)
-		if nil != err {
-			panic(err)
-		}
-	*/
-
 }

@@ -3,6 +3,7 @@ package database
 import (
 	// "context"
 	"database/sql"
+	"encoding/json"
 	"errors"
 	"fmt"
 	// "time"
@@ -90,6 +91,43 @@ func (self *Database) getUser(column string, value string) (*User, error) {
 		}
 
 		user.db = self
+		return nil
+	})
+}
+
+func (self *Database) GetUsers() ([]*User, error) {
+	var users []*User
+	return users, self.Exec(func(db *sql.DB) error {
+		rows, err := db.Query(`
+			SELECT json_agg(c) FROM (
+			    SELECT
+			        email,
+			        username,
+			        apikey,
+			        secret_token,
+			        is_deleted,
+			        to_char(created_at, 'YYYY-MM-DD"T"HH:MI:SS"Z"') as created_at,
+			        to_char(updated_at, 'YYYY-MM-DD"T"HH:MI:SS"Z"') as updated_at
+			    FROM users
+			    WHERE is_deleted = false
+			) c;`)
+		if nil != err {
+			return err
+		}
+
+		for rows.Next() {
+			var temp string
+			rows.Scan(&temp)
+			err = json.Unmarshal([]byte(temp), &users)
+			if nil != err {
+				return err
+			}
+		}
+
+		for i := range users {
+			users[i].db = self
+		}
+
 		return nil
 	})
 }
