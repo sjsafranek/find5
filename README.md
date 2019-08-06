@@ -15,7 +15,7 @@ The `bootstrapper.sh` script will automatically create a PostGreSQL database and
 | dbpass   | dev        | database password |
 
 
-### System Objects
+### Tables
 There are several types objects with in the FIND system: `Users`, `Devices`, `Locations`, `Sensors`, and `Measurements`. Each of these objects share relationship(s) with other object types. The relationship structure is as follows:
 
 ![](docs/database_diagram.png)
