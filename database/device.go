@@ -3,7 +3,6 @@ package database
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"time"
 )
 
@@ -77,6 +76,14 @@ func (self *Device) GetSensors() ([]*Sensor, error) {
 	return self.Sensors, nil
 }
 
+func (self *Device) GetSensorIds() ([]string, error) {
+	sensorIds := []string{}
+	for _, sensor := range self.Sensors {
+		sensorIds = append(sensorIds, sensor.Id)
+	}
+	return sensorIds, nil
+}
+
 func (self *Device) GetSensorByName(sensor_name string) (*Sensor, error) {
 	for _, sensor := range self.Sensors {
 		if sensor.Name == sensor_name {
@@ -92,28 +99,4 @@ func (self *Device) GetSensorById(sensor_id string) (*Sensor, error) {
 		}
 	}
 	return &Sensor{}, errors.New("Not found")
-}
-
-func (self *Device) GetMeasurements(interval string) {
-	query := `
-SELECT json_agg(c)
-FROM (
-    SELECT
-        (EXTRACT(epoch FROM created_at) / EXTRACT(epoch FROM INTERVAL '5 sec'))::INTEGER AS bucket,
-        json_agg(
-            json_build_object(
-                'location_id',
-                measurements.location_id,
-                'key',
-                measurements.key,
-                'value',
-                measurements.value
-            )
-        ) AS measurements
-    FROM measurements
-    WHERE
-        location_id IS NOT NULL
-    GROUP BY bucket
-) c;`
-	fmt.Println(query)
 }

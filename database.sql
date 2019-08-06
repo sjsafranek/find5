@@ -157,8 +157,10 @@ CREATE TABLE IF NOT EXISTS location_history (
     location_id             VARCHAR(36),
     probability             REAL,
     created_at              TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    unique_ts               INTEGER DEFAULT EXTRACT(epoch FROM CURRENT_TIMESTAMP)::INTEGER,
     FOREIGN KEY (device_id) REFERENCES devices(id) ON DELETE CASCADE,
-    FOREIGN KEY (location_id) REFERENCES locations(id) ON DELETE CASCADE
+    FOREIGN KEY (location_id) REFERENCES locations(id) ON DELETE CASCADE,-- ,
+    CONSTRAINT unique_device_location UNIQUE(device_id, location_id, unique_ts)
 );
 
 COMMENT ON TABLE location_history IS 'location history of devices';
@@ -224,7 +226,7 @@ RETURNS TRIGGER AS $$
 BEGIN
     IF NEW.location_id IS NOT NULL THEN
         INSERT INTO location_history (device_id, location_id, probability)
-            SELECT
+            (SELECT
                 devices.id,
                 NEW.location_id,
                 100.0
@@ -233,7 +235,9 @@ BEGIN
                     ON devices.id = sensors.device_id
                 WHERE
                     sensors.id = NEW.sensor_id
-                ;
+            )
+                -- ;
+        ON CONFLICT DO NOTHING;
     END IF;
 	RETURN NEW;
 END;

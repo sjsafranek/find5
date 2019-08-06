@@ -100,7 +100,6 @@ func (self *User) CreateDevice(dname, dtype string) (*Device, error) {
 func (self *User) GetDevices() ([]*Device, error) {
 	var devices []*Device
 	return devices, self.db.Exec(func(conn *sql.DB) error {
-
 		rows, err := conn.Query(`
 		SELECT json_agg(d) FROM (
 			SELECT
@@ -231,6 +230,96 @@ func (self *User) GetLocations() (*geojson.FeatureCollection, error) {
 			var temp string
 			rows.Scan(&temp)
 			err = json.Unmarshal([]byte(temp), &layer)
+			if nil != err {
+				return err
+			}
+		}
+
+		return nil
+	})
+}
+
+func (self *User) ExportMeasurements() ([]*LocationMeasurements, error) {
+	var locationMeasurments []*LocationMeasurements
+
+	return locationMeasurments, self.db.Exec(func(conn *sql.DB) error {
+
+		rows, err := conn.Query(`
+			WITH measurements AS (
+			        SELECT
+			            (EXTRACT(epoch FROM measurements.created_at) / EXTRACT(epoch FROM INTERVAL '5 sec'))::INTEGER AS bucket,
+			            measurements.location_id,
+			            sensors.id AS sensor_id,
+			            json_agg(
+			                json_build_object(
+			                    'key',
+			                    measurements.key,
+			                    'value',
+			                    measurements.value
+			                )
+			            ) AS measurements
+			        FROM measurements
+			        INNER JOIN sensors
+			            ON sensors.id = measurements.sensor_id
+			            AND sensors.is_deleted = false
+			        INNER JOIN devices
+			            ON devices.id = sensors.device_id
+			            AND devices.username = $1
+			        WHERE
+			            measurements.location_id IS NOT NULL
+			        GROUP BY bucket, measurements.location_id, sensors.id
+			    ),
+			    buckets AS (
+			        SELECT
+			            measurements.location_id,
+			            measurements.sensor_id,
+			            json_build_object(
+			                'bucket_id',
+			                measurements.bucket,
+			                'measurements',
+			                json_agg(measurements.measurements)->0
+			            ) AS bucket
+			        FROM measurements
+			        GROUP BY measurements.bucket, measurements.location_id, measurements.sensor_id
+			    ),
+			    location_buckets AS (
+			        SELECT
+			            buckets.sensor_id,
+			            buckets.location_id,
+			            json_agg(buckets.bucket) AS buckets
+			        FROM buckets
+			        GROUP BY buckets.location_id, buckets.sensor_id
+			    ),
+			    sensor_locations AS (
+			        SELECT
+			            location_buckets.location_id,
+			            json_agg(
+			                json_build_object(
+			                'sensor_id',
+			                location_buckets.sensor_id,
+			                'buckets',
+			                location_buckets.buckets
+			                )
+			            ) AS sensors
+			        FROM location_buckets
+			        GROUP BY location_buckets.location_id
+			    )
+
+			SELECT json_agg(c) FROM (
+			    SELECT
+			        location_id,
+			        sensors
+			    FROM sensor_locations
+			) c;`, self.Username)
+
+		if nil != err {
+			return err
+		}
+
+		for rows.Next() {
+			var temp string
+			rows.Scan(&temp)
+			err = json.Unmarshal([]byte(temp), &locationMeasurments)
 			if nil != err {
 				return err
 			}
