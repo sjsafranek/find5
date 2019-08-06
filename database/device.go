@@ -1,6 +1,7 @@
 package database
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"time"
@@ -58,6 +59,18 @@ func (self *Device) Update() error {
 				is_deleted=$3
 			WHERE id=$4;`,
 		self.Name, self.Type, self.IsDeleted, self.Id)
+}
+
+func (self *Device) Marshal() (string, error) {
+	b, err := json.Marshal(self)
+	if nil != err {
+		return "", err
+	}
+	return string(b), err
+}
+
+func (self *Device) Unmarshal(data string) error {
+	return json.Unmarshal([]byte(data), self)
 }
 
 func (self *Device) GetSensorByName(sensor_name string) (*Sensor, error) {

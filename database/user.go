@@ -10,7 +10,6 @@ import (
 	"github.com/paulmach/orb/geojson"
 )
 
-// User: user for wiki engine
 type User struct {
 	Username    string    `json:"username"`
 	Password    string    `json:"-"`
@@ -86,10 +85,16 @@ func (self *User) IsPassword(password string) (bool, error) {
 	})
 }
 
-func (self *User) CreateDevice(dname, dtype string) error {
-	return self.db.Insert(`
+func (self *User) CreateDevice(dname, dtype string) (*Device, error) {
+	err := self.db.Insert(`
 		INSERT INTO devices(username, name, type)
 			VALUES ($1, $2, $3);`, self.Username, dname, dtype)
+
+	if nil != err {
+		return &Device{}, err
+	}
+
+	return self.GetDeviceByName(dname)
 }
 
 func (self *User) GetDevices() ([]*Device, error) {
