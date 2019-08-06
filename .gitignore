@@ -12,3 +12,7 @@
 *.out
 
 __pycache__
+
+
+history.*
+log/

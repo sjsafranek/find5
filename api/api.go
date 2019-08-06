@@ -153,7 +153,7 @@ func (self *Api) Do(request *Request) (*Response, error) {
 		case "create_user":
 			// {"method":"create_user","username": "admin_user" "email":"admin@email.com","password":"1234"}
 			if "" == request.Email || "" == request.Username {
-				return errors.New("Missing parameters")
+				return errors.New("missing parameters")
 			}
 
 			user, err := self.createUser(request.Email, request.Username, request.Password)
@@ -295,7 +295,7 @@ func (self *Api) Do(request *Request) (*Response, error) {
 			})
 
 		default:
-			return errors.New("Method not found")
+			return errors.New("method not found")
 
 		}
 	}()

@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"github.com/sjsafranek/find5/api"
+	"github.com/sjsafranek/find5/repl"
 	"github.com/sjsafranek/ligneous"
 )
 
@@ -34,6 +35,7 @@ var (
 	REDIS_PORT        int64  = DEFAULT_REDIS_PORT
 	REDIS_HOST        string = DEFAULT_REDIS_HOST
 	REQUEST           string = ""
+	MODE              string = "repl"
 	logger                   = ligneous.AddLogger("server", "trace", "./log/find5")
 	findapi           *api.Api
 )
@@ -44,8 +46,8 @@ func init() {
 	// flag.StringVar(&ACTION, "action", DEFAULT_ACTION, "Action")
 	// flag.StringVar(&CONFIG_FILE, "c", DEFAULT_CONFIG_FILE, "Config file")
 	// flag.BoolVar(&DEBUG, "debug", false, "debug mode")
-	//
-	flag.IntVar(&HTTP_PORT, "port", DEFAULT_HTTP_PORT, "Server port")
+
+	flag.IntVar(&HTTP_PORT, "httpport", DEFAULT_HTTP_PORT, "Server port")
 	flag.StringVar(&DATABASE_HOST, "dbhost", DEFAULT_DATABASE_HOST, "database host")
 	flag.StringVar(&DATABASE_DATABASE, "dbname", DEFAULT_DATABASE_DATABASE, "database name")
 	flag.StringVar(&DATABASE_PASSWORD, "dbpass", DEFAULT_DATABASE_PASSWORD, "database password")
@@ -60,6 +62,11 @@ func init() {
 	if print_version {
 		fmt.Println(PROJECT, VERSION)
 		os.Exit(0)
+	}
+
+	args := flag.Args()
+	if 1 == len(args) {
+		MODE = args[0]
 	}
 
 }
@@ -84,5 +91,10 @@ func main() {
 		}
 		fmt.Println(results)
 		return
+	}
+
+	if "repl" == MODE {
+		fmt.Println("repl")
+		repl.New(findapi)
 	}
 }
