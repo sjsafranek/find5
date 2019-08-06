@@ -33,16 +33,15 @@ $$ language 'plpgsql';
 -- @table users
 -- @description stores users for find system
 CREATE TABLE IF NOT EXISTS users (
+    username        VARCHAR(50) PRIMARY KEY,
     email           VARCHAR(50),
-    username        VARCHAR(50) NOT NULL UNIQUE,
     apikey          VARCHAR(32) NOT NULL UNIQUE DEFAULT md5(random()::text),
     secret_token    VARCHAR(32) NOT NULL DEFAULT md5(random()::text),
     created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     is_deleted      BOOLEAN DEFAULT false,
     salt            VARCHAR DEFAULT gen_salt('bf', 8),
-    password        VARCHAR,
-    PRIMARY KEY(username)
+    password        VARCHAR
 );
 
 COMMENT ON TABLE users IS 'username and password info';
@@ -89,7 +88,7 @@ CREATE TRIGGER users_password_update
 -- @table devices
 -- @description stores users devices
 CREATE TABLE IF NOT EXISTS devices (
-    id              VARCHAR(36) NOT NULL UNIQUE DEFAULT md5(random()::text || now()::text)::uuid,
+    id              VARCHAR(36) PRIMARY KEY DEFAULT md5(random()::text || now()::text)::uuid,
     name            VARCHAR(50),
     type            VARCHAR(50),
     username        VARCHAR(50),
@@ -97,8 +96,7 @@ CREATE TABLE IF NOT EXISTS devices (
     updated_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     is_deleted      BOOLEAN DEFAULT false,
     FOREIGN KEY (username) REFERENCES users(username) ON DELETE CASCADE,
-    UNIQUE(username, name),
-    PRIMARY KEY(id)
+    UNIQUE(username, name)
 );
 
 COMMENT ON TABLE devices IS 'device info for data collection';
@@ -121,15 +119,14 @@ CREATE TRIGGER device_update
 -- @table locations
 -- @description stores location info for location_history and predictions
 CREATE TABLE IF NOT EXISTS locations (
-    id              VARCHAR(36) NOT NULL UNIQUE DEFAULT md5(random()::text || now()::text)::uuid,
+    id              VARCHAR(36) PRIMARY KEY DEFAULT md5(random()::text || now()::text)::uuid,
     name            VARCHAR(50),
     username        VARCHAR(50),
     created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     is_deleted      BOOLEAN DEFAULT false,
     FOREIGN KEY (username) REFERENCES users(username) ON DELETE CASCADE,
-    UNIQUE(username, name),
-    PRIMARY KEY(id)
+    UNIQUE(username, name)
 );
 
 -- add geometry column
@@ -177,7 +174,7 @@ COMMENT ON COLUMN location_history.probability IS 'probability of the device bei
 -- @table sensors
 -- @description stores device sensor metadata
 CREATE TABLE IF NOT EXISTS sensors (
-    id              VARCHAR(36) NOT NULL UNIQUE DEFAULT md5(random()::text || now()::text)::uuid,
+    id              VARCHAR(36) PRIMARY KEY DEFAULT md5(random()::text || now()::text)::uuid,
     device_id       VARCHAR(36),
     name            VARCHAR(50),
     type            VARCHAR(50),
@@ -185,8 +182,7 @@ CREATE TABLE IF NOT EXISTS sensors (
     updated_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     is_deleted      BOOLEAN DEFAULT false,
     FOREIGN KEY (device_id) REFERENCES devices(id) ON DELETE CASCADE,
-    UNIQUE(device_id, name),
-    PRIMARY KEY(id)
+    UNIQUE(device_id, name)
 );
 
 COMMENT ON TABLE sensors IS 'device sensor info';

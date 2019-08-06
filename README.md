@@ -1,7 +1,9 @@
 # FIND 5
 F.I.N.D. Version 5
 
-## Database setup
+## Database
+
+### Setup
 The `bootstrapper.sh` script will automatically create a PostGreSQL database and user for the FIND system. The database connection parameters can also be set via command line arguments:
 
 ```bash
@@ -23,6 +25,6 @@ Usage of ./find:
 ```
 
 ### System Objects
-There are several types objects with in the FIND system: `Users`, `Devices`, `Locations`, `Sensors`, and `Measurements`. Each of these objects share relationship(s) with other object types. The basic relationship structure is as follows:
+There are several types objects with in the FIND system: `Users`, `Devices`, `Locations`, `Sensors`, and `Measurements`. Each of these objects share relationship(s) with other object types. The relationship structure is as follows:
 
 ![](docs/database_diagram.png)
