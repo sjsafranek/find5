@@ -31,7 +31,11 @@ func filterInput(r rune) (rune, bool) {
 	return r, true
 }
 
-func New(findapi *api.Api) {
+type Client struct {
+	api *api.Api
+}
+
+func (self *Client) Run() {
 
 	l, err := readline.NewEx(&readline.Config{
 		Prompt:              "\033[31m[find5]#\033[0m ",
@@ -79,7 +83,7 @@ func New(findapi *api.Api) {
 		case strings.HasPrefix(line, "{") && strings.HasSuffix(line, "}"):
 			request := api.Request{}
 			request.Unmarshal(line)
-			response, _ := findapi.Do(&request)
+			response, _ := self.api.Do(&request)
 			results, _ := response.Marshal()
 			fmt.Println(results)
 
@@ -98,4 +102,10 @@ func New(findapi *api.Api) {
 		}
 	}
 exit:
+}
+
+func New(findapi *api.Api) *Client {
+
+	return &Client{api: findapi}
+
 }

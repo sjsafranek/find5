@@ -1,12 +1,14 @@
 package main
 
 import (
+	"errors"
 	"flag"
 	"fmt"
 	"os"
 
 	"github.com/sjsafranek/find5/api"
-	"github.com/sjsafranek/find5/repl"
+	"github.com/sjsafranek/find5/clients/repl"
+	"github.com/sjsafranek/find5/clients/web"
 	"github.com/sjsafranek/ligneous"
 )
 
@@ -35,7 +37,7 @@ var (
 	REDIS_PORT        int64  = DEFAULT_REDIS_PORT
 	REDIS_HOST        string = DEFAULT_REDIS_HOST
 	REQUEST           string = ""
-	MODE              string = "repl"
+	MODE              string = "web"
 	logger                   = ligneous.AddLogger("server", "trace", "./log/find5")
 	findapi           *api.Api
 )
@@ -93,8 +95,15 @@ func main() {
 		return
 	}
 
-	if "repl" == MODE {
-		fmt.Println("repl")
-		repl.New(findapi)
+	switch MODE {
+	case "repl":
+		repl.New(findapi).Run()
+		break
+	case "web":
+		web.New(findapi).Run(HTTP_PORT)
+		break
+	default:
+		panic(errors.New("api client not found"))
 	}
+
 }
