@@ -108,14 +108,14 @@ func (self *Api) fetchDevice(request *Request, clbk func(*database.Device) error
 }
 
 //
-func (self *Api) fetchSensor(request *Request) (*database.Sensor, error) {
-	var sensor *database.Sensor
-	err := self.fetchDevice(request, func(device *database.Device) error {
-		var err error
-		sensor, err = device.GetSensorById(request.SensorId)
-		return err
+func (self *Api) fetchSensor(request *Request, clbk func(*database.Sensor) error) error {
+	return self.fetchDevice(request, func(device *database.Device) error {
+		sensor, err := device.GetSensorById(request.SensorId)
+		if nil != err {
+			return err
+		}
+		return clbk(sensor)
 	})
-	return sensor, err
 }
 
 // RecordMeasurements
@@ -253,13 +253,10 @@ func (self *Api) Do(request *Request) (*Response, error) {
 		case "get_sensor":
 			// {"method":"get_sensor","username":"admin_user","sensor_id":"<uuid>"}
 			// {"method":"get_sensor","apikey":"<apikey>","sensor_id":"<uuid>"}
-			sensor, err := self.fetchSensor(request)
-			if nil != err {
-				return err
-			}
-
-			response.Data.Sensor = sensor
-			return nil
+			return self.fetchSensor(request, func(sensor *database.Sensor) error {
+				response.Data.Sensor = sensor
+				return nil
+			})
 
 		case "create_location":
 			// {"method":"create_location","username":"admin_user","name":"MyHouse","longitude":0.0,"latitude":0.0}
