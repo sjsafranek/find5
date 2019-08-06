@@ -37,9 +37,9 @@ func (self *Api) fetchUser(request *Request) (*database.User, error) {
 	var user *database.User
 	var err error
 	if "" != request.Apikey {
-		user, err = self.GetUserByApikey(request.Apikey)
+		user, err = self.getUserByApikey(request.Apikey)
 	} else if "" != request.Username {
-		user, err = self.GetUserByUsername(request.Username)
+		user, err = self.getUserByUsername(request.Username)
 	} else {
 		err = errors.New("Missing parameters")
 	}
@@ -47,7 +47,7 @@ func (self *Api) fetchUser(request *Request) (*database.User, error) {
 }
 
 // CreateUser
-func (self *Api) CreateUser(email, username, password string) (*database.User, error) {
+func (self *Api) createUser(email, username, password string) (*database.User, error) {
 	user, err := self.db.CreateUser(email, username, password)
 	if nil == err {
 		// cache apikey user pair
@@ -57,13 +57,13 @@ func (self *Api) CreateUser(email, username, password string) (*database.User, e
 }
 
 // GetUserByUserName
-func (self *Api) GetUserByUsername(username string) (*database.User, error) {
+func (self *Api) getUserByUsername(username string) (*database.User, error) {
 	return self.db.GetUserFromUsername(username)
 }
 
 // GetUserByApikey fetches user via apikey. This method uses an inmemory LRU cache to
 // decrease the number of database transactions.
-func (self *Api) GetUserByApikey(apikey string) (*database.User, error) {
+func (self *Api) getUserByApikey(apikey string) (*database.User, error) {
 	// check cache for apikey user pair
 	item := self.cache.Get("user", apikey)
 	if nil != item {
@@ -115,7 +115,7 @@ func (self *Api) fetchSensor(request *Request) (*database.Sensor, error) {
 }
 
 // RecordMeasurements
-func (self *Api) RecordMeasurements(request *Request) error {
+func (self *Api) recordMeasurements(request *Request) error {
 	device, err := self.fetchDevice(request)
 	if nil != err {
 		return err
@@ -155,7 +155,7 @@ func (self *Api) Do(request *Request) (*Response, error) {
 				return errors.New("Missing parameters")
 			}
 
-			user, err := self.CreateUser(request.Email, request.Username, request.Password)
+			user, err := self.createUser(request.Email, request.Username, request.Password)
 			if nil != err {
 				return err
 			}
@@ -335,7 +335,7 @@ func (self *Api) Do(request *Request) (*Response, error) {
 
 		case "record_measurements":
 			// {"method":"record_measurements","username":"admin","device_id":"dada27ee-f57b-e9c0-4ac0-1b2eda8af6fb","data":{"5c434f17-3095-7f74-7688-9de7f7853c2d":{"thing1":1,"thing2":2, "thing3":3}}}
-			return self.RecordMeasurements(request)
+			return self.recordMeasurements(request)
 
 		default:
 			return errors.New("Method not found")
