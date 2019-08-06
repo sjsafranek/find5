@@ -6,23 +6,14 @@ F.I.N.D. Version 5
 ### Setup
 The `bootstrapper.sh` script will automatically create a PostGreSQL database and user for the FIND system. The database connection parameters can also be set via command line arguments:
 
-```bash
-$ ./find -h
-Usage of ./find:
-  -V	Print version and exit
-  -dbhost string
-    	database host (default "localhost")
-  -dbname string
-    	database name (default "finddb")
-  -dbpass string
-    	database password (default "dev")
-  -dbport int
-    	Database port (default 5432)
-  -dbuser string
-    	database username (default "finduser")
-  -port int
-    	Server port (default 5555)
-```
+| argument | default    | description       |
+| -------- | ---------- | ----------------- |
+| dbhost   | localhost  | database host     |
+| dbport   | 5432       | database port     |
+| dbname   | finddb     | database name     |
+| dbuser   | finduser   | database username |
+| dbpass   | dev        | database password |
+
 
 ### System Objects
 There are several types objects with in the FIND system: `Users`, `Devices`, `Locations`, `Sensors`, and `Measurements`. Each of these objects share relationship(s) with other object types. The relationship structure is as follows:
