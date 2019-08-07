@@ -93,7 +93,9 @@ func (self *AuthenticationHandlers) LoginHandler(redirectUrl string) func(http.R
 			session.Values["username"] = username
 			session.Save(r, w)
 
-			apiOKResponse(w)
+			// apiOKResponse(w)
+			data, _ := results.Marshal()
+			apiJSONResponse(w, []byte(data), http.StatusOK)
 			return
 		}
 
