@@ -119,7 +119,7 @@ func (self *Api) fetchSensor(request *Request, clbk func(*database.Sensor) error
 }
 
 // RecordMeasurements
-func (self *Api) recordMeasurements(request *Request) error {
+func (self *Api) importMeasurements(request *Request) error {
 	return self.fetchDevice(request, func(device *database.Device) error {
 		for sensor_id := range request.Data {
 			sensor, err := device.GetSensorById(sensor_id)
@@ -127,9 +127,9 @@ func (self *Api) recordMeasurements(request *Request) error {
 				return err
 			}
 			if "" != request.LocationId {
-				sensor.RecordMeasurementsAtLocation(request.LocationId, request.Data[sensor_id])
+				sensor.ImportMeasurementsAtLocation(request.LocationId, request.Data[sensor_id])
 			} else {
-				sensor.RecordMeasurements(request.Data[sensor_id])
+				sensor.ImportMeasurements(request.Data[sensor_id])
 			}
 		}
 		return nil
@@ -152,7 +152,7 @@ func (self *Api) Do(request *Request) (*Response, error) {
 
 		case "create_user":
 			// {"method":"create_user","username": "admin_user" "email":"admin@email.com","password":"1234"}
-			if "" == request.Email || "" == request.Username {
+			if "" == request.Username {
 				return errors.New("missing parameters")
 			}
 
@@ -231,6 +231,14 @@ func (self *Api) Do(request *Request) (*Response, error) {
 				return nil
 			})
 
+		case "delete_device":
+			// {"method":"get_device","username":"admin_user","device_id":"<uuid>"}
+			// {"method":"get_device","apikey":"<apikey>","device_id":"<uuid>"}
+			return self.fetchDevice(request, func(device *database.Device) error {
+				// TODO: delete cache
+				return device.Delete()
+			})
+
 		case "create_sensor":
 			// {"method":"create_sensor","username":"admin_user","device_id":"<uuid>","name":"laptop","type":"computer"}
 			// {"method":"create_sensor","apikey":"<apikey>","device_id":"<uuid>","name":"laptop","type":"computer"}
@@ -258,6 +266,14 @@ func (self *Api) Do(request *Request) (*Response, error) {
 				return nil
 			})
 
+		case "delete_sensor":
+			// {"method":"get_sensor","username":"admin_user","sensor_id":"<uuid>"}
+			// {"method":"get_sensor","apikey":"<apikey>","sensor_id":"<uuid>"}
+			return self.fetchSensor(request, func(sensor *database.Sensor) error {
+				// TODO: delete cache
+				return sensor.Delete()
+			})
+
 		case "create_location":
 			// {"method":"create_location","username":"admin_user","name":"MyHouse","longitude":0.0,"latitude":0.0}
 			// {"method":"create_location","apikey":"<apikey>","name":"MyHouse","longitude":0.0,"latitude":0.0}
@@ -278,9 +294,13 @@ func (self *Api) Do(request *Request) (*Response, error) {
 				return nil
 			})
 
-		case "record_measurements":
+		case "delete_location":
+			// TODO
+			return nil
+
+		case "import_measurements":
 			// {"method":"record_measurements","username":"admin","device_id":"dada27ee-f57b-e9c0-4ac0-1b2eda8af6fb","data":{"5c434f17-3095-7f74-7688-9de7f7853c2d":{"thing1":1,"thing2":2, "thing3":3}}}
-			return self.recordMeasurements(request)
+			return self.importMeasurements(request)
 
 		case "export_measurements":
 			// {"method":"export_measurements","username":"admin_user"}

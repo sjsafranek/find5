@@ -22,6 +22,12 @@ type User struct {
 	db          *Database `json:"-"`
 }
 
+// SetEmail sets user email
+func (self *User) SetEmail(email string) error {
+	self.Email = email
+	return self.Update()
+}
+
 // SetPassword sets password
 func (self *User) SetPassword(password string) error {
 	self.Password = password
@@ -31,7 +37,23 @@ func (self *User) SetPassword(password string) error {
 // Delete deletes user
 func (self *User) Delete() error {
 	self.IsDeleted = true
-	return self.Update()
+	err := self.Update()
+	if nil != err {
+		return err
+	}
+	// TODO move this logic into database
+	// cascade "delete" all devices
+	devices, err := self.GetDevices()
+	if nil != err {
+		return err
+	}
+	for _, device := range devices {
+		err = device.Delete()
+		if nil != err {
+			return err
+		}
+	}
+	return nil
 }
 
 // Update updates user data in database
@@ -261,7 +283,6 @@ func (self *User) ExportMeasurements() ([]*LocationMeasurements, error) {
 			        FROM measurements
 			        INNER JOIN sensors
 			            ON sensors.id = measurements.sensor_id
-			            AND sensors.is_deleted = false
 			        INNER JOIN devices
 			            ON devices.id = sensors.device_id
 			            AND devices.username = $1

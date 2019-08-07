@@ -45,7 +45,19 @@ func (self *Device) SetType(dtype string) error {
 // Delete deletes user
 func (self *Device) Delete() error {
 	self.IsDeleted = true
-	return self.Update()
+	err := self.Update()
+	if nil != err {
+		return err
+	}
+	// TODO move this logic into database
+	// cascade "delete" all the sensors
+	for _, sensor := range self.Sensors {
+		err = sensor.Delete()
+		if nil != err {
+			return err
+		}
+	}
+	return nil
 }
 
 // Update updates user data in database
@@ -90,7 +102,7 @@ func (self *Device) GetSensorByName(sensor_name string) (*Sensor, error) {
 			return sensor, nil
 		}
 	}
-	return &Sensor{}, errors.New("Not found")
+	return &Sensor{}, errors.New("sensor not found")
 }
 func (self *Device) GetSensorById(sensor_id string) (*Sensor, error) {
 	for _, sensor := range self.Sensors {
@@ -98,5 +110,5 @@ func (self *Device) GetSensorById(sensor_id string) (*Sensor, error) {
 			return sensor, nil
 		}
 	}
-	return &Sensor{}, errors.New("Not found")
+	return &Sensor{}, errors.New("sensor not found")
 }

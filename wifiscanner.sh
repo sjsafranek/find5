@@ -1,12 +1,40 @@
 #!/bin/bash
 
-# SENSOR_ID=$1
-# LOCATION_ID=$2
-
 USERNAME=$1
-LOCATIONNAME=$2
+PASSWORD=$2
+LOCATIONNAME=$3
 
-while [[ true ]]; do
+
+# setup database objects
+python3 -c '
+import os
+import json
+
+from pyfind import client
+client = client.HttpClient(
+    username="'"$USERNAME"'",
+    password="'"$PASSWORD"'"
+)
+
+device_name = "{0}-{1}".format(os.getlogin(), os.uname().sysname)
+client.createDevice(name=device_name, type="computer")
+resp = client.fetchDevices()
+if 200 != resp.status_code:
+    print(resp.text)
+    exit()
+device = [device for device in resp.json()["data"]["devices"] if device["name"] == device_name][0]
+
+sensor_name = "wifi_card"
+client.createSensor(device_id=device["id"], name=sensor_name, type="wifi")
+
+location_name = "'"$LOCATIONNAME"'"
+client.createLocation(name=location_name)
+
+'
+
+
+# while [[ true ]]; do
+for i in {1..24}; do
     sudo iwlist wlan0 scan | egrep 'SSID|Address|Signal' > tmp.txt
 
     python3 -c '
@@ -15,62 +43,41 @@ import re
 import json
 import time
 
-from pyfind import database
-finddb = database.Database(
-    dbname = "finddb",
-    dbuser = "finduser",
-    dbpass = "dev"
+from pyfind import client
+client = client.HttpClient(
+    username="'"$USERNAME"'",
+    password="'"$PASSWORD"'"
 )
 
 
-username = "'"$USERNAME"'"
+device_name = "{0}-{1}".format(os.getlogin(), os.uname().sysname)
+# client.createDevice(name=device_name, type="computer")
+resp = client.fetchDevices()
+if 200 != resp.status_code:
+    print(resp.text)
+    exit()
+device = [device for device in resp.json()["data"]["devices"] if device["name"] == device_name][0]
+
+sensor_name = "wifi_card"
+# client.createSensor(device_id=device["id"], name=sensor_name, type="wifi")
+resp = client.fetchSensors(device_id=device["id"])
+if 200 != resp.status_code:
+    print(resp.text)
+    exit()
+sensor = [sensor for sensor in resp.json()["data"]["sensors"] if sensor["name"] == sensor_name][0]
+
 location_name = "'"$LOCATIONNAME"'"
-
-# get user
-user = finddb.getUser(username)
-if not user:
-    print("Creating {0} username".format(username))
-    email = input("email: ")
-    while True:
-        password1 = input("password: ")
-        password2 = input("password(again): ")
-        if password1 == password2:
-            break
-        print("passwords do not match")
-    finddb.createUser(email, username, password1)
-    user = finddb.getUser(username)
-
-user = user[0]
-
-# get device
-devicename = "{0}-{1}".format(os.getlogin(), os.uname().sysname)
-devices = finddb.getDevices(username)
-if not devices or 0 == len([device for device in devices if device["name"] == devicename]):
-    finddb.createDevice(username, devicename,"computer")
-    devices = finddb.getDevices(username)
-
-device = [device for device in devices if device["name"] == devicename][0]
-
-# get sensor
-if not device["sensors"] or 0 == len([s for s in device["sensors"] if "wifi_card" == s["name"]]):
-    finddb.createSensor(device["id"], "wifi_card", "wifi")
-    devices = finddb.getDevices(username)
-    device = [device for device in devices if device["name"] == devicename][0]
-
-sensor = [s for s in device["sensors"] if "wifi_card" == s["name"]][0]
-print(sensor)
-
-# get location
-locations = finddb.getLocations("admin")
-if not locations["features"] or 0 == len([l for l in locations["features"] if l["properties"]["name"] == location_name]):
-    longitude = float(input("longitude: "))
-    latitude = float(input("latitude: "))
-    finddb.createLocation("admin", location_name, {"type":"Point","coordinates":[longitude, latitude]})
-    locations = finddb.getLocations("admin")
-
-location = [l for l in locations["features"] if l["properties"]["name"] == location_name][0]
+# client.createLocation(name=location_name)
+resp = client.fetchLocations()
+features = resp.json()["data"]["locations"]["features"]
+location = [
+    feature["properties"]
+        for feature in features
+            if feature["properties"]["name"] == location_name
+][0]
 
 
+sensorMeasurements = {}
 
 now = int(time.time())
 mac_address_pattern = re.compile(r"(?:[0-9a-fA-F]:?){12}")
@@ -87,16 +94,24 @@ with open("tmp.txt", "r") as fh:
         quality = parts[0].replace("Quality=","")
         signal_level = int(parts[1].replace("Signal level=","").replace(" dBm", ""))
         essid = rows[2].split("ESSID:")[1].strip().replace("\"","")
-        print(json.dumps({
-            "event_timestamp": now,
-            "mac_address": mac_address,
-            "essid": essid,
-            "quality": quality,
-            "signal_level_dBm": signal_level,
-            "location_id": location["properties"]["id"],
-            "sensor_id": sensor["id"]
-        }))
-        finddb.insertMeasurement(sensor["id"], location["properties"]["id"], mac_address, signal_level)
+        # print(json.dumps({
+        #    "event_timestamp": now,
+        #    "mac_address": mac_address,
+        #    "essid": essid,
+        #    "quality": quality,
+        #    "signal_level_dBm": signal_level,
+        #    "location_id": location["id"],
+        #    "sensor_id": sensor["id"]
+        # }))
+        sensorMeasurements[mac_address] = signal_level
+
+measurements = {}
+measurements[sensor["id"]] = sensorMeasurements
+resp = client.importMeasurements(device_id=device["id"], location_id=location["id"], data=measurements)
+if 200 != resp.status_code:
+    print(resp.text)
+    exit()
+print(resp.text)
 '
 
     sleep 10

@@ -18,19 +18,19 @@ type Sensor struct {
 	device    *Device   `json:"-"`
 }
 
-func (self *Sensor) RecordMeasurementAtLocation(location_id, key string, value float64) error {
+func (self *Sensor) ImportMeasurementAtLocation(location_id, key string, value float64) error {
 	return self.db.Insert(`
 		INSERT INTO measurements (sensor_id, location_id, key, value)
 			VALUES ($1, $2, $3, $4)`, self.Id, location_id, key, value)
 }
 
-func (self *Sensor) RecordMeasurement(key string, value float64) error {
+func (self *Sensor) ImportMeasurement(key string, value float64) error {
 	return self.db.Insert(`
 		INSERT INTO measurements (sensor_id, key, value)
 			VALUES ($1, $2, $3)`, self.Id, key, value)
 }
 
-func (self *Sensor) RecordMeasurementsAtLocation(location_id string, data map[string]float64) error {
+func (self *Sensor) ImportMeasurementsAtLocation(location_id string, data map[string]float64) error {
 	sqlStr := `INSERT INTO measurements (sensor_id, location_id, key, value) VALUES `
 	values := []interface{}{}
 
@@ -48,7 +48,7 @@ func (self *Sensor) RecordMeasurementsAtLocation(location_id string, data map[st
 	return self.db.Insert(sqlStr, values...)
 }
 
-func (self *Sensor) RecordMeasurements(data map[string]float64) error {
+func (self *Sensor) ImportMeasurements(data map[string]float64) error {
 	sqlStr := `INSERT INTO measurements (sensor_id, key, value) VALUES `
 	values := []interface{}{}
 
