@@ -40,9 +40,6 @@ func newApiHandler(findapi *api.Api) func(http.ResponseWriter, *http.Request) {
 
 				var request api.Request
 				json.Unmarshal(body, &request)
-
-				// request := api.Request{}
-				// request.Unmarshal(line)
 				response, _ := findapi.Do(&request)
 				results, _ := response.Marshal()
 				data = results

@@ -27,23 +27,25 @@ func (self *Client) Run(HTTP_PORT int) {
 	server, _ := lemur.NewServer(ligneous.AddLogger("server", "debug", "./log/find5"))
 	server.AttachFileServer("/static/", "static")
 
-	// // Sessions
-	// server.AttachHandlerFunc(lemur.ApiRoute{
-	// 	Name:        "login",
-	// 	Methods:     []string{"GET", "POST"},
-	// 	Pattern:     "/login",
-	// 	HandlerFunc: authMiddleware.LoginHandler("/profile"),
-	// })
-	//
-	// server.AttachHandlerFunc(lemur.ApiRoute{
-	// 	Name:        "logout",
-	// 	Methods:     []string{"GET"},
-	// 	Pattern:     "/logout",
-	// 	HandlerFunc: authMiddleware.LogoutHandler("/login"),
-	// })
-	//
-	// server.Router.Use(authMiddleware.SessionMiddleware("/login", []string{"^/$", "^/ping", "^/login", "^/logout", "^/static/*"}))
-	// //.end
+	authMiddleware := NewAuthenticationHandlers("chocolate-chip", self.api)
+
+	// Sessions
+	server.AttachHandlerFunc(lemur.ApiRoute{
+		Name:        "login",
+		Methods:     []string{"GET", "POST"},
+		Pattern:     "/login",
+		HandlerFunc: authMiddleware.LoginHandler("/profile"),
+	})
+
+	server.AttachHandlerFunc(lemur.ApiRoute{
+		Name:        "logout",
+		Methods:     []string{"GET"},
+		Pattern:     "/logout",
+		HandlerFunc: authMiddleware.LogoutHandler("/login"),
+	})
+
+	server.Router.Use(authMiddleware.SessionMiddleware("/login", []string{"^/$", "^/ping", "^/login", "^/logout", "^/static/*", "^/api/v1/find"}))
+	//.end
 
 	server.AttachHandlerFunc(lemur.ApiRoute{
 		Name:        "index",
@@ -62,7 +64,7 @@ func (self *Client) Run(HTTP_PORT int) {
 
 	// Api routes
 	server.AttachHandlerFunc(lemur.ApiRoute{
-		Name:        "users",
+		Name:        "api",
 		Methods:     []string{"POST"},
 		Pattern:     "/api/v1/find",
 		HandlerFunc: newApiHandler(self.api),
