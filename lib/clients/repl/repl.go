@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	"github.com/chzyer/readline"
-	"github.com/sjsafranek/find5/api"
+	"github.com/sjsafranek/find5/lib/api"
 )
 
 func usage(w io.Writer) {

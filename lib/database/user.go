@@ -129,6 +129,7 @@ func (self *User) GetDevices() ([]*Device, error) {
 				devices.name,
 				devices.type,
 				devices.username,
+				devices.is_active,
 				devices.is_deleted,
 				to_char(devices.created_at, 'YYYY-MM-DD"T"HH:MI:SS"Z"') as created_at,
 		        to_char(devices.updated_at, 'YYYY-MM-DD"T"HH:MI:SS"Z"') as updated_at,
@@ -139,6 +140,7 @@ func (self *User) GetDevices() ([]*Device, error) {
 							sensors.name,
 							sensors.type,
 							sensors.device_id,
+							sensors.is_active,
 							sensors.is_deleted,
 							to_char(sensors.created_at, 'YYYY-MM-DD"T"HH:MI:SS"Z"') as created_at,
 							to_char(sensors.updated_at, 'YYYY-MM-DD"T"HH:MI:SS"Z"') as updated_at
@@ -272,6 +274,7 @@ func (self *User) ExportMeasurements() ([]*LocationMeasurements, error) {
 			            (EXTRACT(epoch FROM measurements.created_at) / EXTRACT(epoch FROM INTERVAL '5 sec'))::INTEGER AS bucket,
 			            measurements.location_id,
 			            sensors.id AS sensor_id,
+						devices.id AS device_id,
 			            json_agg(
 			                json_build_object(
 			                    'key',
@@ -283,12 +286,14 @@ func (self *User) ExportMeasurements() ([]*LocationMeasurements, error) {
 			        FROM measurements
 			        INNER JOIN sensors
 			            ON sensors.id = measurements.sensor_id
+						AND sensors.is_deleted = false
 			        INNER JOIN devices
 			            ON devices.id = sensors.device_id
 			            AND devices.username = $1
+						AND devices.is_deleted = false
 			        WHERE
 			            measurements.location_id IS NOT NULL
-			        GROUP BY bucket, measurements.location_id, sensors.id
+			        GROUP BY bucket, measurements.location_id, sensors.id, devices.id
 			    ),
 			    buckets AS (
 			        SELECT

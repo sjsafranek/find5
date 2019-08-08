@@ -6,7 +6,8 @@ import (
 
 	"github.com/garyburd/redigo/redis"
 	"github.com/karlseguin/ccache"
-	"github.com/sjsafranek/find5/database"
+	"github.com/sjsafranek/find5/lib/ai"
+	"github.com/sjsafranek/find5/lib/database"
 	"github.com/sjsafranek/ligneous"
 )
 
@@ -23,6 +24,7 @@ func New(dbConnStr string, redisAddr string) *Api {
 			Dial:        func() (redis.Conn, error) { return redis.Dial("tcp", redisAddr) },
 		},
 		cache: ccache.Layered(ccache.Configure()),
+		ai:    ai.New(),
 	}
 }
 
@@ -30,6 +32,7 @@ type Api struct {
 	db    *database.Database
 	redis *redis.Pool
 	cache *ccache.LayeredCache
+	ai    *ai.AI
 }
 
 func (self *Api) fetchUser(request *Request, clbk func(*database.User) error) error {
@@ -121,10 +124,16 @@ func (self *Api) fetchSensor(request *Request, clbk func(*database.Sensor) error
 // RecordMeasurements
 func (self *Api) importMeasurements(request *Request) error {
 	return self.fetchDevice(request, func(device *database.Device) error {
+		if !device.IsActive {
+			return errors.New("device is deactivated")
+		}
 		for sensor_id := range request.Data {
 			sensor, err := device.GetSensorById(sensor_id)
 			if nil != err {
 				return err
+			}
+			if !sensor.IsActive {
+				return errors.New("sensor is deactivated")
 			}
 			if "" != request.LocationId {
 				sensor.ImportMeasurementsAtLocation(request.LocationId, request.Data[sensor_id])
@@ -218,7 +227,6 @@ func (self *Api) Do(request *Request) (*Response, error) {
 				if nil != err {
 					return err
 				}
-
 				response.Data.Devices = devices
 				return nil
 			})
@@ -232,17 +240,36 @@ func (self *Api) Do(request *Request) (*Response, error) {
 			})
 
 		case "delete_device":
-			// {"method":"get_device","username":"admin_user","device_id":"<uuid>"}
-			// {"method":"get_device","apikey":"<apikey>","device_id":"<uuid>"}
+			// {"method":"delete_device","username":"admin_user","device_id":"<uuid>"}
+			// {"method":"delete_device","apikey":"<apikey>","device_id":"<uuid>"}
 			return self.fetchDevice(request, func(device *database.Device) error {
 				// TODO: delete cache
 				return device.Delete()
+			})
+
+		case "activate_device":
+			// {"method":"activate_device","username":"admin_user","device_id":"<uuid>"}
+			// {"method":"activate_device","apikey":"<apikey>","device_id":"<uuid>"}
+			return self.fetchDevice(request, func(device *database.Device) error {
+				// TODO: update cache
+				return device.Activate()
+			})
+
+		case "deactivate_device":
+			// {"method":"deactivate_device","username":"admin_user","device_id":"<uuid>"}
+			// {"method":"deactivate_device","apikey":"<apikey>","device_id":"<uuid>"}
+			return self.fetchDevice(request, func(device *database.Device) error {
+				// TODO: update cache
+				return device.Deactivate()
 			})
 
 		case "create_sensor":
 			// {"method":"create_sensor","username":"admin_user","device_id":"<uuid>","name":"laptop","type":"computer"}
 			// {"method":"create_sensor","apikey":"<apikey>","device_id":"<uuid>","name":"laptop","type":"computer"}
 			return self.fetchDevice(request, func(device *database.Device) error {
+				if !device.IsActive {
+					return errors.New("device is deactivated")
+				}
 				return device.CreateSensor(request.Name, request.Type)
 			})
 
@@ -267,11 +294,27 @@ func (self *Api) Do(request *Request) (*Response, error) {
 			})
 
 		case "delete_sensor":
-			// {"method":"get_sensor","username":"admin_user","sensor_id":"<uuid>"}
-			// {"method":"get_sensor","apikey":"<apikey>","sensor_id":"<uuid>"}
+			// {"method":"delete_sensor","username":"admin_user","sensor_id":"<uuid>"}
+			// {"method":"delete_sensor","apikey":"<apikey>","sensor_id":"<uuid>"}
 			return self.fetchSensor(request, func(sensor *database.Sensor) error {
 				// TODO: delete cache
 				return sensor.Delete()
+			})
+
+		case "activate_sensor":
+			// {"method":"activate_sensor","username":"admin_user","sensor_id":"<uuid>"}
+			// {"method":"activate_sensor","apikey":"<apikey>","sensor_id":"<uuid>"}
+			return self.fetchSensor(request, func(sensor *database.Sensor) error {
+				// TODO: update cache
+				return sensor.Activate()
+			})
+
+		case "deactivate_sensor":
+			// {"method":"deactivate_sensor","username":"admin_user","sensor_id":"<uuid>"}
+			// {"method":"deactivate_sensor","apikey":"<apikey>","sensor_id":"<uuid>"}
+			return self.fetchSensor(request, func(sensor *database.Sensor) error {
+				// TODO: update cache
+				return sensor.Deactivate()
 			})
 
 		case "create_location":
@@ -303,7 +346,7 @@ func (self *Api) Do(request *Request) (*Response, error) {
 			return self.importMeasurements(request)
 
 		case "export_measurements":
-			// {"method":"export_measurements","username":"admin_user"}
+			// {"method":"export_measurements","username":"admin"}
 			return self.fetchUser(request, func(user *database.User) error {
 				measurements, err := user.ExportMeasurements()
 				if nil != err {
@@ -311,6 +354,19 @@ func (self *Api) Do(request *Request) (*Response, error) {
 				}
 
 				response.Data.Measurements = measurements
+				return nil
+			})
+
+		case "calibrate":
+			// {"method":"calibrate","username":"admin"}
+			return self.fetchUser(request, func(user *database.User) error {
+				measurements, err := user.ExportMeasurements()
+				if nil != err {
+					return err
+				}
+
+				// TODO
+				self.ai.Calibrate(measurements, user.Username, true)
 				return nil
 			})
 

@@ -95,6 +95,7 @@ CREATE TABLE IF NOT EXISTS devices (
     created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     is_deleted      BOOLEAN DEFAULT false,
+    is_active       BOOLEAN DEFAULT true,
     FOREIGN KEY (username) REFERENCES users(username) ON DELETE CASCADE,
     UNIQUE(username, name)
 );
@@ -183,6 +184,7 @@ CREATE TABLE IF NOT EXISTS sensors (
     created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     is_deleted      BOOLEAN DEFAULT false,
+    is_active       BOOLEAN DEFAULT true,
     FOREIGN KEY (device_id) REFERENCES devices(id) ON DELETE CASCADE,
     UNIQUE(device_id, name)
 );

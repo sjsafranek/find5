@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 
 	"github.com/paulmach/orb/geojson"
-	"github.com/sjsafranek/find5/database"
+	"github.com/sjsafranek/find5/lib/database"
 )
 
 type Request struct {

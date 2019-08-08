@@ -12,6 +12,7 @@ type Device struct {
 	Type      string    `json:"type"`
 	Username  string    `json:"username"`
 	IsDeleted bool      `json:"is_deleted"`
+	IsActive  bool      `json:"is_active"`
 	CreatedAt time.Time `json:"created_at,string"`
 	UpdatedAt time.Time `json:"updated_at,string"`
 	Sensors   []*Sensor `json:"sensors"`
@@ -20,12 +21,20 @@ type Device struct {
 }
 
 func (self *Device) CreateSensor(sname, stype string) error {
+	if !self.IsActive {
+		return errors.New("device is deactivated")
+	}
+
 	return self.db.Insert(`
 		INSERT INTO sensors (device_id, name, type)
 			VALUES ($1, $2, $3)`, self.Id, sname, stype)
 }
 
 func (self *Device) SetLocation(location_id string) error {
+	if !self.IsActive {
+		return errors.New("device is deactivated")
+	}
+
 	return self.db.Insert(`
 		INSERT INTO location_history (device_id, location_id)
 			VALUES ($1, $2)`, self.Id, location_id)
@@ -60,6 +69,18 @@ func (self *Device) Delete() error {
 	return nil
 }
 
+// Activate a device
+func (self *Device) Activate() error {
+	self.IsActive = true
+	return self.Update()
+}
+
+// Deactivate a device
+func (self *Device) Deactivate() error {
+	self.IsActive = false
+	return self.Update()
+}
+
 // Update updates user data in database
 func (self *Device) Update() error {
 	return self.db.Insert(`
@@ -67,9 +88,10 @@ func (self *Device) Update() error {
 			SET
 				name=$1,
 				type=$2,
-				is_deleted=$3
-			WHERE id=$4;`,
-		self.Name, self.Type, self.IsDeleted, self.Id)
+				is_deleted=$3,
+				is_active=$4
+			WHERE id=$5;`,
+		self.Name, self.Type, self.IsDeleted, self.IsActive, self.Id)
 }
 
 func (self *Device) Marshal() (string, error) {

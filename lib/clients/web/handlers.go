@@ -8,7 +8,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/sjsafranek/find5/api"
+	"github.com/sjsafranek/find5/lib/api"
 )
 
 var startTime time.Time

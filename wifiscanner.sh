@@ -35,7 +35,7 @@ client.createLocation(name=location_name)
 
 # while [[ true ]]; do
 for i in {1..24}; do
-    sudo iwlist wlan0 scan | egrep 'SSID|Address|Signal' > tmp.txt
+    sudo iwlist wlan0 scan | egrep 'SSID|Address|Signal' > wifi.tmp
 
     python3 -c '
 import os
@@ -114,5 +114,6 @@ if 200 != resp.status_code:
 print(resp.text)
 '
 
+    rm wifi.tmp
     sleep 10
 done

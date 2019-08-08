@@ -4,7 +4,7 @@ import (
 	"os"
 	"runtime"
 
-	"github.com/sjsafranek/find5/api"
+	"github.com/sjsafranek/find5/lib/api"
 	"github.com/sjsafranek/lemur"
 	"github.com/sjsafranek/ligneous"
 )

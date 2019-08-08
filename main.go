@@ -6,9 +6,9 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/sjsafranek/find5/api"
-	"github.com/sjsafranek/find5/clients/repl"
-	"github.com/sjsafranek/find5/clients/web"
+	"github.com/sjsafranek/find5/lib/api"
+	"github.com/sjsafranek/find5/lib/clients/repl"
+	"github.com/sjsafranek/find5/lib/clients/web"
 	"github.com/sjsafranek/ligneous"
 )
 
