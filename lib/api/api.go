@@ -7,6 +7,7 @@ import (
 	"github.com/garyburd/redigo/redis"
 	"github.com/karlseguin/ccache"
 	"github.com/sjsafranek/find5/lib/ai"
+	"github.com/sjsafranek/find5/lib/ai/models"
 	"github.com/sjsafranek/find5/lib/database"
 	"github.com/sjsafranek/ligneous"
 )
@@ -121,9 +122,36 @@ func (self *Api) fetchSensor(request *Request, clbk func(*database.Sensor) error
 	})
 }
 
+func (self *Api) AnalyzeData(request *Request) error {
+	return self.fetchDevice(request, func(device *database.Device) error {
+
+		sd := models.SensorData{
+			Family:    device.GetUser().Username,
+			Device:    request.DeviceId,
+			Location:  request.LocationId,
+			Timestamp: time.Now().Unix(),
+			Sensors:   make(map[string]map[string]interface{}),
+		}
+
+		for i := range request.Data {
+			if _, ok := sd.Sensors[i]; !ok {
+				sd.Sensors[i] = make(map[string]interface{})
+			}
+			for j := range request.Data[i] {
+				sd.Sensors[i][j] = request.Data[i][j]
+			}
+		}
+
+		return self.ai.Analyze(sd, device.GetUser().Username)
+	})
+}
+
 // RecordMeasurements
 func (self *Api) importMeasurements(request *Request) error {
 	return self.fetchDevice(request, func(device *database.Device) error {
+		// TESTING
+		go self.AnalyzeData(request)
+
 		if !device.IsActive {
 			return errors.New("device is deactivated")
 		}
@@ -352,22 +380,20 @@ func (self *Api) Do(request *Request) (*Response, error) {
 				if nil != err {
 					return err
 				}
-
 				response.Data.Measurements = measurements
 				return nil
 			})
 
 		case "calibrate":
 			// {"method":"calibrate","username":"admin"}
+			// {"apikey": "a0a1695e8cd13322f1acb312b40cddb6", "method": "calibrate"}
 			return self.fetchUser(request, func(user *database.User) error {
 				measurements, err := user.ExportMeasurements()
 				if nil != err {
 					return err
 				}
-
 				// TODO
-				self.ai.Calibrate(measurements, user.Username, true)
-				return nil
+				return self.ai.Calibrate(measurements, user.Username, true)
 			})
 
 		default:

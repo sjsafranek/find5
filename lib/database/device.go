@@ -20,6 +20,10 @@ type Device struct {
 	user      *User     `json:"-"`
 }
 
+func (self *Device) GetUser() *User {
+	return self.user
+}
+
 func (self *Device) CreateSensor(sname, stype string) error {
 	if !self.IsActive {
 		return errors.New("device is deactivated")
