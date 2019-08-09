@@ -1,119 +1,278 @@
-2019-08-08 19:06:07,460 - [api/learn] - DEBUG - /home/stefan/go/src/github.com/sjsafranek/find5
-2019-08-08 19:06:08,267 - [api/classify] - DEBUG - classifed for admin -37 ms
-2019-08-08 19:06:08,277 - [api/classify] - DEBUG - classifed for admin -50 ms
-2019-08-08 19:06:08,299 - [api/classify] - DEBUG - classifed for admin -74 ms
-2019-08-08 19:06:08,323 - [api/classify] - DEBUG - classifed for admin -73 ms
-2019-08-08 19:06:08,351 - [api/classify] - DEBUG - classifed for admin -99 ms
-2019-08-08 19:20:21,789 - [api/learn] - DEBUG - /home/stefan/go/src/github.com/sjsafranek/find5
-2019-08-08 19:20:22,890 - [api/classify] - DEBUG - classifed for admin -102 ms
-2019-08-08 19:20:22,910 - [api/classify] - DEBUG - classifed for admin -32 ms
-2019-08-08 19:20:22,914 - [api/classify] - DEBUG - classifed for admin -33 ms
-2019-08-08 19:20:22,944 - [api/classify] - DEBUG - classifed for admin -154 ms
-2019-08-08 19:20:22,948 - [api/classify] - DEBUG - classifed for admin -83 ms
-2019-08-08 19:20:22,953 - [api/classify] - DEBUG - classifed for admin -160 ms
-2019-08-08 19:20:22,956 - [api/classify] - DEBUG - classifed for admin -82 ms
-2019-08-08 19:20:23,886 - [api/classify] - DEBUG - classifed for admin -69 ms
-2019-08-08 19:22:03,780 - [api/learn] - DEBUG - /home/stefan/go/src/github.com/sjsafranek/find5
-2019-08-08 19:22:04,826 - [api/classify] - DEBUG - classifed for admin -43 ms
-2019-08-08 19:22:04,839 - [api/classify] - DEBUG - classifed for admin -27 ms
-2019-08-08 19:22:04,878 - [api/classify] - DEBUG - classifed for admin -22 ms
-2019-08-08 19:22:04,881 - [api/classify] - DEBUG - classifed for admin -22 ms
-2019-08-08 19:22:04,883 - [api/classify] - DEBUG - classifed for admin -55 ms
-2019-08-08 19:22:04,902 - [api/classify] - DEBUG - classifed for admin -42 ms
-2019-08-08 19:22:04,920 - [api/classify] - DEBUG - classifed for admin -58 ms
-2019-08-08 19:22:05,868 - [api/classify] - DEBUG - classifed for admin -29 ms
-2019-08-08 19:22:50,052 - [api/learn] - DEBUG - /home/stefan/go/src/github.com/sjsafranek/find5
-2019-08-08 19:22:51,400 - [api/classify] - DEBUG - classifed for admin -82 ms
-2019-08-08 19:22:51,404 - [api/classify] - DEBUG - classifed for admin -71 ms
-2019-08-08 19:22:51,418 - [api/classify] - DEBUG - classifed for admin -92 ms
-2019-08-08 19:22:51,420 - [api/classify] - DEBUG - classifed for admin -99 ms
-2019-08-08 19:22:51,426 - [api/classify] - DEBUG - classifed for admin -96 ms
-2019-08-08 19:22:51,442 - [api/classify] - DEBUG - classifed for admin -126 ms
-2019-08-08 19:22:51,446 - [api/classify] - DEBUG - classifed for admin -109 ms
-2019-08-08 19:22:51,449 - [api/classify] - DEBUG - classifed for admin -126 ms
-2019-08-08 19:22:54,897 - [api/learn] - DEBUG - /home/stefan/go/src/github.com/sjsafranek/find5
-2019-08-08 19:22:56,029 - [api/classify] - DEBUG - classifed for admin -55 ms
-2019-08-08 19:22:56,036 - [api/classify] - DEBUG - classifed for admin -77 ms
-2019-08-08 19:22:56,041 - [api/classify] - DEBUG - classifed for admin -81 ms
-2019-08-08 19:22:56,046 - [api/classify] - DEBUG - classifed for admin -83 ms
-2019-08-08 19:22:56,051 - [api/classify] - DEBUG - classifed for admin -73 ms
-2019-08-08 19:22:56,061 - [api/classify] - DEBUG - classifed for admin -95 ms
-2019-08-08 19:22:56,063 - [api/classify] - DEBUG - classifed for admin -109 ms
-2019-08-08 19:22:56,082 - [api/classify] - DEBUG - classifed for admin -106 ms
-2019-08-08 19:22:59,755 - [api/learn] - DEBUG - /home/stefan/go/src/github.com/sjsafranek/find5
-2019-08-08 19:23:00,765 - [api/classify] - DEBUG - classifed for admin -68 ms
-2019-08-08 19:23:00,781 - [api/classify] - DEBUG - classifed for admin -80 ms
-2019-08-08 19:23:00,791 - [api/classify] - DEBUG - classifed for admin -85 ms
-2019-08-08 19:23:00,798 - [api/classify] - DEBUG - classifed for admin -105 ms
-2019-08-08 19:23:00,800 - [api/classify] - DEBUG - classifed for admin -87 ms
-2019-08-08 19:23:00,802 - [api/classify] - DEBUG - classifed for admin -88 ms
-2019-08-08 19:23:00,807 - [api/classify] - DEBUG - classifed for admin -32 ms
-2019-08-08 19:23:00,854 - [api/classify] - DEBUG - classifed for admin -156 ms
-2019-08-08 20:36:04,172 - [api/classify] - DEBUG - loading ./data/BzJT2Y5.find3.ai
-2019-08-08 20:36:04,172 - [api/classify] - ERROR - File not found
-2019-08-08 20:36:17,784 - [api/classify] - DEBUG - loading ./data/BzJT2Y5.find3.ai
-2019-08-08 20:36:17,784 - [api/classify] - ERROR - File not found
-2019-08-08 20:47:46,335 - [api/classify] - DEBUG - loading ./BzJT2Y5.find3.ai
-2019-08-08 20:47:46,335 - [api/classify] - ERROR - File not found
-2019-08-08 20:51:41,942 - [api/classify] - DEBUG - loading ./BzJT2Y5.find3.ai
-2019-08-08 20:51:41,942 - [api/classify] - ERROR - File not found
-2019-08-08 20:52:30,321 - [api/classify] - DEBUG - loading /home/stefan/go/src/github.com/sjsafranek/find5/BzJT2Y5.find3.ai
-2019-08-08 20:52:30,372 - [api/classify] - DEBUG - classifed for admin -51 ms
-2019-08-08 20:52:44,055 - [api/classify] - DEBUG - classifed for admin -9 ms
-2019-08-08 20:52:57,155 - [api/classify] - DEBUG - classifed for admin -24 ms
-2019-08-08 20:53:09,211 - [api/classify] - DEBUG - classifed for admin -18 ms
-2019-08-08 20:53:21,410 - [api/classify] - DEBUG - classifed for admin -32 ms
-2019-08-08 21:01:43,841 - [api/learn] - DEBUG - /home/stefan/go/src/github.com/sjsafranek/find5/data
-2019-08-08 21:01:46,066 - [api/classify] - DEBUG - classifed for admin -34 ms
-2019-08-08 21:01:46,072 - [api/classify] - DEBUG - classifed for admin -36 ms
-2019-08-08 21:01:46,076 - [api/classify] - DEBUG - classifed for admin -39 ms
-2019-08-08 21:01:46,093 - [api/classify] - DEBUG - classifed for admin -23 ms
-2019-08-08 21:01:46,178 - [api/classify] - DEBUG - classifed for admin -24 ms
-2019-08-08 21:01:46,203 - [api/classify] - DEBUG - classifed for admin -50 ms
-2019-08-08 21:01:46,208 - [api/classify] - DEBUG - classifed for admin -59 ms
-2019-08-08 21:01:46,211 - [api/classify] - DEBUG - classifed for admin -60 ms
-2019-08-08 21:01:46,217 - [api/classify] - DEBUG - classifed for admin -34 ms
-2019-08-08 21:01:46,228 - [api/classify] - DEBUG - classifed for admin -28 ms
-2019-08-08 21:01:46,239 - [api/classify] - DEBUG - classifed for admin -34 ms
-2019-08-08 21:02:13,427 - [api/classify] - DEBUG - classifed for admin -13 ms
-2019-08-08 21:02:27,367 - [api/classify] - DEBUG - classifed for admin -7 ms
-2019-08-08 21:02:39,492 - [api/classify] - DEBUG - classifed for admin -53 ms
-2019-08-08 21:02:54,384 - [api/classify] - DEBUG - loading /home/stefan/go/src/github.com/sjsafranek/find5/data/BzJT2Y5.find3.ai
-2019-08-08 21:02:54,418 - [api/classify] - DEBUG - classifed for admin -34 ms
-2019-08-08 21:03:09,051 - [api/classify] - DEBUG - classifed for admin -19 ms
-2019-08-08 21:15:24,011 - [api/classify] - DEBUG - loading /home/stefan/go/src/github.com/sjsafranek/find5/data/BzJT2Y5.find3.ai
-2019-08-08 21:15:24,011 - [api/classify] - ERROR - File not found
-2019-08-08 21:15:36,082 - [api/classify] - DEBUG - loading /home/stefan/go/src/github.com/sjsafranek/find5/data/BzJT2Y5.find3.ai
-2019-08-08 21:15:36,082 - [api/classify] - ERROR - File not found
-2019-08-08 21:15:48,023 - [api/classify] - DEBUG - loading /home/stefan/go/src/github.com/sjsafranek/find5/data/BzJT2Y5.find3.ai
-2019-08-08 21:15:48,023 - [api/classify] - ERROR - File not found
-2019-08-08 21:16:01,863 - [api/classify] - DEBUG - loading /home/stefan/go/src/github.com/sjsafranek/find5/data/BzJT2Y5.find3.ai
-2019-08-08 21:16:01,863 - [api/classify] - ERROR - File not found
-2019-08-08 21:16:14,033 - [api/classify] - DEBUG - loading /home/stefan/go/src/github.com/sjsafranek/find5/data/BzJT2Y5.find3.ai
-2019-08-08 21:16:14,035 - [api/classify] - ERROR - File not found
-2019-08-08 21:16:26,033 - [api/classify] - DEBUG - loading /home/stefan/go/src/github.com/sjsafranek/find5/data/BzJT2Y5.find3.ai
-2019-08-08 21:16:26,033 - [api/classify] - ERROR - File not found
-2019-08-08 21:16:38,134 - [api/classify] - DEBUG - loading /home/stefan/go/src/github.com/sjsafranek/find5/data/BzJT2Y5.find3.ai
-2019-08-08 21:16:38,134 - [api/classify] - ERROR - File not found
-2019-08-08 21:16:51,745 - [api/classify] - DEBUG - loading /home/stefan/go/src/github.com/sjsafranek/find5/data/BzJT2Y5.find3.ai
-2019-08-08 21:16:51,747 - [api/classify] - ERROR - File not found
-2019-08-08 21:17:05,579 - [api/classify] - DEBUG - loading /home/stefan/go/src/github.com/sjsafranek/find5/data/BzJT2Y5.find3.ai
-2019-08-08 21:17:05,579 - [api/classify] - ERROR - File not found
-2019-08-08 21:17:06,062 - [api/learn] - DEBUG - /home/stefan/go/src/github.com/sjsafranek/find5/data
-2019-08-08 21:17:08,325 - [api/classify] - DEBUG - classifed for admin -36 ms
-2019-08-08 21:17:08,330 - [api/classify] - DEBUG - classifed for admin -38 ms
-2019-08-08 21:17:08,342 - [api/classify] - DEBUG - classifed for admin -66 ms
-2019-08-08 21:17:08,362 - [api/classify] - DEBUG - classifed for admin -85 ms
-2019-08-08 21:17:08,383 - [api/classify] - DEBUG - classifed for admin -17 ms
-2019-08-08 21:17:08,397 - [api/classify] - DEBUG - classifed for admin -28 ms
-2019-08-08 21:17:08,447 - [api/classify] - DEBUG - classifed for admin -22 ms
-2019-08-08 21:17:08,448 - [api/classify] - DEBUG - classifed for admin -43 ms
-2019-08-08 21:17:08,469 - [api/classify] - DEBUG - classifed for admin -67 ms
-2019-08-08 21:17:08,547 - [api/classify] - DEBUG - classifed for admin -140 ms
-2019-08-08 21:17:08,548 - [api/classify] - DEBUG - classifed for admin -118 ms
-2019-08-08 21:17:08,555 - [api/classify] - DEBUG - classifed for admin -116 ms
-2019-08-08 21:17:08,567 - [api/classify] - DEBUG - classifed for admin -147 ms
-2019-08-08 21:17:08,570 - [api/classify] - DEBUG - classifed for admin -37 ms
-2019-08-08 21:17:08,612 - [api/classify] - DEBUG - classifed for admin -75 ms
-2019-08-08 21:17:17,693 - [api/classify] - DEBUG - classifed for admin -57 ms
-2019-08-08 21:17:29,740 - [api/classify] - DEBUG - classifed for admin -10 ms
+2019-08-08 21:51:08,525 - [api/learn] - DEBUG - /home/stefan/go/src/github.com/sjsafranek/find5/data
+2019-08-08 22:13:25,231 - [api/learn] - DEBUG - /home/stefan/go/src/github.com/sjsafranek/find5/data
+2019-08-08 22:14:48,604 - [api/learn] - DEBUG - /home/stefan/go/src/github.com/sjsafranek/find5/data
+2019-08-08 22:14:49,751 - [api/classify] - DEBUG - classifed for admin -79 ms
+2019-08-08 22:14:49,790 - [api/classify] - DEBUG - classifed for admin -133 ms
+2019-08-08 22:14:49,800 - [api/classify] - DEBUG - classifed for admin -132 ms
+2019-08-08 22:14:49,829 - [api/classify] - DEBUG - classifed for admin -30 ms
+2019-08-08 22:14:49,847 - [api/classify] - DEBUG - classifed for admin -89 ms
+2019-08-08 22:14:49,860 - [api/classify] - DEBUG - classifed for admin -67 ms
+2019-08-08 22:14:49,861 - [api/classify] - DEBUG - classifed for admin -67 ms
+2019-08-08 22:14:49,870 - [api/classify] - DEBUG - classifed for admin -201 ms
+2019-08-08 22:14:49,884 - [api/classify] - DEBUG - classifed for admin -48 ms
+2019-08-08 22:14:49,892 - [api/classify] - DEBUG - classifed for admin -84 ms
+2019-08-08 22:14:49,896 - [api/classify] - DEBUG - classifed for admin -92 ms
+2019-08-08 22:14:49,907 - [api/classify] - DEBUG - classifed for admin -61 ms
+2019-08-08 22:14:49,911 - [api/classify] - DEBUG - classifed for admin -34 ms
+2019-08-08 22:14:49,916 - [api/classify] - DEBUG - classifed for admin -44 ms
+2019-08-08 22:14:50,757 - [api/classify] - DEBUG - classifed for admin -10 ms
+2019-08-08 22:15:08,660 - [api/learn] - DEBUG - /home/stefan/go/src/github.com/sjsafranek/find5/data
+2019-08-08 22:15:09,933 - [api/classify] - DEBUG - classifed for admin -49 ms
+2019-08-08 22:15:09,935 - [api/classify] - DEBUG - classifed for admin -39 ms
+2019-08-08 22:15:09,948 - [api/classify] - DEBUG - classifed for admin -70 ms
+2019-08-08 22:15:09,959 - [api/classify] - DEBUG - classifed for admin -46 ms
+2019-08-08 22:15:09,960 - [api/classify] - DEBUG - classifed for admin -86 ms
+2019-08-08 22:15:09,983 - [api/classify] - DEBUG - classifed for admin -97 ms
+2019-08-08 22:15:09,996 - [api/classify] - DEBUG - classifed for admin -108 ms
+2019-08-08 22:15:10,003 - [api/classify] - DEBUG - classifed for admin -109 ms
+2019-08-08 22:15:10,010 - [api/classify] - DEBUG - classifed for admin -119 ms
+2019-08-08 22:15:10,048 - [api/classify] - DEBUG - classifed for admin -54 ms
+2019-08-08 22:15:10,059 - [api/classify] - DEBUG - classifed for admin -78 ms
+2019-08-08 22:15:10,087 - [api/classify] - DEBUG - classifed for admin -97 ms
+2019-08-08 22:15:10,088 - [api/classify] - DEBUG - classifed for admin -68 ms
+2019-08-08 22:15:10,095 - [api/classify] - DEBUG - classifed for admin -50 ms
+2019-08-08 22:15:10,141 - [api/classify] - DEBUG - classifed for admin -58 ms
+2019-08-09 00:40:46,166 - [api/learn] - DEBUG - /home/stefan/go/src/github.com/sjsafranek/find5/data
+2019-08-09 00:40:47,252 - [api/classify] - DEBUG - classifed for admin -59 ms
+2019-08-09 00:40:47,268 - [api/classify] - DEBUG - classifed for admin -72 ms
+2019-08-09 00:40:47,278 - [api/classify] - DEBUG - classifed for admin -20 ms
+2019-08-09 00:40:47,279 - [api/classify] - DEBUG - classifed for admin -67 ms
+2019-08-09 00:40:47,301 - [api/classify] - DEBUG - classifed for admin -104 ms
+2019-08-09 00:40:47,326 - [api/classify] - DEBUG - classifed for admin -24 ms
+2019-08-09 00:40:47,347 - [api/classify] - DEBUG - classifed for admin -28 ms
+2019-08-09 00:40:47,364 - [api/classify] - DEBUG - classifed for admin -58 ms
+2019-08-09 00:40:47,368 - [api/classify] - DEBUG - classifed for admin -30 ms
+2019-08-09 00:40:47,389 - [api/classify] - DEBUG - classifed for admin -127 ms
+2019-08-09 00:40:47,416 - [api/classify] - DEBUG - classifed for admin -54 ms
+2019-08-09 00:40:47,418 - [api/classify] - DEBUG - classifed for admin -67 ms
+2019-08-09 00:40:47,425 - [api/classify] - DEBUG - classifed for admin -55 ms
+2019-08-09 00:40:47,427 - [api/classify] - DEBUG - classifed for admin -123 ms
+2019-08-09 00:40:47,464 - [api/classify] - DEBUG - classifed for admin -15 ms
+2019-08-09 00:47:29,106 - [api/learn] - DEBUG - /home/stefan/go/src/github.com/sjsafranek/find5/data
+2019-08-09 00:47:30,486 - [api/classify] - DEBUG - classifed for admin -85 ms
+2019-08-09 00:47:30,504 - [api/classify] - DEBUG - classifed for admin -63 ms
+2019-08-09 00:47:30,504 - [api/classify] - DEBUG - classifed for admin -87 ms
+2019-08-09 00:47:30,508 - [api/classify] - DEBUG - classifed for admin -91 ms
+2019-08-09 00:47:30,510 - [api/classify] - DEBUG - classifed for admin -55 ms
+2019-08-09 00:47:30,549 - [api/classify] - DEBUG - classifed for admin -9 ms
+2019-08-09 00:47:30,580 - [api/classify] - DEBUG - classifed for admin -56 ms
+2019-08-09 00:47:30,581 - [api/classify] - DEBUG - classifed for admin -26 ms
+2019-08-09 00:47:30,584 - [api/classify] - DEBUG - classifed for admin -57 ms
+2019-08-09 00:47:30,619 - [api/classify] - DEBUG - classifed for admin -25 ms
+2019-08-09 00:47:30,625 - [api/classify] - DEBUG - classifed for admin -36 ms
+2019-08-09 00:47:30,645 - [api/classify] - DEBUG - classifed for admin -124 ms
+2019-08-09 00:47:30,653 - [api/classify] - DEBUG - classifed for admin -24 ms
+2019-08-09 00:47:30,708 - [api/classify] - DEBUG - classifed for admin -66 ms
+2019-08-09 00:47:31,532 - [api/classify] - DEBUG - classifed for admin -11 ms
+2019-08-09 00:49:10,980 - [api/learn] - DEBUG - /home/stefan/go/src/github.com/sjsafranek/find5/data
+2019-08-09 00:49:13,077 - [api/classify] - DEBUG - classifed for admin -29 ms
+2019-08-09 00:49:13,077 - [api/classify] - DEBUG - classifed for admin -31 ms
+2019-08-09 00:49:13,084 - [api/classify] - DEBUG - classifed for admin -71 ms
+2019-08-09 00:49:13,092 - [api/classify] - DEBUG - classifed for admin -41 ms
+2019-08-09 00:49:13,229 - [api/classify] - DEBUG - classifed for admin -15 ms
+2019-08-09 00:49:13,282 - [api/classify] - DEBUG - classifed for admin -96 ms
+2019-08-09 00:49:13,310 - [api/classify] - DEBUG - classifed for admin -87 ms
+2019-08-09 00:49:13,317 - [api/classify] - DEBUG - classifed for admin -82 ms
+2019-08-09 00:49:13,324 - [api/classify] - DEBUG - classifed for admin -84 ms
+2019-08-09 00:49:13,327 - [api/classify] - DEBUG - classifed for admin -118 ms
+2019-08-09 00:49:13,336 - [api/classify] - DEBUG - classifed for admin -104 ms
+2019-08-09 00:49:13,338 - [api/classify] - DEBUG - classifed for admin -101 ms
+2019-08-09 00:49:13,339 - [api/classify] - DEBUG - classifed for admin -27 ms
+2019-08-09 00:49:13,340 - [api/classify] - DEBUG - classifed for admin -35 ms
+2019-08-09 00:49:13,388 - [api/classify] - DEBUG - classifed for admin -104 ms
+2019-08-09 00:52:18,388 - [api/learn] - DEBUG - /home/stefan/go/src/github.com/sjsafranek/find5/data
+2019-08-09 00:52:20,558 - [api/classify] - DEBUG - classifed for admin -36 ms
+2019-08-09 00:52:20,610 - [api/classify] - DEBUG - classifed for admin -94 ms
+2019-08-09 00:52:20,613 - [api/classify] - DEBUG - classifed for admin -102 ms
+2019-08-09 00:52:20,615 - [api/classify] - DEBUG - classifed for admin -101 ms
+2019-08-09 00:52:20,640 - [api/classify] - DEBUG - classifed for admin -19 ms
+2019-08-09 00:52:20,643 - [api/classify] - DEBUG - classifed for admin -36 ms
+2019-08-09 00:52:20,652 - [api/classify] - DEBUG - classifed for admin -47 ms
+2019-08-09 00:52:20,710 - [api/classify] - DEBUG - classifed for admin -18 ms
+2019-08-09 00:52:20,713 - [api/classify] - DEBUG - classifed for admin -52 ms
+2019-08-09 00:52:20,715 - [api/classify] - DEBUG - classifed for admin -34 ms
+2019-08-09 00:52:20,734 - [api/classify] - DEBUG - classifed for admin -34 ms
+2019-08-09 00:52:20,734 - [api/classify] - DEBUG - classifed for admin -41 ms
+2019-08-09 00:52:20,749 - [api/classify] - DEBUG - classifed for admin -13 ms
+2019-08-09 00:52:20,751 - [api/classify] - DEBUG - classifed for admin -43 ms
+2019-08-09 00:52:20,804 - [api/classify] - DEBUG - classifed for admin -45 ms
+2019-08-09 00:53:56,286 - [api/learn] - DEBUG - /home/stefan/go/src/github.com/sjsafranek/find5/data
+2019-08-09 00:53:58,391 - [api/classify] - DEBUG - classifed for admin -50 ms
+2019-08-09 00:53:58,405 - [api/classify] - DEBUG - classifed for admin -62 ms
+2019-08-09 00:53:58,446 - [api/classify] - DEBUG - classifed for admin -96 ms
+2019-08-09 00:53:58,448 - [api/classify] - DEBUG - classifed for admin -97 ms
+2019-08-09 00:53:58,464 - [api/classify] - DEBUG - classifed for admin -128 ms
+2019-08-09 00:53:58,473 - [api/classify] - DEBUG - classifed for admin -19 ms
+2019-08-09 00:53:58,487 - [api/classify] - DEBUG - classifed for admin -37 ms
+2019-08-09 00:53:58,503 - [api/classify] - DEBUG - classifed for admin -37 ms
+2019-08-09 00:53:58,520 - [api/classify] - DEBUG - classifed for admin -34 ms
+2019-08-09 00:53:58,526 - [api/classify] - DEBUG - classifed for admin -33 ms
+2019-08-09 00:53:58,582 - [api/classify] - DEBUG - classifed for admin -30 ms
+2019-08-09 00:53:58,587 - [api/classify] - DEBUG - classifed for admin -26 ms
+2019-08-09 00:53:58,623 - [api/classify] - DEBUG - classifed for admin -58 ms
+2019-08-09 00:53:58,645 - [api/classify] - DEBUG - classifed for admin -77 ms
+2019-08-09 00:53:58,653 - [api/classify] - DEBUG - classifed for admin -123 ms
+2019-08-09 00:58:05,375 - [api/learn] - DEBUG - /home/stefan/go/src/github.com/sjsafranek/find5/data
+2019-08-09 00:58:07,277 - [api/classify] - DEBUG - classifed for admin -46 ms
+2019-08-09 00:58:07,293 - [api/classify] - DEBUG - classifed for admin -57 ms
+2019-08-09 00:58:07,311 - [api/classify] - DEBUG - classifed for admin -48 ms
+2019-08-09 00:58:07,329 - [api/classify] - DEBUG - classifed for admin -97 ms
+2019-08-09 00:58:07,341 - [api/classify] - DEBUG - classifed for admin -55 ms
+2019-08-09 00:58:07,347 - [api/classify] - DEBUG - classifed for admin -44 ms
+2019-08-09 00:58:07,349 - [api/classify] - DEBUG - classifed for admin -61 ms
+2019-08-09 00:58:07,362 - [api/classify] - DEBUG - classifed for admin -9 ms
+2019-08-09 00:58:07,381 - [api/classify] - DEBUG - classifed for admin -91 ms
+2019-08-09 00:58:07,394 - [api/classify] - DEBUG - classifed for admin -30 ms
+2019-08-09 00:58:07,410 - [api/classify] - DEBUG - classifed for admin -32 ms
+2019-08-09 00:58:07,508 - [api/classify] - DEBUG - classifed for admin -41 ms
+2019-08-09 00:58:07,510 - [api/classify] - DEBUG - classifed for admin -37 ms
+2019-08-09 00:58:07,526 - [api/classify] - DEBUG - classifed for admin -55 ms
+2019-08-09 00:58:07,531 - [api/classify] - DEBUG - classifed for admin -37 ms
+2019-08-09 01:08:25,793 - [api/learn] - DEBUG - /home/stefan/go/src/github.com/sjsafranek/find5/data
+2019-08-09 01:08:29,917 - [api/learn] - DEBUG - /home/stefan/go/src/github.com/sjsafranek/find5/data
+2019-08-09 01:10:06,974 - [api/learn] - DEBUG - /home/stefan/go/src/github.com/sjsafranek/find5/data
+2019-08-09 01:10:09,385 - [api/classify] - DEBUG - classifed for admin -80 ms
+2019-08-09 01:10:09,419 - [api/classify] - DEBUG - classifed for admin -104 ms
+2019-08-09 01:10:09,448 - [api/classify] - DEBUG - classifed for admin -151 ms
+2019-08-09 01:10:09,455 - [api/classify] - DEBUG - classifed for admin -66 ms
+2019-08-09 01:10:09,460 - [api/classify] - DEBUG - classifed for admin -35 ms
+2019-08-09 01:10:09,489 - [api/classify] - DEBUG - classifed for admin -42 ms
+2019-08-09 01:10:09,508 - [api/classify] - DEBUG - classifed for admin -87 ms
+2019-08-09 01:10:09,535 - [api/classify] - DEBUG - classifed for admin -105 ms
+2019-08-09 01:10:09,539 - [api/classify] - DEBUG - classifed for admin -67 ms
+2019-08-09 01:10:09,545 - [api/classify] - DEBUG - classifed for admin -99 ms
+2019-08-09 01:10:09,553 - [api/classify] - DEBUG - classifed for admin -57 ms
+2019-08-09 01:10:09,555 - [api/classify] - DEBUG - classifed for admin -61 ms
+2019-08-09 01:10:09,558 - [api/classify] - DEBUG - classifed for admin -122 ms
+2019-08-09 01:10:09,571 - [api/classify] - DEBUG - classifed for admin -73 ms
+2019-08-09 01:10:10,461 - [api/classify] - DEBUG - classifed for admin -28 ms
+2019-08-09 01:17:43,758 - [api/learn] - DEBUG - /home/stefan/go/src/github.com/sjsafranek/find5/data
+2019-08-09 01:17:45,798 - [api/classify] - DEBUG - classifed for admin -9 ms
+2019-08-09 01:17:45,803 - [api/classify] - DEBUG - classifed for admin -13 ms
+2019-08-09 01:17:45,830 - [api/classify] - DEBUG - classifed for admin -52 ms
+2019-08-09 01:17:45,837 - [api/classify] - DEBUG - classifed for admin -57 ms
+2019-08-09 01:17:45,873 - [api/classify] - DEBUG - classifed for admin -32 ms
+2019-08-09 01:17:45,897 - [api/classify] - DEBUG - classifed for admin -52 ms
+2019-08-09 01:17:45,950 - [api/classify] - DEBUG - classifed for admin -84 ms
+2019-08-09 01:17:45,953 - [api/classify] - DEBUG - classifed for admin -92 ms
+2019-08-09 01:17:45,958 - [api/classify] - DEBUG - classifed for admin -100 ms
+2019-08-09 01:17:45,970 - [api/classify] - DEBUG - classifed for admin -94 ms
+2019-08-09 01:17:45,976 - [api/classify] - DEBUG - classifed for admin -36 ms
+2019-08-09 01:17:45,983 - [api/classify] - DEBUG - classifed for admin -63 ms
+2019-08-09 01:17:45,985 - [api/classify] - DEBUG - classifed for admin -94 ms
+2019-08-09 01:17:46,825 - [api/classify] - DEBUG - classifed for admin -5 ms
+2019-08-09 01:17:46,871 - [api/classify] - DEBUG - classifed for admin -19 ms
+2019-08-09 01:25:22,211 - [api/learn] - DEBUG - /home/stefan/go/src/github.com/sjsafranek/find5/data
+2019-08-09 01:25:26,214 - [api/learn] - DEBUG - /home/stefan/go/src/github.com/sjsafranek/find5/data
+2019-08-09 01:26:26,144 - [api/learn] - DEBUG - /home/stefan/go/src/github.com/sjsafranek/find5/data
+2019-08-09 01:26:30,150 - [api/learn] - DEBUG - /home/stefan/go/src/github.com/sjsafranek/find5/data
+2019-08-09 01:27:51,317 - [api/learn] - DEBUG - /home/stefan/go/src/github.com/sjsafranek/find5/data
+2019-08-09 01:27:55,378 - [api/learn] - DEBUG - /home/stefan/go/src/github.com/sjsafranek/find5/data
+2019-08-09 01:29:52,900 - [api/learn] - DEBUG - /home/stefan/go/src/github.com/sjsafranek/find5/data
+2019-08-09 10:22:04,855 - [api/learn] - DEBUG - /home/stefan/go/src/github.com/sjsafranek/find5/data
+2019-08-09 10:22:06,081 - [api/classify] - DEBUG - classifed for admin -27 ms
+2019-08-09 10:22:06,124 - [api/classify] - DEBUG - classifed for admin -62 ms
+2019-08-09 10:22:06,129 - [api/classify] - DEBUG - classifed for admin -68 ms
+2019-08-09 10:22:06,152 - [api/classify] - DEBUG - classifed for admin -89 ms
+2019-08-09 10:22:06,220 - [api/classify] - DEBUG - classifed for admin -73 ms
+2019-08-09 10:22:06,230 - [api/classify] - DEBUG - classifed for admin -95 ms
+2019-08-09 10:22:06,270 - [api/classify] - DEBUG - classifed for admin -48 ms
+2019-08-09 10:22:06,274 - [api/classify] - DEBUG - classifed for admin -71 ms
+2019-08-09 10:22:06,279 - [api/classify] - DEBUG - classifed for admin -147 ms
+2019-08-09 10:22:06,283 - [api/classify] - DEBUG - classifed for admin -135 ms
+2019-08-09 10:22:06,284 - [api/classify] - DEBUG - classifed for admin -140 ms
+2019-08-09 10:22:06,289 - [api/classify] - DEBUG - classifed for admin -42 ms
+2019-08-09 10:22:06,298 - [api/classify] - DEBUG - classifed for admin -48 ms
+2019-08-09 10:22:07,167 - [api/classify] - DEBUG - classifed for admin -43 ms
+2019-08-09 10:22:07,167 - [api/classify] - DEBUG - classifed for admin -45 ms
+2019-08-09 10:23:35,197 - [api/learn] - DEBUG - /home/stefan/go/src/github.com/sjsafranek/find5/data
+2019-08-09 10:23:36,416 - [api/classify] - DEBUG - classifed for admin -22 ms
+2019-08-09 10:23:36,417 - [api/classify] - DEBUG - classifed for admin -19 ms
+2019-08-09 10:23:36,470 - [api/classify] - DEBUG - classifed for admin -73 ms
+2019-08-09 10:23:36,472 - [api/classify] - DEBUG - classifed for admin -10 ms
+2019-08-09 10:23:36,475 - [api/classify] - DEBUG - classifed for admin -72 ms
+2019-08-09 10:23:36,609 - [api/classify] - DEBUG - classifed for admin -93 ms
+2019-08-09 10:23:36,615 - [api/classify] - DEBUG - classifed for admin -118 ms
+2019-08-09 10:23:36,621 - [api/classify] - DEBUG - classifed for admin -102 ms
+2019-08-09 10:23:36,622 - [api/classify] - DEBUG - classifed for admin -85 ms
+2019-08-09 10:23:36,624 - [api/classify] - DEBUG - classifed for admin -129 ms
+2019-08-09 10:23:36,660 - [api/classify] - DEBUG - classifed for admin -18 ms
+2019-08-09 10:23:36,669 - [api/classify] - DEBUG - classifed for admin -106 ms
+2019-08-09 10:23:36,686 - [api/classify] - DEBUG - classifed for admin -95 ms
+2019-08-09 10:23:36,691 - [api/classify] - DEBUG - classifed for admin -53 ms
+2019-08-09 10:23:36,692 - [api/classify] - DEBUG - classifed for admin -52 ms
+2019-08-09 10:24:33,900 - [api/learn] - DEBUG - /home/stefan/go/src/github.com/sjsafranek/find5/data
+2019-08-09 10:24:36,225 - [api/classify] - DEBUG - classifed for admin -49 ms
+2019-08-09 10:24:36,227 - [api/classify] - DEBUG - classifed for admin -31 ms
+2019-08-09 10:24:36,233 - [api/classify] - DEBUG - classifed for admin -44 ms
+2019-08-09 10:24:36,237 - [api/classify] - DEBUG - classifed for admin -63 ms
+2019-08-09 10:24:36,249 - [api/classify] - DEBUG - classifed for admin -89 ms
+2019-08-09 10:24:36,296 - [api/classify] - DEBUG - classifed for admin -19 ms
+2019-08-09 10:24:36,315 - [api/classify] - DEBUG - classifed for admin -13 ms
+2019-08-09 10:24:36,338 - [api/classify] - DEBUG - classifed for admin -65 ms
+2019-08-09 10:24:36,346 - [api/classify] - DEBUG - classifed for admin -48 ms
+2019-08-09 10:24:36,362 - [api/classify] - DEBUG - classifed for admin -83 ms
+2019-08-09 10:24:36,366 - [api/classify] - DEBUG - classifed for admin -33 ms
+2019-08-09 10:24:36,390 - [api/classify] - DEBUG - classifed for admin -21 ms
+2019-08-09 10:24:36,396 - [api/classify] - DEBUG - classifed for admin -39 ms
+2019-08-09 10:24:36,405 - [api/classify] - DEBUG - classifed for admin -26 ms
+2019-08-09 10:24:36,419 - [api/classify] - DEBUG - classifed for admin -41 ms
+2019-08-09 10:25:48,103 - [api/learn] - DEBUG - /home/stefan/go/src/github.com/sjsafranek/find5/data
+2019-08-09 10:25:49,801 - [api/classify] - DEBUG - classifed for admin -102 ms
+2019-08-09 10:25:49,810 - [api/classify] - DEBUG - classifed for admin -118 ms
+2019-08-09 10:25:49,814 - [api/classify] - DEBUG - classifed for admin -114 ms
+2019-08-09 10:25:49,842 - [api/classify] - DEBUG - classifed for admin -145 ms
+2019-08-09 10:25:49,848 - [api/classify] - DEBUG - classifed for admin -41 ms
+2019-08-09 10:25:49,857 - [api/classify] - DEBUG - classifed for admin -90 ms
+2019-08-09 10:25:49,861 - [api/classify] - DEBUG - classifed for admin -62 ms
+2019-08-09 10:25:49,867 - [api/classify] - DEBUG - classifed for admin -70 ms
+2019-08-09 10:25:49,900 - [api/classify] - DEBUG - classifed for admin -74 ms
+2019-08-09 10:25:49,906 - [api/classify] - DEBUG - classifed for admin -51 ms
+2019-08-09 10:25:49,918 - [api/classify] - DEBUG - classifed for admin -54 ms
+2019-08-09 10:25:49,921 - [api/classify] - DEBUG - classifed for admin -35 ms
+2019-08-09 10:25:49,926 - [api/classify] - DEBUG - classifed for admin -67 ms
+2019-08-09 10:25:49,934 - [api/classify] - DEBUG - classifed for admin -59 ms
+2019-08-09 10:25:49,956 - [api/classify] - DEBUG - classifed for admin -88 ms
+2019-08-09 10:36:16,151 - [api/classify] - DEBUG - loading /home/stefan/go/src/github.com/sjsafranek/find5/data/BzJT2Y5.find3.ai
+2019-08-09 10:36:16,174 - [api/classify] - DEBUG - classifed for admin -24 ms
+2019-08-09 10:36:29,030 - [api/classify] - DEBUG - classifed for admin -7 ms
+2019-08-09 10:39:27,540 - [api/classify] - DEBUG - loading /home/stefan/go/src/github.com/sjsafranek/find5/data/BzJT2Y5.find3.ai
+2019-08-09 10:39:27,619 - [api/classify] - DEBUG - classifed for admin -79 ms
+2019-08-09 10:39:41,911 - [api/classify] - DEBUG - classifed for admin -23 ms
+2019-08-09 10:39:54,955 - [api/classify] - DEBUG - classifed for admin -105 ms
+2019-08-09 10:40:07,802 - [api/classify] - DEBUG - classifed for admin -63 ms
+2019-08-09 10:40:20,613 - [api/classify] - DEBUG - classifed for admin -19 ms
+2019-08-09 10:40:33,597 - [api/classify] - DEBUG - loading /home/stefan/go/src/github.com/sjsafranek/find5/data/BzJT2Y5.find3.ai
+2019-08-09 10:40:33,623 - [api/classify] - DEBUG - classifed for admin -25 ms
+2019-08-09 10:40:46,531 - [api/classify] - DEBUG - classifed for admin -29 ms
+2019-08-09 10:40:59,436 - [api/classify] - DEBUG - classifed for admin -24 ms
+2019-08-09 10:43:11,137 - [api/learn] - DEBUG - /home/stefan/go/src/github.com/sjsafranek/find5/data
+2019-08-09 10:43:13,592 - [api/classify] - DEBUG - classifed for admin -57 ms
+2019-08-09 10:43:13,600 - [api/classify] - DEBUG - classifed for admin -81 ms
+2019-08-09 10:43:13,601 - [api/classify] - DEBUG - classifed for admin -67 ms
+2019-08-09 10:43:13,603 - [api/classify] - DEBUG - classifed for admin -82 ms
+2019-08-09 10:43:13,608 - [api/classify] - DEBUG - classifed for admin -95 ms
+2019-08-09 10:43:13,626 - [api/classify] - DEBUG - classifed for admin -94 ms
+2019-08-09 10:43:13,769 - [api/classify] - DEBUG - classifed for admin -51 ms
+2019-08-09 10:43:13,858 - [api/classify] - DEBUG - classifed for admin -34 ms
+2019-08-09 10:43:13,892 - [api/classify] - DEBUG - classifed for admin -45 ms
+2019-08-09 10:43:13,930 - [api/classify] - DEBUG - classifed for admin -69 ms
+2019-08-09 10:43:13,944 - [api/classify] - DEBUG - classifed for admin -40 ms
+2019-08-09 10:43:14,061 - [api/classify] - DEBUG - classifed for admin -44 ms
+2019-08-09 10:43:14,063 - [api/classify] - DEBUG - classifed for admin -52 ms
+2019-08-09 10:43:14,107 - [api/classify] - DEBUG - classifed for admin -59 ms
+2019-08-09 10:43:14,127 - [api/classify] - DEBUG - classifed for admin -70 ms
+2019-08-09 10:43:14,614 - [api/classify] - DEBUG - classifed for admin -63 ms
+2019-08-09 10:43:14,614 - [api/classify] - DEBUG - classifed for admin -79 ms
+2019-08-09 10:43:14,623 - [api/classify] - DEBUG - classifed for admin -83 ms
+2019-08-09 10:43:25,496 - [api/classify] - DEBUG - classifed for admin -64 ms
+2019-08-09 10:43:40,100 - [api/classify] - DEBUG - classifed for admin -87 ms
+2019-08-09 10:43:52,928 - [api/classify] - DEBUG - classifed for admin -39 ms
+2019-08-09 10:44:04,433 - [api/classify] - DEBUG - classifed for admin -54 ms
+2019-08-09 10:44:17,412 - [api/classify] - DEBUG - loading /home/stefan/go/src/github.com/sjsafranek/find5/data/BzJT2Y5.find3.ai
+2019-08-09 10:44:17,518 - [api/classify] - DEBUG - classifed for admin -105 ms
+2019-08-09 10:44:30,352 - [api/classify] - DEBUG - classifed for admin -21 ms
+2019-08-09 10:45:28,785 - [api/classify] - DEBUG - loading /home/stefan/go/src/github.com/sjsafranek/find5/data/BzJT2Y5.find3.ai
+2019-08-09 10:45:28,873 - [api/classify] - DEBUG - classifed for admin -89 ms
+2019-08-09 10:45:43,138 - [api/classify] - DEBUG - classifed for admin -80 ms
+2019-08-09 10:45:56,111 - [api/classify] - DEBUG - classifed for admin -45 ms

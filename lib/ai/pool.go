@@ -36,7 +36,7 @@ type ClassifyPayload struct {
 const RETRY_LIMIT int = 2
 
 func aiSendAndRecieveWithRetry(query string, attempt int) (string, error) {
-	logger.Debug(query)
+	// logger.Debug(query)
 
 	if RETRY_LIMIT < attempt {
 		err := errors.New("retry limit reached")
@@ -80,12 +80,6 @@ func aiSendAndRecieveWithRetry(query string, attempt int) (string, error) {
 		pc.MarkUnusable()
 		pc.Close()
 	}
-	// HACK
-	//  - close sockets every transaction...
-	// logger.Warn("socket is unusable, removing from pool [TEST]")
-	// pc := conn.(*pool.PoolConn)
-	// pc.MarkUnusable()
-	// pc.Close()
 
 	return results, nil
 }
@@ -93,7 +87,7 @@ func aiSendAndRecieveWithRetry(query string, attempt int) (string, error) {
 func aiSendAndRecieve(query string) (string, error) {
 	// TODO
 	//  - block duplicate calls
-	logger.Tracef("IN  %v", query)
+	logger.Tracef("Out  %v bytes", len(query))
 	logger.Debug("sending message to ai server")
 
 	ai_counter_lock.Lock()
@@ -106,7 +100,8 @@ func aiSendAndRecieve(query string) (string, error) {
 	AI_PENDING--
 	ai_counter_lock.Unlock()
 
-	logger.Tracef("OUT %v", results)
+	logger.Tracef("In %v bytes", len(results))
+	logger.Tracef("In %v", results)
 	return results, err
 }
 

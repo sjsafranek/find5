@@ -5,13 +5,16 @@ import csv
 from random import shuffle
 import warnings
 import pickle
+import zlib
 import gzip
 import operator
 import time
 # import logging
 import math
+from io import StringIO
 from threading import Thread
 import functools
+import base64
 import multiprocessing
 
 from log import NewLogger
@@ -179,37 +182,48 @@ class AI(object):
     def train(self, clf, x, y):
         return clf.fit(x, y)
 
-    def learn(self, fname):
+    def learn(self, fname, file_data=None):
+        csvfile = None
+        if file_data:
+            # base64 and gzipped file
+            data = base64.b64decode(file_data)
+            # data = zlib.decompress(data, 16 + zlib.MAX_WBITS)
+            data = gzip.decompress(data)
+            csvfile = StringIO(data.decode('utf-8'))
+        else:
+            csvfile = open(fname, 'r')
+
         t = time.time()
         # load CSV file
         self.header = []
         rows = []
         naming_num = 0
-        with open(fname, 'r') as csvfile:
-            reader = csv.reader(csvfile, delimiter=',')
-            for i, row in enumerate(reader):
-                self.logger.debug(row)
-                if i == 0:
-                    self.header = row
-                else:
-                    for j, val in enumerate(row):
-                        if j == 0:
-                            # this is a name of the location
-                            if val not in self.naming['from']:
-                                self.naming['from'][val] = naming_num
-                                self.naming['to'][naming_num] = val
-                                naming_num += 1
-                            row[j] = self.naming['from'][val]
-                            continue
-                        if val == '':
-                            row[j] = 0
-                            continue
-                        try:
-                            row[j] = float(val)
-                        except:
-                            self.logger.error(
-                                "problem parsing value " + str(val))
-                    rows.append(row)
+        # with open(fname, 'r') as csvfile:
+        reader = csv.reader(csvfile, delimiter=',')
+        for i, row in enumerate(reader):
+            self.logger.debug(row)
+            if i == 0:
+                self.header = row
+            else:
+                for j, val in enumerate(row):
+                    if j == 0:
+                        # this is a name of the location
+                        if val not in self.naming['from']:
+                            self.naming['from'][val] = naming_num
+                            self.naming['to'][naming_num] = val
+                            naming_num += 1
+                        row[j] = self.naming['from'][val]
+                        continue
+                    if val == '':
+                        row[j] = 0
+                        continue
+                    try:
+                        row[j] = float(val)
+                    except:
+                        self.logger.error(
+                            "problem parsing value " + str(val))
+                rows.append(row)
+        csvfile.close()
 
         # first column in row is the classification, Y
         y = numpy.zeros(len(rows))

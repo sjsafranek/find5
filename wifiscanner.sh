@@ -83,7 +83,7 @@ now = int(time.time())
 mac_address_pattern = re.compile(r"(?:[0-9a-fA-F]:?){12}")
 
 c = 0
-with open("tmp.txt", "r") as fh:
+with open("wifi.tmp", "r") as fh:
     lines = fh.readlines()
     for i in range(int(len(lines)/3)):
         s = i*3
@@ -112,6 +112,8 @@ if 200 != resp.status_code:
     print(resp.text)
     exit()
 print(resp.text)
+
+
 '
 
     rm wifi.tmp

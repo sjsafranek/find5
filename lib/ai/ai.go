@@ -1,13 +1,13 @@
 package ai
 
 import (
+	"bytes"
+	"compress/gzip"
+	b64 "encoding/base64"
 	"encoding/json"
 	"fmt"
 	"math"
 	"math/rand"
-	"os"
-	"path"
-	// "path/filepath"
 	"strings"
 	"time"
 
@@ -17,7 +17,6 @@ import (
 	"github.com/sjsafranek/find5/lib/ai/learning/nb2"
 	"github.com/sjsafranek/find5/lib/ai/models"
 	"github.com/sjsafranek/find5/lib/database"
-	"github.com/sjsafranek/find5/lib/utils"
 	"github.com/sjsafranek/ligneous"
 )
 
@@ -230,42 +229,13 @@ func (self *AI) splitDataForLearning(datas []models.SensorData, crossValidation 
 }
 
 func (self *AI) learnFromData(family string, datas []models.SensorData) error {
-	// inquire the AI
-	// type Payload struct {
-	// 	Family     string `json:"family"`
-	// 	CSVFile    string `json:"csv_file"`
-	// 	DataFolder string `json:"data_folder"`
-	// }
-	// var p Payload
-	// p.CSVFile = utils.RandomString(8) + ".csv"
-	// p.Family = family
-	// dir_path, err := filepath.Abs(path.Join(p.DataFolder, p.CSVFile))
-	// if nil != err {
-	// 	return err
-	// }
-	// p.DataFolder = filepath.Dir(dir_path)
 
-	// CSVFilePath, err := filepath.Abs(path.Join(DataFolder, utils.RandomString(8)+".csv"))
-	// if nil != err {
-	// 	return err
-	// }
-
-	CSVFilePath := utils.RandomString(8) + ".csv"
-
-	logger.Debugf("[%s] writing data to %s", family, CSVFilePath)
-	err := dumpSensorsToCSV(datas, CSVFilePath)
+	b64Data, err := formatFilePayload(datas)
 	if err != nil {
 		return err
 	}
-	defer os.Remove(CSVFilePath)
 
-	// bPayload, err := json.Marshal(p)
-	// if err != nil {
-	// 	return err
-	// }
-
-	// body, err := aiSendAndRecieve(fmt.Sprintf(`{"method": "learn", "data":%v}`, string(bPayload)))
-	body, err := aiSendAndRecieve(fmt.Sprintf(`{"method":"learn","data":{"family":"%v","csv_file":"%v","data_folder":"%v"}}`, family, CSVFilePath, DataFolder))
+	body, err := aiSendAndRecieve(fmt.Sprintf(`{"method":"learn","data":{"family":"%v","data_folder":"%v","file_data":"%v"}}`, family, DataFolder, b64Data))
 	if nil != err {
 		return errors.Wrap(err, "problem sending message to ai server")
 	}
@@ -483,17 +453,10 @@ func stdDev(numbers []float64, mean float64) float64 {
 	return math.Sqrt(variance)
 }
 
-func dumpSensorsToCSV(datas []models.SensorData, csvFile string) error {
+func formatFilePayload(datas []models.SensorData) (string, error) {
 	if len(datas) == 0 {
-		return errors.New("data is empty")
+		return "", errors.New("data is empty")
 	}
-	logger.Infof("[%s] dumping %d fingerprints to %s", datas[0].Family, len(datas), csvFile)
-	// open CSV file for writing
-	f, err := os.Create(path.Join(DataFolder, csvFile))
-	if err != nil {
-		return err
-	}
-	defer f.Close()
 
 	// determine all possible columns
 	sensorColumns := make(map[string]int)
@@ -516,18 +479,28 @@ func dumpSensorsToCSV(datas []models.SensorData, csvFile string) error {
 	for column := range sensorColumns {
 		columns[sensorColumns[column]] = column
 	}
-	f.WriteString(strings.Join(columns, ",") + "\n")
+
+	csv_data := strings.Join(columns, ",") + "\n"
 
 	for _, data := range datas {
 		columns = make([]string, columnCount)
 		columns[0] = data.Location
 		for sensorType := range data.Sensors {
 			for sensorName := range data.Sensors[sensorType] {
-				columns[sensorColumns[fmt.Sprintf("%s-%s", sensorType, sensorName)]] = fmt.Sprintf("%3.9f", data.Sensors[sensorType][sensorName])
+				cId := fmt.Sprintf("%s-%s", sensorType, sensorName)
+				columns[sensorColumns[cId]] = fmt.Sprintf("%3.9f", data.Sensors[sensorType][sensorName])
 			}
 		}
-		f.WriteString(strings.Join(columns, ",") + "\n")
+		line := strings.Join(columns, ",") + "\n"
+		csv_data += line
 	}
 
-	return nil
+	// compress
+	var buff bytes.Buffer
+	gz := gzip.NewWriter(&buff)
+	gz.Write([]byte(csv_data))
+	gz.Close()
+	payload := b64.StdEncoding.EncodeToString(buff.Bytes())
+
+	return payload, nil
 }

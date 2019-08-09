@@ -87,3 +87,11 @@ class HttpClient(object):
             "device_id": device_id,
             "data": data
         })
+
+    # def analyzeMeasurements(self,  device_id=None, location_id=None, data={}):
+    #     return self.do({
+    #         "method": "analyze",
+    #         # "location_id": location_id,
+    #         "device_id": device_id,
+    #         "data": data
+    #     })

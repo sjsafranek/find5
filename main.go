@@ -15,7 +15,7 @@ import (
 const (
 	PROJECT                   string = "Find"
 	VERSION                   string = "5.0.1"
-	DEFAULT_HTTP_PORT         int    = 5555
+	DEFAULT_HTTP_PORT         int    = 8080
 	DEFAULT_DATABASE_ENGINE   string = "postgres"
 	DEFAULT_DATABASE_DATABASE string = "finddb"
 	DEFAULT_DATABASE_PASSWORD string = "dev"

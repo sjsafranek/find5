@@ -33,10 +33,8 @@ type AnalysisResponse struct {
 	Success bool                    `json:"success"`
 }
 
-func (self *AI) Analyze(s models.SensorData, family string) error {
-	aidata, err := self.AnalyzeSensorData(s, family)
-	logger.Info(aidata)
-	return err
+func (self *AI) Analyze(s models.SensorData, family string) (models.LocationAnalysis, error) {
+	return self.AnalyzeSensorData(s, family)
 }
 
 func (self *AI) AnalyzeSensorData(s models.SensorData, family string) (aidata models.LocationAnalysis, err error) {
@@ -190,17 +188,6 @@ func (self *AI) AnalyzeSensorData(s models.SensorData, family string) (aidata mo
 			},
 		}
 	}
-
-	// add prediction to the database
-	// adding predictions uses up a lot of space
-	go func() {
-		// TODO INSERT
-		// WHY???
-		// errInsert := db.AddPrediction(s.Timestamp, aidata.Guesses)
-		// if errInsert != nil {
-		// 	logger.Errorf("[%s] problem inserting: %s", s.Family, errInsert.Error())
-		// }
-	}()
 
 	logger.Debugf("[%s] analyzed in %s", s.Family, time.Since(startAnalyze))
 	return

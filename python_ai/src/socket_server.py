@@ -3,6 +3,7 @@ import json
 import time
 import signal
 import socket
+import traceback
 import threading
 # import _thread
 
@@ -41,7 +42,7 @@ def on_new_client(conn, addr):
             if parts[0].count('{') == parts[0].count('}') and 0 != parts[0].count('{'):
 
                 query = json.loads(parts[0])
-                logger.info("IN  {0}".format(json.dumps(query)))
+                logger.info("IN  {0} bytes".format(len(json.dumps(query))))
 
                 results = {"success": False, "message": "incorrect usage"}
                 if 'method' in query and 'data' in query:
@@ -58,6 +59,9 @@ def on_new_client(conn, addr):
 
     except Exception as e:
         logger.error(e)
+        with open("__query.json","w") as fh:
+            fh.write(parts[0])
+        traceback.print_exc()
 
     logger.warn("client closed socket")
     conn.close()

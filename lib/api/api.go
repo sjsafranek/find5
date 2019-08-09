@@ -142,7 +142,22 @@ func (self *Api) AnalyzeData(request *Request) error {
 			}
 		}
 
-		return self.ai.Analyze(sd, device.GetUser().Username)
+		aidata, err := self.ai.Analyze(sd, device.GetUser().Username)
+
+		// add location predictions
+		if nil == err {
+			go func() {
+				logger.Info(aidata.Guesses)
+				for i := range aidata.Guesses {
+					aidata.Guesses[i].Probability = float64(int64(float64(aidata.Guesses[i].Probability)*100)) / 100
+					device.SetLocation(aidata.Guesses[i].Location, aidata.Guesses[i].Probability*100)
+				}
+
+			}()
+		}
+		//.end
+
+		return err
 	})
 }
 

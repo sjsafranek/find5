@@ -56,7 +56,7 @@ def learn(payload):
         return {'success': False, 'message': 'must provide sensor data'}
     if 'family' not in payload:
         return {'success': False, 'message': 'must provide family'}
-    if 'csv_file' not in payload:
+    if 'csv_file' not in payload and 'file_data' not in payload:
         return {'success': False, 'message': 'must provide CSV file'}
     data_folder = '.'
     if 'data_folder' in payload:
@@ -67,11 +67,15 @@ def learn(payload):
     logger.debug(data_folder)
 
     ai = AI(to_base58(payload['family']), data_folder)
-    fname = os.path.join(data_folder, payload['csv_file'])
-    try:
-        ai.learn(fname)
-    except FileNotFoundError:
-        return {"success": False, "message": "could not find '{}'".format(fname)}
+
+    if 'file_data' in payload:
+        ai.learn("", file_data=payload['file_data'])
+    elif 'csv_file' in payload:
+        fname = os.path.join(data_folder, payload['csv_file'])
+        try:
+            ai.learn(fname)
+        except FileNotFoundError:
+            return {"success": False, "message": "could not find '{}'".format(fname)}
 
     print(payload['family'])
     ai.save(os.path.join(data_folder, to_base58(

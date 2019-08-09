@@ -34,14 +34,14 @@ func (self *Device) CreateSensor(sname, stype string) error {
 			VALUES ($1, $2, $3)`, self.Id, sname, stype)
 }
 
-func (self *Device) SetLocation(location_id string) error {
+func (self *Device) SetLocation(location_id string, probability float64) error {
 	if !self.IsActive {
 		return errors.New("device is deactivated")
 	}
 
 	return self.db.Insert(`
-		INSERT INTO location_history (device_id, location_id)
-			VALUES ($1, $2)`, self.Id, location_id)
+		INSERT INTO location_history (device_id, location_id, probability)
+			VALUES ($1, $2, $3)`, self.Id, location_id, probability)
 }
 
 // SetPassword sets password
