@@ -27,12 +27,6 @@ func init() {
 	DataFolder = path.Join(folder, "data/")
 }
 
-type AnalysisResponse struct {
-	Data    models.LocationAnalysis `json:"analysis"`
-	Message string                  `json:"message"`
-	Success bool                    `json:"success"`
-}
-
 func (self *AI) Analyze(s models.SensorData, family string) (models.LocationAnalysis, error) {
 	return self.AnalyzeSensorData(s, family)
 }

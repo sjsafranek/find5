@@ -6,7 +6,6 @@ import (
 	b64 "encoding/base64"
 	"encoding/json"
 	"fmt"
-	"math"
 	"math/rand"
 	"strings"
 	"time"
@@ -28,19 +27,6 @@ var (
 		Dial:        func() (redis.Conn, error) { return redis.Dial("tcp", ":6379") },
 	}
 )
-
-type CalibrationModel struct {
-	Id                       int                                      `json:"id"`
-	ProbabilityMeans         []float64                                `json:"probability_means"`
-	ProbabilitiesOfBestGuess []float64                                `json:"probabilities_of_best_guess"`
-	PercentCorrect           float64                                  `json:"percent_correct"`
-	AccuracyBreakdown        map[string]float64                       `json:"accuracy_breakdown"`
-	PredictionAnalysis       map[string]map[string]map[string]int     `json:"prediction_analysis"`
-	AlgorithmEfficacy        map[string]map[string]models.BinaryStats `json:"algorithm_efficacy"`
-	CalibrationTime          time.Time                                `json:"calibration_time"`
-	CreateAt                 time.Time                                `json:"create_at"`
-	UpdateAt                 time.Time                                `json:"update_at"`
-}
 
 func New() *AI {
 	return &AI{}
@@ -434,23 +420,6 @@ func (self *AI) findBestAlgorithm(datas []models.SensorData, family string) (alg
 	self.Set(fmt.Sprintf("calibration-%v", family), calibrationModel)
 
 	return
-}
-
-func average(xs []float64) float64 {
-	total := 0.0
-	for _, v := range xs {
-		total += v
-	}
-	return total / float64(len(xs))
-}
-
-func stdDev(numbers []float64, mean float64) float64 {
-	total := 0.0
-	for _, number := range numbers {
-		total += math.Pow(number-mean, 2)
-	}
-	variance := total / float64(len(numbers)-1)
-	return math.Sqrt(variance)
 }
 
 func formatFilePayload(datas []models.SensorData) (string, error) {
