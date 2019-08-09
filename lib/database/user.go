@@ -386,6 +386,7 @@ func (self *User) ExportDevicesByLocation() ([]*DeviceLocations, error) {
 				        AND locations.is_deleted = false
 				    INNER JOIN sensors
 				        ON sensors.device_id = devices.id
+						AND sensors.is_deleted = false
 				    LEFT JOIN measurements
 				        ON measurements.sensor_id = sensors.id
 				        AND measurements.created_at >= (NOW() - INTERVAL '5 minutes')
