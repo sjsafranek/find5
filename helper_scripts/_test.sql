@@ -1,163 +1,300 @@
 
+-- GetByLocation
+
+-- get count of mac addresses seen by device within time window
+
+WITH device_locations AS (
+    SELECT
+        locations.id AS location_id,
+        locations.name AS location_name,
+        ST_AsGeoJSON(locations.geom)::JSONB AS geometry,
+        devices.id AS device_id,
+        devices.name AS device_name,
+        sensors.id AS sensor_id,
+        sensors.name AS sensor_name,
+        MAX(location_history.created_at) AS lastest_timestamp,
+        AVG(location_history.probability) AS average_probability,
+        COUNT(measurements.*) AS scanners
+    FROM
+        location_history
+    INNER JOIN devices
+        ON devices.id = location_history.device_id
+        ANd devices.username = 'admin'
+        AND devices.is_deleted = false
+    INNER JOIN locations
+        ON locations.id = location_history.location_id
+        AND locations.is_deleted = false
+
+    INNER JOIN sensors
+        ON sensors.device_id = devices.id
+    LEFT JOIN measurements
+        ON measurements.sensor_id = sensors.id
+        AND measurements.created_at >= (NOW() - INTERVAL '60 minutes')
+
+    WHERE
+        location_history.created_at >= (NOW() - INTERVAL '60 minutes')
+    GROUP BY locations.id, devices.id, sensors.id
+)
 
 SELECT json_agg(c)
 FROM (
     SELECT
-        (EXTRACT(epoch FROM created_at) / EXTRACT(epoch FROM INTERVAL '5 sec'))::INTEGER AS bucket,
+        device_locations.location_id,
+        device_locations.location_name,
+        device_locations.geometry,
         json_agg(
             json_build_object(
-                'location_id',
-                measurements.location_id,
-                'key',
-                measurements.key,
-                'value',
-                measurements.value
-            )
-        ) AS measurements
-    FROM measurements
-    WHERE
-        location_id IS NOT NULL
-    GROUP BY bucket
-) c;
-
-
-
-SELECT json_agg(c)
-FROM (
-    SELECT
-        (EXTRACT(epoch FROM created_at) / EXTRACT(epoch FROM INTERVAL '5 sec'))::INTEGER AS bucket,
-        location_id,
-        json_agg(
-            json_build_object(
-                'key',
-                measurements.key,
-                'value',
-                measurements.value
-            )
-        ) AS measurements
-    FROM measurements
-    WHERE
-        location_id IS NOT NULL
-    GROUP BY bucket, location_id
-) c;
-
-
-
-
-SELECT json_agg(l) FROM (
-    SELECT
-        location_buckets.location_id,
-        json_agg(location_buckets.bucket) AS buckets
-    FROM (
-        SELECT
-            buckets.location_id,
-            json_build_object(
-                'bucket',
-                buckets.bucket,
-                'measurements',
-                json_agg(buckets.measurements)->0
-            ) AS bucket
-        FROM (
-            SELECT
-                (EXTRACT(epoch FROM measurements.created_at) / EXTRACT(epoch FROM INTERVAL '5 sec'))::INTEGER AS bucket,
-                measurements.location_id,
-                json_agg(
-                    json_build_object(
-                        'sensor_id',
-                        sensors.id,
-                        'key',
-                        measurements.key,
-                        'value',
-                        measurements.value
-                    )
-                ) AS measurements
-            FROM measurements
-            INNER JOIN sensors
-                ON sensors.id = measurements.sensor_id
-                AND sensors.is_deleted = false
-            INNER JOIN devices
-                ON devices.id = sensors.device_id
-                AND devices.username = 'admin'
-            WHERE
-                measurements.location_id IS NOT NULL
-            GROUP BY bucket, location_id
-        ) AS buckets
-        GROUP BY buckets.bucket, buckets.location_id
-    ) location_buckets
-    GROUP BY location_buckets.location_id
-) AS l;
-
-
-
-
-
-
-
-
-
-WITH measurements AS (
-        SELECT
-            (EXTRACT(epoch FROM measurements.created_at) / EXTRACT(epoch FROM INTERVAL '5 sec'))::INTEGER AS bucket,
-            measurements.location_id,
-            sensors.id AS sensor_id,
-            json_agg(
-                json_build_object(
-                    'key',
-                    measurements.key,
-                    'value',
-                    measurements.value
-                )
-            ) AS measurements
-        FROM measurements
-        INNER JOIN sensors
-            ON sensors.id = measurements.sensor_id
-            AND sensors.is_deleted = false
-        INNER JOIN devices
-            ON devices.id = sensors.device_id
-            AND devices.username = 'admin'
-        WHERE
-            measurements.location_id IS NOT NULL
-        GROUP BY bucket, measurements.location_id, sensors.id
-    ),
-    buckets AS (
-        SELECT
-            measurements.location_id,
-            measurements.sensor_id,
-            json_build_object(
-                'bucket_id',
-                measurements.bucket,
-                'measurements',
-                json_agg(measurements.measurements)->0
-            ) AS bucket
-        FROM measurements
-        GROUP BY measurements.bucket, measurements.location_id, measurements.sensor_id
-    ),
-    location_buckets AS (
-        SELECT
-            buckets.sensor_id,
-            buckets.location_id,
-            json_agg(buckets.bucket) AS buckets
-        FROM buckets
-        GROUP BY buckets.location_id, buckets.sensor_id
-    ),
-    sensor_locations AS (
-        SELECT
-            location_buckets.location_id,
-            json_agg(
-                json_build_object(
+                'device_id',
+                device_id,
+                'device_name',
+                device_name,
+                'lastest_timestamp',
+                lastest_timestamp,
+                'average_probability',
+                average_probability,
                 'sensor_id',
-                location_buckets.sensor_id,
-                'buckets',
-                location_buckets.buckets
+                sensor_id,
+                'sensor_name',
+                sensor_name,
+                'scanners',
+                scanners
+            )
+        ) AS devices
+    FROM device_locations
+    GROUP BY
+        device_locations.location_id,
+        device_locations.location_name,
+        device_locations.geometry
+) c;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-- GetByLocation
+
+-- get count of mac addresses seen by device within time window
+
+WITH device_sensor_locations AS (
+    SELECT
+        locations.id AS location_id,
+        locations.name AS location_name,
+        ST_AsGeoJSON(locations.geom)::JSONB AS geometry,
+        devices.id AS device_id,
+        devices.name AS device_name,
+        sensors.id AS sensor_id,
+        sensors.name AS sensor_name,
+        MAX(location_history.created_at) AS lastest_timestamp,
+        AVG(location_history.probability) AS average_probability,
+        COUNT(measurements.*) AS scanners
+    FROM
+        location_history
+    INNER JOIN devices
+        ON devices.id = location_history.device_id
+        ANd devices.username = 'admin'
+        AND devices.is_deleted = false
+    INNER JOIN locations
+        ON locations.id = location_history.location_id
+        AND locations.is_deleted = false
+
+    INNER JOIN sensors
+        ON sensors.device_id = devices.id
+    LEFT JOIN measurements
+        ON measurements.sensor_id = sensors.id
+        AND measurements.created_at >= (NOW() - INTERVAL '60 minutes')
+
+    WHERE
+        location_history.created_at >= (NOW() - INTERVAL '60 minutes')
+    GROUP BY locations.id, devices.id, sensors.id
+),
+device_locations AS (
+    SELECT
+        device_sensor_locations.location_id,
+        device_sensor_locations.location_name,
+        device_sensor_locations.geometry,
+        device_sensor_locations.device_id,
+        device_sensor_locations.device_name,
+        device_sensor_locations.lastest_timestamp,
+        device_sensor_locations.average_probability,
+        json_agg(
+            json_build_object(
+                'sensor_id',
+                device_sensor_locations.sensor_id,
+                'sensor_name',
+                device_sensor_locations.sensor_name,
+                'scanners',
+                device_sensor_locations.scanners
+            )
+        ) AS sensors
+    FROM device_sensor_locations
+    GROUP BY
+        device_sensor_locations.location_id,
+        device_sensor_locations.location_name,
+        device_sensor_locations.geometry,
+        device_sensor_locations.device_id,
+        device_sensor_locations.device_name,
+        device_sensor_locations.lastest_timestamp,
+        device_sensor_locations.average_probability
+)
+
+SELECT json_agg(c)
+FROM (
+    SELECT
+        device_locations.location_id,
+        device_locations.location_name,
+        device_locations.geometry,
+        json_agg(
+            json_build_object(
+                'device_id',
+                device_locations.device_id,
+                'device_name',
+                device_locations.device_name,
+                'lastest_timestamp',
+                device_locations.lastest_timestamp,
+                'average_probability',
+                device_locations.average_probability,
+                'sensors',
+                device_locations.sensors
+            )
+        ) AS devices
+    FROM device_locations
+    GROUP BY
+        device_locations.location_id,
+        device_locations.location_name,
+        device_locations.geometry
+) c;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+WITH
+    device_sensor_locations AS (
+        SELECT
+            locations.id AS location_id,
+            locations.name AS location_name,
+            ST_AsGeoJSON(locations.geom)::JSONB AS geometry,
+            devices.id AS device_id,
+            devices.name AS device_name,
+            sensors.id AS sensor_id,
+            sensors.name AS sensor_name,
+            MIN(location_history.created_at) AS first_timestamp,
+            MAX(location_history.created_at) AS lastest_timestamp,
+            AVG(location_history.probability) AS average_probability,
+            COUNT(measurements.*) AS num_measurements
+        FROM
+            location_history
+        INNER JOIN devices
+            ON devices.id = location_history.device_id
+            ANd devices.username = 'admin'
+            AND devices.is_deleted = false
+        INNER JOIN locations
+            ON locations.id = location_history.location_id
+            AND locations.is_deleted = false
+        INNER JOIN sensors
+            ON sensors.device_id = devices.id
+        LEFT JOIN measurements
+            ON measurements.sensor_id = sensors.id
+            AND measurements.created_at >= (NOW() - INTERVAL '5 minutes')
+        WHERE
+            location_history.created_at >= (NOW() - INTERVAL '5 minutes')
+        GROUP BY locations.id, devices.id, sensors.id
+    ),
+    device_locations AS (
+        SELECT
+            device_sensor_locations.location_id,
+            device_sensor_locations.location_name,
+            device_sensor_locations.geometry,
+            device_sensor_locations.device_id,
+            device_sensor_locations.device_name,
+            device_sensor_locations.first_timestamp,
+            device_sensor_locations.lastest_timestamp,
+            device_sensor_locations.average_probability,
+            json_agg(
+                json_build_object(
+                    'sensor_id',
+                    device_sensor_locations.sensor_id,
+                    'sensor_name',
+                    device_sensor_locations.sensor_name,
+                    'measurements',
+                    device_sensor_locations.num_measurements
                 )
             ) AS sensors
-        FROM location_buckets
-        GROUP BY location_buckets.location_id
+        FROM device_sensor_locations
+        GROUP BY
+            device_sensor_locations.location_id,
+            device_sensor_locations.location_name,
+            device_sensor_locations.geometry,
+            device_sensor_locations.device_id,
+            device_sensor_locations.device_name,
+            device_sensor_locations.first_timestamp,
+            device_sensor_locations.lastest_timestamp,
+            device_sensor_locations.average_probability
     )
 
-SELECT json_agg(c) FROM (
+SELECT json_agg(c)
+FROM (
     SELECT
-        location_id,
-        sensors
-    FROM sensor_locations
+        device_locations.location_id,
+        device_locations.location_name,
+        device_locations.geometry,
+        json_agg(
+            json_build_object(
+                'device_id',
+                device_locations.device_id,
+                'device_name',
+                device_locations.device_name,
+                'first_timestamp',
+                device_locations.first_timestamp,
+                'lastest_timestamp',
+                device_locations.lastest_timestamp,
+                'average_probability',
+                device_locations.average_probability,
+                'sensors',
+                device_locations.sensors
+            )
+        ) AS devices
+    FROM device_locations
+    GROUP BY
+        device_locations.location_id,
+        device_locations.location_name,
+        device_locations.geometry
 ) c;

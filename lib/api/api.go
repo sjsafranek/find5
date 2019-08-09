@@ -164,12 +164,12 @@ func (self *Api) AnalyzeData(request *Request) error {
 // RecordMeasurements
 func (self *Api) importMeasurements(request *Request) error {
 	return self.fetchDevice(request, func(device *database.Device) error {
-		// TESTING
-		go self.AnalyzeData(request)
-
 		if !device.IsActive {
 			return errors.New("device is deactivated")
 		}
+		// TESTING
+		go self.AnalyzeData(request)
+
 		for sensor_id := range request.Data {
 			sensor, err := device.GetSensorById(sensor_id)
 			if nil != err {
@@ -396,6 +396,17 @@ func (self *Api) Do(request *Request) (*Response, error) {
 					return err
 				}
 				response.Data.Measurements = measurements
+				return nil
+			})
+
+		case "export_devices_by_location":
+			// {"method":"export_devices_by_location","username":"admin"}
+			return self.fetchUser(request, func(user *database.User) error {
+				deviceLocations, err := user.ExportDevicesByLocation()
+				if nil != err {
+					return err
+				}
+				response.Data.DeviceLocations = deviceLocations
 				return nil
 			})
 

@@ -28,14 +28,15 @@ func (self *Request) Unmarshal(data string) error {
 }
 
 type ResponseData struct {
-	Users        []*database.User                 `json:"users,omitempty"`
-	User         *database.User                   `json:"user,omitempty"`
-	Devices      []*database.Device               `json:"devices,omitempty"`
-	Device       *database.Device                 `json:"device,omitempty"`
-	Sensors      []*database.Sensor               `json:"sensors,omitempty"`
-	Sensor       *database.Sensor                 `json:"sensor,omitempty"`
-	Locations    *geojson.FeatureCollection       `json:"locations,omitempty"`
-	Measurements []*database.LocationMeasurements `json:"measurements,omitempty"`
+	Users           []*database.User                 `json:"users,omitempty"`
+	User            *database.User                   `json:"user,omitempty"`
+	Devices         []*database.Device               `json:"devices,omitempty"`
+	Device          *database.Device                 `json:"device,omitempty"`
+	Sensors         []*database.Sensor               `json:"sensors,omitempty"`
+	Sensor          *database.Sensor                 `json:"sensor,omitempty"`
+	Locations       *geojson.FeatureCollection       `json:"locations,omitempty"`
+	Measurements    []*database.LocationMeasurements `json:"measurements,omitempty"`
+	DeviceLocations []*database.DeviceLocations      `json:"device_locations,omitempty"`
 }
 
 type Response struct {
