@@ -21,11 +21,19 @@ var (
 
 func init() {
 	factory := func() (net.Conn, error) { return net.Dial("tcp", AI_SERVER_ADDRESS) }
-	pool, err := pool.NewChannelPool(4, 10, factory)
-	if nil != err {
-		panic(err)
-	}
-	AI_POOL = pool
+	go func() {
+		for {
+			pool, err := pool.NewChannelPool(4, 10, factory)
+			if nil != err {
+				logger.Warn("Unable to communicate with AI server")
+				time.Sleep(5 * time.Second)
+				continue
+			}
+			logger.Info("Connected to AI server")
+			AI_POOL = pool
+			break
+		}
+	}()
 }
 
 type ClassifyPayload struct {

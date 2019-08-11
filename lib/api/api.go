@@ -411,7 +411,7 @@ func (self *Api) Do(request *Request) (*Response, error) {
 			})
 
 		case "export_measurement_stats_by_location":
-			// {"method":"export_devices_by_location","username":"admin"}
+			// {"method":"export_measurement_stats_by_location","username":"admin"}
 			return self.fetchUser(request, func(user *database.User) error {
 				measurementLocations, err := user.ExportMeasurementStatsByLocation()
 				if nil != err {
