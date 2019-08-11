@@ -1,7 +1,83 @@
 
+WITH measurements_locations AS (
+        SELECT
+            measurements.key,
+            COUNT(DISTINCT(measurements.sensor_id)) AS sensors,
+            COUNT(measurements.*),
+            MIN(measurements.value),
+            MAX(measurements.value),
+            STDDEV(measurements.value),
+            AVG(measurements.value),
+            MIN(measurements.created_at) AS first_timestamp,
+            MAX(measurements.created_at) AS lastest_timestamp,
+            locations.id AS location_id,
+            locations.name AS location_name,
+            ST_AsGeoJSON(locations.geom)::JSONB AS geometry
+        FROM measurements
+            INNER JOIN locations
+                ON locations.id = measurements.location_id
+        INNER JOIN sensors
+            ON sensors.id = measurements.sensor_id
+            AND sensors.is_deleted = false
+        INNER JOIN devices
+            ON devices.id = sensors.device_id
+            ANd devices.username = 'admin'
+            AND devices.is_deleted = false
+        GROUP BY
+            locations.id, measurements.key
+    )
+
+SELECT json_agg(c)
+FROM (
+    SELECT
+        location_id,
+        location_name,
+        geometry,
+        json_agg(
+            json_build_object(
+                'key',
+                key,
+                'sensors',
+                sensors,
+                'min',
+                min,
+                'max',
+                max,
+                'stddev',
+                stddev,
+                'mean',
+                avg,
+                'first_timestamp',
+                first_timestamp,
+                'lastest_timestamp',
+                lastest_timestamp
+            )
+        ) AS scanners
+    FROM
+        measurements_locations
+    GROUP BY
+        location_id,
+        location_name,
+        geometry
+) c;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 -- GetByLocation
 
 -- get count of mac addresses seen by device within time window
+
 
 WITH device_locations AS (
     SELECT

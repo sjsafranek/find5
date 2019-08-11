@@ -410,6 +410,17 @@ func (self *Api) Do(request *Request) (*Response, error) {
 				return nil
 			})
 
+		case "export_measurement_stats_by_location":
+			// {"method":"export_devices_by_location","username":"admin"}
+			return self.fetchUser(request, func(user *database.User) error {
+				measurementLocations, err := user.ExportMeasurementStatsByLocation()
+				if nil != err {
+					return err
+				}
+				response.Data.MeasurementLocations = measurementLocations
+				return nil
+			})
+
 		case "calibrate":
 			// {"method":"calibrate","username":"admin"}
 			// {"apikey": "a0a1695e8cd13322f1acb312b40cddb6", "method": "calibrate"}

@@ -462,8 +462,94 @@ func (self *User) ExportDevicesByLocation() ([]*DeviceLocations, error) {
 		for rows.Next() {
 			var temp string
 			rows.Scan(&temp)
-			fmt.Println(temp)
 			err = json.Unmarshal([]byte(temp), &deviceLocations)
+			if nil != err {
+				return err
+			}
+		}
+
+		return nil
+	})
+}
+
+func (self *User) ExportMeasurementStatsByLocation() ([]*MeasurementLocations, error) {
+	var measurementLocations []*MeasurementLocations
+
+	return measurementLocations, self.db.Exec(func(conn *sql.DB) error {
+
+		rows, err := conn.Query(`
+			WITH measurements_locations AS (
+			        SELECT
+			            measurements.key,
+			            COUNT(DISTINCT(measurements.sensor_id)) AS sensors,
+			            COUNT(measurements.*),
+			            MIN(measurements.value),
+			            MAX(measurements.value),
+			            STDDEV(measurements.value),
+			            AVG(measurements.value),
+						to_char(MIN(measurements.created_at), 'YYYY-MM-DD"T"HH:MI:SS"Z"') AS first_timestamp,
+						to_char(MAX(measurements.created_at), 'YYYY-MM-DD"T"HH:MI:SS"Z"') AS lastest_timestamp,
+			            locations.id AS location_id,
+			            locations.name AS location_name,
+			            ST_AsGeoJSON(locations.geom)::JSONB AS geometry
+			        FROM measurements
+			            INNER JOIN locations
+			                ON locations.id = measurements.location_id
+			        INNER JOIN sensors
+			            ON sensors.id = measurements.sensor_id
+			            AND sensors.is_deleted = false
+			        INNER JOIN devices
+			            ON devices.id = sensors.device_id
+			            ANd devices.username = $1
+			            AND devices.is_deleted = false
+			        GROUP BY
+			            locations.id, measurements.key
+			    )
+
+			SELECT json_agg(c)
+			FROM (
+			    SELECT
+			        location_id,
+			        location_name,
+			        geometry,
+			        json_agg(
+			            json_build_object(
+			                'key',
+			                key,
+			                'sensors',
+			                sensors,
+							'count',
+							count,
+			                'min',
+			                min,
+			                'max',
+			                max,
+			                'stddev',
+			                stddev,
+			                'mean',
+			                avg,
+			                'first_timestamp',
+			                first_timestamp,
+			                'lastest_timestamp',
+			                lastest_timestamp
+			            )
+			        ) AS scanners
+			    FROM
+			        measurements_locations
+			    GROUP BY
+			        location_id,
+			        location_name,
+			        geometry
+			) c; `, self.Username)
+
+		if nil != err {
+			return err
+		}
+
+		for rows.Next() {
+			var temp string
+			rows.Scan(&temp)
+			err = json.Unmarshal([]byte(temp), &measurementLocations)
 			if nil != err {
 				return err
 			}

@@ -48,3 +48,22 @@ type SensorLocationStats struct {
 	SensorName   string `json:"sensor_name"`
 	Measurements int    `json:"measurements"`
 }
+
+type MeasurementLocations struct {
+	LocationId   string                      `json:"location_id"`
+	LocationName string                      `json:"location_name"`
+	Geometry     geojson.Geometry            `json:"geometry"`
+	Scanners     []*MeasurementLocationStats `json:"scanners"`
+}
+
+type MeasurementLocationStats struct {
+	Key              string    `json:"key"`
+	Sensors          int       `json:"sensors"`
+	Count            int       `json:"count"`
+	Min              float64   `json:"min"`
+	Max              float64   `json:"max"`
+	Stddev           float64   `json:"stddev"`
+	Mean             float64   `json:"mean"`
+	FirstTimestamp   time.Time `json:"first_timestamp,string"`
+	LastestTimestamp time.Time `json:"latest_timestamp,string"`
+}
