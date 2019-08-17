@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"html/template"
 	"io/ioutil"
 	"net/http"
 	"time"
@@ -40,10 +41,16 @@ func newApiHandler(findapi *api.Api) func(http.ResponseWriter, *http.Request) {
 
 				var request api.Request
 				json.Unmarshal(body, &request)
-				response, _ := findapi.Do(&request)
+				response, err := findapi.Do(&request)
+
+				if nil != err {
+					results, _ := response.Marshal()
+					data = results
+					return http.StatusBadRequest, nil
+				}
+
 				results, _ := response.Marshal()
 				data = results
-
 				return http.StatusOK, nil
 			default:
 				return http.StatusMethodNotAllowed, errors.New(http.StatusText(http.StatusMethodNotAllowed))
@@ -56,5 +63,23 @@ func newApiHandler(findapi *api.Api) func(http.ResponseWriter, *http.Request) {
 		}
 
 		apiJSONResponse(w, []byte(data), status_code)
+	}
+}
+
+func newProfileHandler(authMiddleware *AuthenticationHandlers) func(http.ResponseWriter, *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		data, err := authMiddleware.GetUserFromSession(r)
+		if nil != err {
+			apiBasicResponse(w, http.StatusInternalServerError, err)
+			return
+		}
+
+		t := template.Must(template.ParseFiles("tmpl/profile.html"))
+		t.Delims("[[", "]]")
+		err = t.ExecuteTemplate(w, "profile", data.Data.User)
+		if nil != err {
+			apiBasicResponse(w, http.StatusInternalServerError, err)
+			return
+		}
 	}
 }

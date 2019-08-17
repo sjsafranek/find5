@@ -1,6 +1,7 @@
 package api
 
 import (
+	"encoding/json"
 	"errors"
 	"time"
 
@@ -92,7 +93,6 @@ func (self *Api) fetchDevice(request *Request, clbk func(*database.Device) error
 	if nil != item {
 		device = item.Value().(*database.Device)
 	} else {
-
 		err := self.fetchUser(request, func(user *database.User) error {
 			var err error
 			device, err = user.GetDeviceById(request.DeviceId)
@@ -103,11 +103,9 @@ func (self *Api) fetchDevice(request *Request, clbk func(*database.Device) error
 			return err
 		}
 
-		// cache device device_id pair
 		self.cache.Set("device", request.DeviceId, device, 5*time.Minute)
 	}
 
-	// return device, nil
 	return clbk(device)
 }
 
@@ -178,15 +176,32 @@ func (self *Api) importMeasurements(request *Request) error {
 			if !sensor.IsActive {
 				return errors.New("sensor is deactivated")
 			}
+
 			if "" != request.LocationId {
-				sensor.ImportMeasurementsAtLocation(request.LocationId, request.Data[sensor_id])
+				err = sensor.ImportMeasurementsAtLocation(request.LocationId, request.Data[sensor_id])
 			} else {
-				sensor.ImportMeasurements(request.Data[sensor_id])
+				err = sensor.ImportMeasurements(request.Data[sensor_id])
 			}
+
+			if nil != err {
+				return nil
+			}
+
 		}
 		return nil
 	})
 
+}
+
+func (self *Api) DoJSON(jdata string) (*Response, error) {
+	var request Request
+	err := json.Unmarshal([]byte(jdata), &request)
+	if nil != err {
+		response := &Response{Status: "err"}
+		response.SetError(err)
+		return response, err
+	}
+	return self.Do(&request)
 }
 
 func (self *Api) Do(request *Request) (*Response, error) {
@@ -237,6 +252,7 @@ func (self *Api) Do(request *Request) (*Response, error) {
 			// {"method":"delete_user","username":"admin_user"}
 			// {"method":"delete_user","apikey":"<apikey>"}
 			return self.fetchUser(request, func(user *database.User) error {
+				self.cache.Delete("user", user.Apikey)
 				return user.Delete()
 			})
 
@@ -286,7 +302,7 @@ func (self *Api) Do(request *Request) (*Response, error) {
 			// {"method":"delete_device","username":"admin_user","device_id":"<uuid>"}
 			// {"method":"delete_device","apikey":"<apikey>","device_id":"<uuid>"}
 			return self.fetchDevice(request, func(device *database.Device) error {
-				// TODO: delete cache
+				self.cache.Delete("device", request.DeviceId)
 				return device.Delete()
 			})
 
@@ -294,16 +310,18 @@ func (self *Api) Do(request *Request) (*Response, error) {
 			// {"method":"activate_device","username":"admin_user","device_id":"<uuid>"}
 			// {"method":"activate_device","apikey":"<apikey>","device_id":"<uuid>"}
 			return self.fetchDevice(request, func(device *database.Device) error {
-				// TODO: update cache
-				return device.Activate()
+				err := device.Activate()
+				self.cache.Replace("device", request.DeviceId, device)
+				return err
 			})
 
 		case "deactivate_device":
 			// {"method":"deactivate_device","username":"admin_user","device_id":"<uuid>"}
 			// {"method":"deactivate_device","apikey":"<apikey>","device_id":"<uuid>"}
 			return self.fetchDevice(request, func(device *database.Device) error {
-				// TODO: update cache
-				return device.Deactivate()
+				err := device.Deactivate()
+				self.cache.Replace("device", request.DeviceId, device)
+				return err
 			})
 
 		case "create_sensor":
@@ -340,7 +358,7 @@ func (self *Api) Do(request *Request) (*Response, error) {
 			// {"method":"delete_sensor","username":"admin_user","sensor_id":"<uuid>"}
 			// {"method":"delete_sensor","apikey":"<apikey>","sensor_id":"<uuid>"}
 			return self.fetchSensor(request, func(sensor *database.Sensor) error {
-				// TODO: delete cache
+				self.cache.Delete("sensor", request.SensorId)
 				return sensor.Delete()
 			})
 
@@ -348,16 +366,18 @@ func (self *Api) Do(request *Request) (*Response, error) {
 			// {"method":"activate_sensor","username":"admin_user","sensor_id":"<uuid>"}
 			// {"method":"activate_sensor","apikey":"<apikey>","sensor_id":"<uuid>"}
 			return self.fetchSensor(request, func(sensor *database.Sensor) error {
-				// TODO: update cache
-				return sensor.Activate()
+				err := sensor.Activate()
+				self.cache.Replace("sensor", request.SensorId, sensor)
+				return err
 			})
 
 		case "deactivate_sensor":
 			// {"method":"deactivate_sensor","username":"admin_user","sensor_id":"<uuid>"}
 			// {"method":"deactivate_sensor","apikey":"<apikey>","sensor_id":"<uuid>"}
 			return self.fetchSensor(request, func(sensor *database.Sensor) error {
-				// TODO: update cache
-				return sensor.Deactivate()
+				err := sensor.Deactivate()
+				self.cache.Replace("sensor", request.SensorId, sensor)
+				return err
 			})
 
 		case "create_location":

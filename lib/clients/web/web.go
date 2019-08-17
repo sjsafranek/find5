@@ -62,6 +62,13 @@ func (self *Client) Run(HTTP_PORT int) {
 		HandlerFunc: pingHandler,
 	})
 
+	server.AttachHandlerFunc(lemur.ApiRoute{
+		Name:        "ping",
+		Methods:     []string{"GET"},
+		Pattern:     "/profile",
+		HandlerFunc: newProfileHandler(authMiddleware),
+	})
+
 	// Api routes
 	server.AttachHandlerFunc(lemur.ApiRoute{
 		Name:        "api",

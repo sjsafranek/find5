@@ -94,15 +94,6 @@ with open("wifi.tmp", "r") as fh:
         quality = parts[0].replace("Quality=","")
         signal_level = int(parts[1].replace("Signal level=","").replace(" dBm", ""))
         essid = rows[2].split("ESSID:")[1].strip().replace("\"","")
-        # print(json.dumps({
-        #    "event_timestamp": now,
-        #    "mac_address": mac_address,
-        #    "essid": essid,
-        #    "quality": quality,
-        #    "signal_level_dBm": signal_level,
-        #    "location_id": location["id"],
-        #    "sensor_id": sensor["id"]
-        # }))
         sensorMeasurements[mac_address] = signal_level
 
 measurements = {}
