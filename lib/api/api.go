@@ -31,10 +31,27 @@ func New(dbConnStr string, redisAddr string) *Api {
 }
 
 type Api struct {
-	db    *database.Database
-	redis *redis.Pool
-	cache *ccache.LayeredCache
-	ai    *ai.AI
+	db             *database.Database
+	redis          *redis.Pool
+	cache          *ccache.LayeredCache
+	ai             *ai.AI
+	eventListeners map[string][]func(string, string, float64)
+}
+
+func (self *Api) RegisterEventListener(username string, clbk func(string, string, float64)) {
+	if nil == self.eventListeners {
+		self.eventListeners = make(map[string][]func(string, string, float64))
+	}
+	self.eventListeners[username] = append(self.eventListeners[username], clbk)
+}
+
+func (self *Api) fireEvent(username, device_id, location_id string, probability float64) {
+	logger.Info(username, device_id, location_id, probability)
+	if clbks, ok := self.eventListeners[username]; ok {
+		for i := 0; i < len(clbks); i++ {
+			clbks[i](device_id, location_id, probability)
+		}
+	}
 }
 
 func (self *Api) fetchUser(request *Request, clbk func(*database.User) error) error {
@@ -149,8 +166,8 @@ func (self *Api) AnalyzeData(request *Request) error {
 				for i := range aidata.Guesses {
 					aidata.Guesses[i].Probability = float64(int64(float64(aidata.Guesses[i].Probability)*100)) / 100
 					device.SetLocation(aidata.Guesses[i].Location, aidata.Guesses[i].Probability*100)
+					self.fireEvent(device.GetUser().Username, device.Id, aidata.Guesses[i].Location, aidata.Guesses[i].Probability*100)
 				}
-
 			}()
 		}
 		//.end

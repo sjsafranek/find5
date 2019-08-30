@@ -44,7 +44,7 @@ func (self *Client) Run(HTTP_PORT int) {
 		HandlerFunc: authMiddleware.LogoutHandler("/login"),
 	})
 
-	server.Router.Use(authMiddleware.SessionMiddleware("/login", []string{"^/$", "^/ping", "^/login", "^/logout", "^/static/*", "^/api/v1/find"}))
+	server.Router.Use(authMiddleware.SessionMiddleware("/login", []string{"^/$", "^/ping", "^/login", "^/logout", "^/static/*", "^/api/v1/find", "^/events/*"}))
 	//.end
 
 	server.AttachHandlerFunc(lemur.ApiRoute{
@@ -75,6 +75,14 @@ func (self *Client) Run(HTTP_PORT int) {
 		Methods:     []string{"POST"},
 		Pattern:     "/api/v1/find",
 		HandlerFunc: newApiHandler(self.api),
+	})
+
+	// event source
+	server.AttachHandlerFunc(lemur.ApiRoute{
+		Name:        "event_source",
+		Methods:     []string{"GET"},
+		Pattern:     "/events/{username}",
+		HandlerFunc: newEventSourceHandler(self.api),
 	})
 
 	server.ListenAndServe(HTTP_PORT)
