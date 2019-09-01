@@ -1,0 +1,150 @@
+{{define "profile"}}
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>FIND 5</title>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+
+		<script src="/static/jquery/3.4.1/jquery.min.js"></script>
+		<script src="/static/vue/vue.min.js"></script>
+		<script src="/static/sweetalert2/sweetalert2.all.min.js"></script>
+
+	</head>
+	<body>
+
+		<div id="user">
+			<label>[| username |]</label>
+		</div>
+
+
+		<h4>Devices</h4>
+		<div id="devices">
+			<button v-on:click="createDevice()">Create</button>
+			<div class="objects"><div>
+		</div>
+
+		<script>
+
+			var api,
+				app;
+
+
+			function FindApi(user) {
+				this.user = user;
+			}
+
+			FindApi.prototype.do = function(payload, callback) {
+				payload.apikey = this.user.apikey;		// <-- always add apikey to api call
+				callback = callback || console.log; 	// <-- default callback
+				$.post("/api/v1/find", JSON.stringify(payload))
+					.done(function(data) {
+						callback && callback(null, data);
+					})
+					.fail(function(xhr){
+						callback(xhr.responseJSON);
+					});
+			}
+
+
+			FindApi.prototype.getDevices = function(callback) {
+				this.do({"method":"get_devices"}, callback);
+			}
+
+
+			FindApi.prototype.createDevice = function(name, type, callback) {
+				this.do({"method":"create_device", "name":name, "type":type}, callback);
+			}
+
+
+			function App(api) {
+				this.api = api;
+				this.views = {
+					'user': new Vue({
+						el: '#user',
+						delimiters: ['[|', '|]'],
+						data: {{ index . }},
+						methods: {}
+					}),
+					'devices': new Vue({
+						el: '#devices',
+						delimiters: ['[|', '|]'],
+						data: [],
+						methods: {
+
+							'createDevice': function() {
+								var self = this;
+								Swal.fire({
+									title: 'Multiple inputs',
+									html:
+										'<input id="swal-input1" class="swal2-input" placeholder="name">' +
+										'<input id="swal-input2" class="swal2-input" placeholder="type">',
+									focusConfirm: false,
+									preConfirm: () => {
+										return {
+											'name': document.getElementById('swal-input1').value,
+											'type': document.getElementById('swal-input2').value
+										}
+									}
+								}).then((result) => {
+									if (result.value) {
+										api.createDevice(result.value.name, result.value.type, function() {
+											self.fetchDevices();
+										});
+									}
+								});
+
+							},
+
+							'fetchDevices': function() {
+								var self = this;
+								api.getDevices(function(err, data) {
+									self.data = data.data.devices;
+									$(self.$el).find('.objects').empty();
+									for (var i=0; i<self.data.length; i++) {
+										var device = self.data[i];
+										$(self.$el).find('.objects').append(
+											$('<div>').append(
+												$('<div>').append(
+													$('<label>').append('id: '),
+													$('<span>').append(device.id)
+												),
+												$('<div>').append(
+													$('<label>').append('name: '),
+													$('<span>').append(device.name)
+												),
+												$('<div>').append(
+													$('<label>').append('type: '),
+													$('<span>').append(device.type)
+												),
+												$('<div>').append(
+													$('<sensors>').append('sensors: '),
+													$('<span>').append(device.sensors ? device.sensors.length : 0)
+												)
+											)
+										);
+									};
+								})
+							}
+
+						}
+					})
+				}
+
+				this.views.devices.fetchDevices();
+
+			}
+
+
+			$(document).ready(function(){
+				api = new FindApi({{ index . }});
+				app = new App(api);
+			});
+
+		</script>
+	</body>
+</html>
+
+{{end}}

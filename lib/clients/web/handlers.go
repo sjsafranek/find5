@@ -96,7 +96,7 @@ func newEventSourceHandler(findapi *api.Api) func(http.ResponseWriter, *http.Req
 		if _, ok := brokers[username]; !ok {
 
 			// create broker
-			broker := NewServer(findapi)
+			broker := NewServer()
 			brokers[username] = broker
 			// listen for events
 			go func() {
@@ -111,14 +111,3 @@ func newEventSourceHandler(findapi *api.Api) func(http.ResponseWriter, *http.Req
 		brokers[username].ServeHTTP(w, r)
 	}
 }
-
-/*
-
-
-var stream = new EventSource('/events/admin');
-stream.onmessage = function(e) {
-	console.log(JSON.parse(e.data));
-}
-
-
-*/
