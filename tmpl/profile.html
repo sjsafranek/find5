@@ -12,18 +12,77 @@
 		<script src="/static/vue/vue.min.js"></script>
 		<script src="/static/sweetalert2/sweetalert2.all.min.js"></script>
 
+		<!-- Font Awesome CSS -->
+		<link rel="stylesheet" href="/static/fontawesome/5.9.0/css/all.css">
+
+		<!-- Bootstrap -->
+        <link rel="stylesheet" href="/static/bootstrap/4.1.3/css/bootstrap.min.css">
+		<script src="/static/bootstrap/4.1.3/js/bootstrap.min.js"></script>
+
+
+		<script src="/static/app.js"></script>
+		<style>
+			.selected {
+				background-color: darkred;
+				color: white;
+			}
+		</style>
+
 	</head>
 	<body>
 
-		<div id="user">
-			<label>[| username |]</label>
-		</div>
+		<div class="container-fluid">
 
+			<div class="row" id="user">
+				<label>[| username |]</label>
+			</div>
 
-		<h4>Devices</h4>
-		<div id="devices">
-			<button v-on:click="createDevice()">Create</button>
-			<div class="objects"><div>
+			<div class="row">
+
+				<div class="col col-2" id="devices">
+					<label>Devices</label>
+					<button class="btn btn-sm btn-default" v-on:click="createDevice()">
+						<i class="fa fa-plus"></i>
+					</button>
+					<div class="objects"></div>
+				</div>
+
+				<div class="col col-4" id="device" style="display: none;">
+					<label>Device</label>
+					<div class="attributes selected">
+						<div><label>name:</label>  [| name |]</div>
+						<div><label>id:</label>  [| id |]</div>
+						<div><label>type:</label>  [| type |]</div>
+						<div><label>is_active:</label>  [| is_active |]</div>
+						<div><label>is_deleted:</label>  [| is_deleted |]</div>
+						<div><label>created_at:</label>  [| created_at |]</div>
+						<div><label>updated_at:</label>  [| updated_at |]</div>
+					</div>
+				</div>
+
+				<div class="col col-2" id="sensors" style="display: none;">
+					<label>sensors</label>
+					<button class="btn btn-sm btn-default" v-on:click="createSensor()">
+						<i class="fa fa-plus"></i>
+					</button>
+					<div class="objects"></div>
+				</div>
+
+				<div class="col col-4" id="sensor" style="display: none;">
+					<label>Sensor</label>
+					<div class="attributes selected">
+						<div><label>name:</label>  [| name |]</div>
+						<div><label>id:</label>  [| id |]</div>
+						<div><label>type:</label>  [| type |]</div>
+						<div><label>is_active:</label>  [| is_active |]</div>
+						<div><label>is_deleted:</label>  [| is_deleted |]</div>
+						<div><label>created_at:</label>  [| created_at |]</div>
+						<div><label>updated_at:</label>  [| updated_at |]</div>
+					</div>
+				</div>
+
+			</div>
+
 		</div>
 
 		<script>
@@ -48,99 +107,27 @@
 					});
 			}
 
-
 			FindApi.prototype.getDevices = function(callback) {
 				this.do({"method":"get_devices"}, callback);
 			}
-
 
 			FindApi.prototype.createDevice = function(name, type, callback) {
 				this.do({"method":"create_device", "name":name, "type":type}, callback);
 			}
 
-
-			function App(api) {
-				this.api = api;
-				this.views = {
-					'user': new Vue({
-						el: '#user',
-						delimiters: ['[|', '|]'],
-						data: {{ index . }},
-						methods: {}
-					}),
-					'devices': new Vue({
-						el: '#devices',
-						delimiters: ['[|', '|]'],
-						data: [],
-						methods: {
-
-							'createDevice': function() {
-								var self = this;
-								Swal.fire({
-									title: 'Multiple inputs',
-									html:
-										'<input id="swal-input1" class="swal2-input" placeholder="name">' +
-										'<input id="swal-input2" class="swal2-input" placeholder="type">',
-									focusConfirm: false,
-									preConfirm: () => {
-										return {
-											'name': document.getElementById('swal-input1').value,
-											'type': document.getElementById('swal-input2').value
-										}
-									}
-								}).then((result) => {
-									if (result.value) {
-										api.createDevice(result.value.name, result.value.type, function() {
-											self.fetchDevices();
-										});
-									}
-								});
-
-							},
-
-							'fetchDevices': function() {
-								var self = this;
-								api.getDevices(function(err, data) {
-									self.data = data.data.devices;
-									$(self.$el).find('.objects').empty();
-									for (var i=0; i<self.data.length; i++) {
-										var device = self.data[i];
-										$(self.$el).find('.objects').append(
-											$('<div>').append(
-												$('<div>').append(
-													$('<label>').append('id: '),
-													$('<span>').append(device.id)
-												),
-												$('<div>').append(
-													$('<label>').append('name: '),
-													$('<span>').append(device.name)
-												),
-												$('<div>').append(
-													$('<label>').append('type: '),
-													$('<span>').append(device.type)
-												),
-												$('<div>').append(
-													$('<sensors>').append('sensors: '),
-													$('<span>').append(device.sensors ? device.sensors.length : 0)
-												)
-											)
-										);
-									};
-								})
-							}
-
-						}
-					})
-				}
-
-				this.views.devices.fetchDevices();
-
+			FindApi.prototype.createSensor = function(device_id, name, type, callback) {
+				this.do({"method":"create_sensor", "device_id": device_id, "name":name, "type":type}, callback);
 			}
+
+			FindApi.prototype.getSensors = function(device_id, callback) {
+				this.do({"method":"get_sensors", "device_id": device_id}, callback);
+			}
+
 
 
 			$(document).ready(function(){
 				api = new FindApi({{ index . }});
-				app = new App(api);
+				app = new App({{ index . }}, api);
 			});
 
 		</script>

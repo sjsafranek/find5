@@ -24,6 +24,7 @@ const (
 	DEFAULT_DATABASE_PORT     int64  = 5432
 	DEFAULT_REDIS_PORT        int64  = 6379
 	DEFAULT_REDIS_HOST        string = ""
+	DEFAULT_LOGGING_DIRECTORY string = "./log/"
 )
 
 var (
@@ -36,6 +37,7 @@ var (
 	DATABASE_PORT     int64  = DEFAULT_DATABASE_PORT
 	REDIS_PORT        int64  = DEFAULT_REDIS_PORT
 	REDIS_HOST        string = DEFAULT_REDIS_HOST
+	LOGGING_DIRECTORY string = DEFAULT_LOGGING_DIRECTORY
 	REQUEST           string = ""
 	MODE              string = "web"
 	logger                   = ligneous.AddLogger("server", "trace", "./log/find5")
