@@ -24,6 +24,8 @@ const (
 	DEFAULT_DATABASE_PORT     int64  = 5432
 	DEFAULT_REDIS_PORT        int64  = 6379
 	DEFAULT_REDIS_HOST        string = ""
+	DEFAULT_AI_HOST           string = "localhost"
+	DEFAULT_AI_PORT           int64  = 7005
 	DEFAULT_LOGGING_DIRECTORY string = "./log/"
 )
 
@@ -38,6 +40,8 @@ var (
 	REDIS_PORT        int64  = DEFAULT_REDIS_PORT
 	REDIS_HOST        string = DEFAULT_REDIS_HOST
 	LOGGING_DIRECTORY string = DEFAULT_LOGGING_DIRECTORY
+	AI_HOST           string = DEFAULT_AI_HOST
+	AI_PORT           int64  = DEFAULT_AI_PORT
 	REQUEST           string = ""
 	MODE              string = "web"
 	logger                   = ligneous.AddLogger("server", "trace", "./log/find5")
@@ -58,8 +62,11 @@ func init() {
 	flag.StringVar(&DATABASE_USERNAME, "dbuser", DEFAULT_DATABASE_USERNAME, "database username")
 	flag.Int64Var(&DATABASE_PORT, "dbport", DEFAULT_DATABASE_PORT, "Database port")
 	flag.StringVar(&REDIS_HOST, "redishost", DEFAULT_REDIS_HOST, "Redis host")
-	flag.StringVar(&REQUEST, "c", "", "Api query to execute")
 	flag.Int64Var(&REDIS_PORT, "redisport", DEFAULT_REDIS_PORT, "Redis port")
+	flag.StringVar(&AI_HOST, "aihost", DEFAULT_AI_HOST, "AI host")
+	flag.Int64Var(&AI_PORT, "aiport", DEFAULT_AI_PORT, "AI port")
+	flag.StringVar(&REQUEST, "c", "", "Api query to execute")
+
 	flag.BoolVar(&print_version, "V", false, "Print version and exit")
 	flag.Parse()
 
@@ -78,7 +85,8 @@ func init() {
 func main() {
 	dbConnectionString := fmt.Sprintf("%v://%v:%v@%v:%v/%v?sslmode=disable", DATABASE_ENGINE, DATABASE_USERNAME, DATABASE_PASSWORD, DATABASE_HOST, DATABASE_PORT, DATABASE_DATABASE)
 	redisAddr := fmt.Sprintf("%v:%v", REDIS_HOST, REDIS_PORT)
-	findapi = api.New(dbConnectionString, redisAddr)
+	aiConnStr := fmt.Sprintf("%v:%v", AI_HOST, AI_PORT)
+	findapi = api.New(dbConnectionString, aiConnStr, redisAddr)
 
 	if "" != REQUEST {
 		request := api.Request{}

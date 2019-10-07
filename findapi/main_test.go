@@ -111,7 +111,7 @@ func TestMain(m *testing.M) {
 	// set up api and database
 	dbConnectionString := fmt.Sprintf("%v://%v:%v@%v:%v/%v?sslmode=disable", DATABASE_ENGINE, DATABASE_USERNAME, DATABASE_PASSWORD, DATABASE_HOST, DATABASE_PORT, DATABASE_DATABASE)
 	redisAddr := fmt.Sprintf("%v:%v", REDIS_HOST, REDIS_PORT)
-	findapi = api.New(dbConnectionString, redisAddr)
+	findapi = api.New(dbConnectionString, "localhost:8002", redisAddr)
 
 	// setup objects for testing
 	TEST_USERNAME = fmt.Sprintf("test_user_%v", time.Now().UnixNano())

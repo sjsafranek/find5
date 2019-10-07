@@ -18,6 +18,4 @@ RUN go get github.com/pkg/errors
 
 RUN cd /go/src/github.com/sjsafranek/find5/findapi && go build -o /go/find *.go
 
-RUN ls -lhr
-
-CMD ./find -dbhost finddb -redishost redis
+CMD ./find -dbhost finddb -redishost redis -aihost findai

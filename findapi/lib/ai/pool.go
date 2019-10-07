@@ -4,47 +4,19 @@ import (
 	"bufio"
 	"errors"
 	"fmt"
-	"net"
-	"sync"
 	"time"
 
 	"github.com/sjsafranek/find5/findapi/lib/ai/models"
 	"github.com/sjsafranek/pool"
 )
 
-var (
-	AI_SERVER_ADDRESS string = "localhost:7005"
-	AI_POOL           pool.Pool
-	AI_PENDING        int = 0
-	ai_counter_lock   sync.RWMutex
-)
-
-func init() {
-	factory := func() (net.Conn, error) { return net.Dial("tcp", AI_SERVER_ADDRESS) }
-	go func() {
-		for {
-			pool, err := pool.NewChannelPool(4, 10, factory)
-			if nil != err {
-				logger.Warn("Unable to communicate with AI server")
-				time.Sleep(5 * time.Second)
-				continue
-			}
-			logger.Info("Connected to AI server")
-			AI_POOL = pool
-			break
-		}
-	}()
-}
-
 type ClassifyPayload struct {
 	Sensor models.SensorData `json:"sensor_data"`
-	// DataFolder string            `json:"data_folder"`
 }
 
 const RETRY_LIMIT int = 2
 
-func aiSendAndRecieveWithRetry(query string, attempt int) (string, error) {
-	// logger.Debug(query)
+func (self *AI) aiSendAndRecieveWithRetry(query string, attempt int) (string, error) {
 
 	if RETRY_LIMIT < attempt {
 		err := errors.New("retry limit reached")
@@ -53,7 +25,7 @@ func aiSendAndRecieveWithRetry(query string, attempt int) (string, error) {
 		return "", err
 	}
 
-	conn, err := AI_POOL.Get()
+	conn, err := self.aiPool.Get()
 	if nil != err {
 		panic(err)
 	}
@@ -76,7 +48,7 @@ func aiSendAndRecieveWithRetry(query string, attempt int) (string, error) {
 		// exponential backoff
 		time.Sleep(time.Duration(attempt*attempt) * time.Second)
 
-		return aiSendAndRecieveWithRetry(query, attempt)
+		return self.aiSendAndRecieveWithRetry(query, attempt)
 	}
 
 	// TODO
@@ -92,43 +64,23 @@ func aiSendAndRecieveWithRetry(query string, attempt int) (string, error) {
 	return results, nil
 }
 
-func aiSendAndRecieve(query string) (string, error) {
+func (self *AI) aiSendAndRecieve(query string) (string, error) {
 	// TODO
 	//  - block duplicate calls
 	logger.Tracef("Out  %v bytes", len(query))
 	logger.Debug("sending message to ai server")
 
-	ai_counter_lock.Lock()
-	AI_PENDING++
-	ai_counter_lock.Unlock()
+	self.guard.Lock()
+	self.pending++
+	self.guard.Unlock()
 
-	results, err := aiSendAndRecieveWithRetry(query, 1)
+	results, err := self.aiSendAndRecieveWithRetry(query, 1)
 
-	ai_counter_lock.Lock()
-	AI_PENDING--
-	ai_counter_lock.Unlock()
+	self.guard.Lock()
+	self.pending--
+	self.guard.Unlock()
 
 	logger.Tracef("In %v bytes", len(results))
 	logger.Tracef("In %v", results)
 	return results, err
-}
-
-func init() {
-
-	go func() {
-		for {
-			time.Sleep(10 * time.Second)
-			ai_counter_lock.RLock()
-			if 0 != AI_PENDING {
-				logger.Debugf("%v pending AI requests", AI_PENDING)
-			}
-			ai_counter_lock.RUnlock()
-		}
-	}()
-
-}
-
-func Shutdown() {
-	logger.Warn("Closing connection pool...")
-	AI_POOL.Close()
 }

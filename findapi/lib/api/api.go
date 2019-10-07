@@ -17,7 +17,7 @@ var (
 	logger = ligneous.AddLogger("api", "trace", "./log/find5")
 )
 
-func New(dbConnStr string, redisAddr string) *Api {
+func New(dbConnStr, aiConnStr, redisAddr string) *Api {
 	return &Api{
 		db: database.New(dbConnStr),
 		redis: &redis.Pool{
@@ -26,7 +26,7 @@ func New(dbConnStr string, redisAddr string) *Api {
 			Dial:        func() (redis.Conn, error) { return redis.Dial("tcp", redisAddr) },
 		},
 		cache: ccache.Layered(ccache.Configure()),
-		ai:    ai.New(),
+		ai:    ai.New(aiConnStr, redisAddr),
 	}
 }
 

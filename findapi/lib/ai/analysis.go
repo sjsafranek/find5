@@ -12,7 +12,7 @@ import (
 )
 
 // AIPort designates the port for the AI processing
-var AIPort = "8002"
+// var AIPort = "8002"
 
 // var DataFolder = "./data/"
 
@@ -56,7 +56,7 @@ func (self *AI) AnalyzeSensorData(s models.SensorData, family string) (aidata mo
 			return
 		}
 
-		body, err := aiSendAndRecieve(fmt.Sprintf(`{"method": "classify", "data":%v}`, string(bPayload)))
+		body, err := self.aiSendAndRecieve(fmt.Sprintf(`{"method": "classify", "data":%v}`, string(bPayload)))
 		if nil != err {
 			err = errors.Wrap(err, "problem sending message to ai server")
 			return

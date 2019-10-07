@@ -14,7 +14,7 @@ logger = NewLogger("tcp")
 
 # tcp server
 # TCP_IP = '127.0.0.1'
-TCP_IP = 'localhost'
+TCP_IP = '0.0.0.0'
 TCP_PORT = 7005
 BUFFER_SIZE = 1024
 
@@ -43,6 +43,9 @@ def on_new_client(conn, addr):
 
                 query = json.loads(parts[0])
                 logger.info("IN  {0} bytes".format(len(json.dumps(query))))
+
+                # logger.info(query['data']['sensor_data']['f'])
+                # print(query['sensor_data'].keys())
 
                 results = {"success": False, "message": "incorrect usage"}
                 if 'method' in query and 'data' in query:

@@ -7,7 +7,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"math/rand"
+	"net"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/garyburd/redigo/redis"
@@ -17,36 +19,75 @@ import (
 	"github.com/sjsafranek/find5/findapi/lib/ai/models"
 	"github.com/sjsafranek/find5/findapi/lib/database"
 	"github.com/sjsafranek/ligneous"
+	"github.com/sjsafranek/pool"
 )
 
 var (
-	logger    = ligneous.AddLogger("ai", "trace", "./log/find5")
-	redisPool = redis.Pool{
-		MaxIdle:     3,
-		IdleTimeout: 240 * time.Second,
-		Dial:        func() (redis.Conn, error) { return redis.Dial("tcp", ":6379") },
-	}
+	logger = ligneous.AddLogger("ai", "trace", "./log/find5")
 )
 
-func New() *AI {
-	return &AI{}
+func New(aiConnStr, redisAddr string) *AI {
+
+	factory := func() (net.Conn, error) { return net.Dial("tcp", aiConnStr) }
+	var aiPool pool.Pool
+	for {
+		connPool, err := pool.NewChannelPool(4, 10, factory)
+		if nil != err {
+			logger.Warn("Unable to communicate with AI server")
+			time.Sleep(5 * time.Second)
+			continue
+		}
+		logger.Info("Connected to AI server")
+		aiPool = connPool
+		break
+	}
+
+	ai := AI{
+		// aiConnStr: aiConnStr,
+		aiPool: aiPool,
+		redis: &redis.Pool{
+			MaxIdle:     3,
+			IdleTimeout: 240 * time.Second,
+			Dial:        func() (redis.Conn, error) { return redis.Dial("tcp", redisAddr) },
+		},
+	}
+
+	go func() {
+		for {
+			time.Sleep(10 * time.Second)
+			ai.guard.RLock()
+			if 0 != ai.pending {
+				logger.Debugf("%v pending AI requests", ai.pending)
+			}
+			ai.guard.RUnlock()
+		}
+	}()
+
+	return &ai
+
 }
 
-type AI struct{}
+type AI struct {
+	// aiConnStr string
+	redis   *redis.Pool
+	aiPool  pool.Pool
+	pending int
+	guard   sync.RWMutex
+}
 
 func (self *AI) Set(key string, v interface{}) error {
 	data, err := json.Marshal(v)
 	if err != nil {
 		return err
 	}
-	conn := redisPool.Get()
+	conn := self.redis.Get()
 	defer conn.Close()
 	_, err = redis.Bytes(conn.Do("SET", key, data))
 	return err
 }
 
 func (self *AI) Get(key string, v interface{}) error {
-	conn := redisPool.Get()
+	conn := self.redis.Get()
 	defer conn.Close()
 	data, err := redis.Bytes(conn.Do("GET", key))
 	if err != nil {
@@ -221,7 +262,7 @@ func (self *AI) learnFromData(family string, datas []models.SensorData) error {
 		return err
 	}
 
-	body, err := aiSendAndRecieve(fmt.Sprintf(`{"method":"learn","data":{"family":"%v","file_data":"%v"}}`, family, b64Data))
+	body, err := self.aiSendAndRecieve(fmt.Sprintf(`{"method":"learn","data":{"family":"%v","file_data":"%v"}}`, family, b64Data))
 	if nil != err {
 		return errors.Wrap(err, "problem sending message to ai server")
 	}

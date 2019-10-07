@@ -29,6 +29,7 @@ services:
        - webnet
      ports:
        - "8002:8002"
+       - "7005:7005"
 
    findapi:
      container_name: "findapi"
