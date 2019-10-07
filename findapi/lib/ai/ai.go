@@ -12,10 +12,10 @@ import (
 
 	"github.com/garyburd/redigo/redis"
 	"github.com/pkg/errors"
-	"github.com/sjsafranek/find5/lib/ai/learning/nb1"
-	"github.com/sjsafranek/find5/lib/ai/learning/nb2"
-	"github.com/sjsafranek/find5/lib/ai/models"
-	"github.com/sjsafranek/find5/lib/database"
+	"github.com/sjsafranek/find5/findapi/lib/ai/learning/nb1"
+	"github.com/sjsafranek/find5/findapi/lib/ai/learning/nb2"
+	"github.com/sjsafranek/find5/findapi/lib/ai/models"
+	"github.com/sjsafranek/find5/findapi/lib/database"
 	"github.com/sjsafranek/ligneous"
 )
 
@@ -221,7 +221,7 @@ func (self *AI) learnFromData(family string, datas []models.SensorData) error {
 		return err
 	}
 
-	body, err := aiSendAndRecieve(fmt.Sprintf(`{"method":"learn","data":{"family":"%v","data_folder":"%v","file_data":"%v"}}`, family, DataFolder, b64Data))
+	body, err := aiSendAndRecieve(fmt.Sprintf(`{"method":"learn","data":{"family":"%v","file_data":"%v"}}`, family, b64Data))
 	if nil != err {
 		return errors.Wrap(err, "problem sending message to ai server")
 	}

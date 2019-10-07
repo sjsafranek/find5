@@ -8,7 +8,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/sjsafranek/find5/lib/ai/models"
+	"github.com/sjsafranek/find5/findapi/lib/ai/models"
 	"github.com/sjsafranek/pool"
 )
 
@@ -37,8 +37,8 @@ func init() {
 }
 
 type ClassifyPayload struct {
-	Sensor     models.SensorData `json:"sensor_data"`
-	DataFolder string            `json:"data_folder"`
+	Sensor models.SensorData `json:"sensor_data"`
+	// DataFolder string            `json:"data_folder"`
 }
 
 const RETRY_LIMIT int = 2

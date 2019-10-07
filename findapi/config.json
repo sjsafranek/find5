@@ -1,0 +1,28 @@
+{
+	"communication": [
+		{
+			"type": "http",
+			"port": 8080
+		},
+		{
+			"type": "tcp",
+			"port": 9622
+		}
+	],
+	"database": {
+		"engine": "postgres",
+		"dbname": "finddb",
+		"dbpass": "dev",
+		"dbuser": "finduser",
+		"host": "localhost",
+		"port": 5432,
+		"sslmode": "disable"
+	},
+	"redis": {
+		"host": "",
+		"port": 6379
+	},
+	"ai": {
+		"port": 8002
+	}
+}

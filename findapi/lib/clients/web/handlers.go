@@ -10,7 +10,7 @@ import (
 	"time"
 
 	"github.com/gorilla/mux"
-	"github.com/sjsafranek/find5/lib/api"
+	"github.com/sjsafranek/find5/findapi/lib/api"
 )
 
 var startTime time.Time

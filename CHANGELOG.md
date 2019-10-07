@@ -1,7 +1,12 @@
 
+TODO
+remove ai datafolder requirement in api calls
+python_ai starts up with default datafolder
+switch to json config files
 
 
-
+5.0.5
+created separate directory to track database schema and patches
 
 5.0.4
 fixed tcp pool for retry on golang side
@@ -13,7 +18,7 @@ golang api with method callbacks
 
 5.0.2
 database golang api
-fixed database contraints for measurements table
+fixed database constraints for measurements table
 
 5.0.1
 database structure

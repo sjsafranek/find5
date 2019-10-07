@@ -7,9 +7,9 @@ import (
 
 	"github.com/garyburd/redigo/redis"
 	"github.com/karlseguin/ccache"
-	"github.com/sjsafranek/find5/lib/ai"
-	"github.com/sjsafranek/find5/lib/ai/models"
-	"github.com/sjsafranek/find5/lib/database"
+	"github.com/sjsafranek/find5/findapi/lib/ai"
+	"github.com/sjsafranek/find5/findapi/lib/ai/models"
+	"github.com/sjsafranek/find5/findapi/lib/database"
 	"github.com/sjsafranek/ligneous"
 )
 

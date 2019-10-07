@@ -3,29 +3,27 @@ package ai
 import (
 	"encoding/json"
 	"fmt"
-	"path"
-	"path/filepath"
 	"sort"
 	"time"
 
 	"github.com/pkg/errors"
-	"github.com/sjsafranek/find5/lib/ai/learning/nb1"
-	"github.com/sjsafranek/find5/lib/ai/models"
-	// "github.com/sjsafranek/find5/lib/utils"
+	"github.com/sjsafranek/find5/findapi/lib/ai/learning/nb1"
+	"github.com/sjsafranek/find5/findapi/lib/ai/models"
 )
 
 // AIPort designates the port for the AI processing
 var AIPort = "8002"
-var DataFolder = "./data/"
 
-func init() {
-	fpath, err := filepath.Abs("./data/")
-	if nil != err {
-		return
-	}
-	folder := filepath.Dir(fpath)
-	DataFolder = path.Join(folder, "data/")
-}
+// var DataFolder = "./data/"
+
+// func init() {
+// 	fpath, err := filepath.Abs("./data/")
+// 	if nil != err {
+// 		return
+// 	}
+// 	folder := filepath.Dir(fpath)
+// 	DataFolder = path.Join(folder, "data/")
+// }
 
 func (self *AI) Analyze(s models.SensorData, family string) (models.LocationAnalysis, error) {
 	return self.AnalyzeSensorData(s, family)
@@ -49,7 +47,7 @@ func (self *AI) AnalyzeSensorData(s models.SensorData, family string) (aidata mo
 
 		var p2 ClassifyPayload
 		p2.Sensor = s
-		p2.DataFolder = DataFolder
+		// p2.DataFolder = DataFolder
 
 		bPayload, err := json.Marshal(p2)
 		if err != nil {

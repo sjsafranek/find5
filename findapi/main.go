@@ -6,9 +6,9 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/sjsafranek/find5/lib/api"
-	"github.com/sjsafranek/find5/lib/clients/repl"
-	"github.com/sjsafranek/find5/lib/clients/web"
+	"github.com/sjsafranek/find5/findapi/lib/api"
+	"github.com/sjsafranek/find5/findapi/lib/clients/repl"
+	"github.com/sjsafranek/find5/findapi/lib/clients/web"
 	"github.com/sjsafranek/ligneous"
 )
 
@@ -76,7 +76,6 @@ func init() {
 }
 
 func main() {
-
 	dbConnectionString := fmt.Sprintf("%v://%v:%v@%v:%v/%v?sslmode=disable", DATABASE_ENGINE, DATABASE_USERNAME, DATABASE_PASSWORD, DATABASE_HOST, DATABASE_PORT, DATABASE_DATABASE)
 	redisAddr := fmt.Sprintf("%v:%v", REDIS_HOST, REDIS_PORT)
 	findapi = api.New(dbConnectionString, redisAddr)

@@ -3,7 +3,7 @@ package ai
 import (
 	"time"
 
-	"github.com/sjsafranek/find5/lib/ai/models"
+	"github.com/sjsafranek/find5/findapi/lib/ai/models"
 )
 
 type CalibrationModel struct {

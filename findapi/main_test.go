@@ -6,8 +6,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/sjsafranek/find5/lib/api"
-	"github.com/sjsafranek/find5/lib/database"
+	"github.com/sjsafranek/find5/findapi/lib/api"
+	"github.com/sjsafranek/find5/findapi/lib/database"
 )
 
 /*

@@ -252,3 +252,25 @@ CREATE TRIGGER measurements__location_history__insert
             EXECUTE PROCEDURE measurements__location_history__insert();
 
 -- END {SENSOR MEASUREMENTS}
+
+
+
+
+
+-- {CONFIG}
+CREATE TABLE IF NOT EXISTS config (
+    key             VARCHAR,
+    value           VARCHAR,
+    created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- @trigger config_update
+DROP TRIGGER IF EXISTS config_update ON config;
+CREATE TRIGGER config_update
+    BEFORE UPDATE ON config
+        FOR EACH ROW
+            EXECUTE PROCEDURE update_modified_column();
+
+INSERT INTO config(key, value) VALUES('version', '5.0.1');
+-- END {CONFIG}

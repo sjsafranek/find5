@@ -1,0 +1,49 @@
+version: '3.0'
+
+services:
+
+   redis:
+     container_name: "redis"
+     image: redis
+     networks:
+       - webnet
+     ports:
+       - "6378:6379"
+
+   finddb:
+     container_name: "finddb"
+     build: finddb_schema/.
+     volumes:
+       - ./pgdata/finddb_schema:/var/lib/postgresql/data
+     restart: always
+     networks:
+       - webnet
+     ports:
+       - "5431:5432"
+
+   findai:
+     container_name: "findai"
+     build: python_ai/.
+     restart: always
+     networks:
+       - webnet
+     ports:
+       - "8002:8002"
+
+   findapi:
+     container_name: "findapi"
+     build: findapi/.
+    #  volumes:
+    #    - ./turnstile/log:/var/log/turnstile
+     restart: always
+     ports:
+       - "8080:8080"
+     networks:
+       - webnet
+     depends_on:
+       - redis
+       - finddb
+       - findai
+
+networks:
+   webnet:

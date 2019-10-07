@@ -1,60 +1,57 @@
-package nb2
+package nb1
 
 import (
 	"errors"
 	"math"
 	"sort"
 
-	"github.com/sjsafranek/find5/lib/ai/models"
+	"github.com/sjsafranek/find5/findapi/lib/ai/models"
 )
 
 // Algorithm defines the basic structure
 type Algorithm struct {
-	Data map[string]map[string]float64
+	Data map[string]map[string]map[int]int
 	// isLoaded bool
 }
 
 // New returns new algorithm
 func New() *Algorithm {
 	n := new(Algorithm)
-	n.Data = make(map[string]map[string]float64)
+	n.Data = make(map[string]map[string]map[int]int)
 	// n.isLoaded = false
 	return n
 }
 
 // Fit will take the data and learn it
 func (a *Algorithm) Fit(datas []models.SensorData) error {
-
-	a.Data = make(map[string]map[string]float64)
+	a.Data = make(map[string]map[string]map[int]int)
 
 	if len(datas) == 0 {
+		// err = errors.New("no data")
 		return errors.New("no data")
 	}
-	locationTotals := make(map[string]float64)
+
 	for _, data := range datas {
 		if _, ok := a.Data[data.Location]; !ok {
-			a.Data[data.Location] = make(map[string]float64)
-			locationTotals[data.Location] = float64(0)
+			a.Data[data.Location] = make(map[string]map[int]int)
 		}
-		locationTotals[data.Location]++
 		for sensorType := range data.Sensors {
 			for sensor := range data.Sensors[sensorType] {
 				mac := sensorType + "-" + sensor
+				val := int(data.Sensors[sensorType][sensor].(float64))
 				if _, ok := a.Data[data.Location][mac]; !ok {
-					a.Data[data.Location][mac] = float64(0)
+					a.Data[data.Location][mac] = make(map[int]int)
 				}
-				a.Data[data.Location][mac]++
+				if _, ok := a.Data[data.Location][mac][val]; !ok {
+					a.Data[data.Location][mac][val] = 0
+				}
+				a.Data[data.Location][mac][val]++
 			}
 		}
 	}
-	// normalize each location
-	for loc := range a.Data {
-		for mac := range a.Data[loc] {
-			a.Data[loc][mac] = a.Data[loc][mac] / locationTotals[loc]
-		}
-	}
-
-	// return db.Set("NB2", a.Data)
+	//
+	// return db.Set("NB1", a.Data)
+	// err = db.SetLearning("NB1", a.Data)
 	return nil
 }
 
@@ -62,7 +59,7 @@ func (a *Algorithm) Fit(datas []models.SensorData) error {
 func (a *Algorithm) Classify(data models.SensorData) (pl PairList, err error) {
 	// load data if not already
 	// if !a.isLoaded {
-	// 	err = db.Get("NB2", &a.Data)
+	// 	err = db.Get("NB1", &a.Data)
 	// 	if err != nil {
 	// 		return
 	// 	}
@@ -129,36 +126,90 @@ func (p PairList) Swap(i, j int)      { p[i], p[j] = p[j], p[i] }
 
 func (a *Algorithm) probMacGivenLocation(mac string, val int, loc string, positive bool) (P float64) {
 	P = 0.005
-
-	numerator := float64(0)
-	if positive {
-		// positive: find count of mac in loc
-		if v, ok := a.Data[loc][mac]; ok {
-			numerator = float64(v)
-		}
-	} else {
-		// NOT positive: find count of mac NOT in loc
-		for locX := range a.Data {
+	valToCount := make(map[int]int)
+	newValToCount := make(map[int]int)
+	// positive: find val,count where loc = X and mac = X
+	// not positive: find val,count where loc != X and mac = X
+	for locX := range a.Data {
+		if positive {
 			if locX != loc {
-				if v, ok := a.Data[locX][mac]; ok {
-					numerator += float64(v)
-				}
+				continue
+			}
+		} else {
+			if locX == loc {
+				continue
+			}
+		}
+		for macX := range a.Data[locX] {
+			if macX != mac {
+				continue
+			}
+			for valX := range a.Data[locX][macX] {
+				valToCount[valX] = a.Data[locX][macX][valX]
+				newValToCount[valX] = a.Data[locX][macX][valX]
 			}
 		}
 	}
-	// find total count of mac
-	denominator := float64(0)
-	for locX := range a.Data {
-		if v, ok := a.Data[locX][mac]; ok {
-			denominator += float64(v)
+
+	// apply gaussian filter
+	width := 3
+	gaussRange := []int{}
+	widthCubed := int(math.Pow(float64(width), 3))
+	for i := -1 * widthCubed; i <= widthCubed; i++ {
+		gaussRange = append(gaussRange, i)
+	}
+	for _, v := range valToCount {
+		for _, x := range gaussRange {
+			addend := int(round(normPDF(0, float64(x), float64(width))))
+			if addend <= 0 {
+				continue
+			}
+			if _, ok := newValToCount[v+x]; !ok {
+				newValToCount[v+x] = 0
+			}
+			newValToCount[v+x] += addend
 		}
 	}
 
-	if denominator > 0 && numerator > 0 {
-		P = numerator / denominator
+	// normalize
+	total := 0
+	for v := range newValToCount {
+		total += newValToCount[v]
+	}
+	probs := make(map[int]float64)
+	for v := range newValToCount {
+		probs[v] = float64(newValToCount[v]) / float64(total)
+	}
+
+	// return probability
+	if v, ok := probs[val]; ok {
+		P = v
 	}
 
 	// TODO: cache it
 
+	return
+}
+
+func normPDF(mean, x, sd float64) float64 {
+	m := sd * math.Sqrt(2*math.Pi)
+	e := math.Exp(-math.Pow(x-mean, 2) / (2 * math.Pow(sd, 2)))
+	return e / m
+}
+
+// https://play.golang.org/p/BkdofAFOJRh
+func round(val float64) (newVal float64) {
+	roundOn := 0.5
+	places := 0
+	var round float64
+	pow := math.Pow(10, float64(places))
+	digit := pow * val
+	_, div := math.Modf(digit)
+	if div >= roundOn {
+		round = math.Ceil(digit)
+	} else {
+		round = math.Floor(digit)
+	}
+	newVal = round / pow
 	return
 }
