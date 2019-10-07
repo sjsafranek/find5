@@ -70,39 +70,84 @@ def on_new_client(conn, addr):
     conn.close()
 
 
-class TcpServer(threading.Thread):
-    def __init__(self):
-        threading.Thread.__init__(self)
-        self.event = threading.Event()
+# class TcpServer(threading.Thread):
+#     def __init__(self):
+#         threading.Thread.__init__(self)
+#         self.event = threading.Event()
+#
+#     def run(self):
+#         try:
+#             logger.info("starting up on {0} port {1}".format(TCP_IP, TCP_PORT))
+#             self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+#             self.socket.bind((TCP_IP, TCP_PORT))
+#             self.socket.listen(1)
+#             self._acceptClients()
+#         except Exception as e:
+#             logger.error(e)
+#             # fatal error occured
+#             # bail main process
+#             os._exit(1)
+#
+#     def _acceptClients(self):
+#         logger.debug('waiting for connections')
+#         while not self.event.is_set() :
+#             conn, addr = self.socket.accept()
+#             logger.debug('Connected address: {0}'.format(addr))
+#             t = threading.Thread(target=on_new_client, args=(conn, addr,))
+#             t.start()
+#
+#     def shutdown(self):
+#         self.event.set()
+#         self.socket.close()
+#         raise ValueError("SHUTDOWN")
+#
+#
+# def Run():
+#     thread = TcpServer()
+#     thread.setDaemon(True)
+#     thread.start()
 
-    def run(self):
-        try:
-            logger.info("starting up on {0} port {1}".format(TCP_IP, TCP_PORT))
-            self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            self.socket.bind((TCP_IP, TCP_PORT))
-            self.socket.listen(1)
-            self._acceptClients()
-        except Exception as e:
-            logger.error(e)
-            # fatal error occured
-            # bail main process
-            os._exit(1)
 
-    def _acceptClients(self):
-        logger.debug('waiting for connections')
-        while not self.event.is_set() :
-            conn, addr = self.socket.accept()
-            logger.debug('Connected address: {0}'.format(addr))
-            t = threading.Thread(target=on_new_client, args=(conn, addr,))
-            t.start()
 
-    def shutdown(self):
-        self.event.set()
-        self.socket.close()
-        raise ValueError("SHUTDOWN")
+# def _acceptClients(self):
+    # logger.debug('waiting for connections')
+    # # while not self.event.is_set() :
+    #     conn, addr = self.socket.accept()
+    #     logger.debug('Connected address: {0}'.format(addr))
+    #     t = threading.Thread(target=on_new_client, args=(conn, addr,))
+    #     t.start()
 
 
 def Run():
-    thread = TcpServer()
-    thread.setDaemon(True)
-    thread.start()
+# class TcpServer(threading.Thread):
+#     def __init__(self):
+#         threading.Thread.__init__(self)
+#         self.event = threading.Event()
+#
+#     def run(self):
+    try:
+        logger.info("starting up on {0} port {1}".format(TCP_IP, TCP_PORT))
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock.bind((TCP_IP, TCP_PORT))
+        sock.listen(1)
+        # _acceptClients()
+
+        logger.debug('waiting for connections')
+        # while not self.event.is_set() :
+        conn, addr = sock.accept()
+        logger.debug('Connected address: {0}'.format(addr))
+        t = threading.Thread(target=on_new_client, args=(conn, addr,))
+        t.start()
+
+    except Exception as e:
+        logger.error(e)
+        # fatal error occured
+        # bail main process
+        os._exit(1)
+
+
+
+    # def shutdown(self):
+    #     self.event.set()
+    #     self.socket.close()
+    #     raise ValueError("SHUTDOWN")

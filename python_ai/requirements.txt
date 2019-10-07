@@ -3,7 +3,6 @@ base58==1.0.0
 click==6.7
 coverage==4.5.1
 expiringdict==1.1.4
-Flask==0.12.2
 itsdangerous==0.24
 Jinja2==2.10
 MarkupSafe==1.0
@@ -21,4 +20,3 @@ six==1.11.0
 sklearn==0.0
 tqdm==4.23.0
 ujson==1.35
-Werkzeug==0.14.1

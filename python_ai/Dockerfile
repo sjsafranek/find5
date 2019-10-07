@@ -12,8 +12,7 @@ RUN pip install \
 	base58 \
 	expiringdict \
 	scikit-learn \
-	tqdm \
-	flask
+	tqdm
 
 
 # RUN pip install -r requirements.txt

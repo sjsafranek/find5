@@ -1,19 +1,20 @@
 .PHONY: install test clean benchmark production serve
 
 serve: clean
-	export FLASK_APP=server.py && \
-	export FLASK_DEBUG=1 && \
+	# export FLASK_APP=server.py && \
+	# export FLASK_DEBUG=1 && \
 	cd src && \
 	python3 server.py
 	# flask run --debugger --port 8002
 
-production: clean
-	export LC_ALL=C.UTF-8 && \
-	export LANG=C.UTF-8 && \
-	export FLASK_APP=server.py && \
-	export FLASK_DEBUG=0 && \
-	cd src && \
-	flask run --port 8002
+# production: clean
+# 	export LC_ALL=C.UTF-8 && \
+# 	export LANG=C.UTF-8 && \
+# 	# export FLASK_APP=server.py && \
+# 	# export FLASK_DEBUG=0 && \
+# 	cd src && \
+# 	# flask run --port 8002
+# 	python3 server.py
 
 production2: clean
 	export LC_ALL=C.UTF-8 && \
