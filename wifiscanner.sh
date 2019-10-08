@@ -110,3 +110,12 @@ print(resp.text)
     rm wifi.tmp
     sleep 10
 done
+
+python3 -c '
+from pyfind import client
+client = client.HttpClient(
+    username="'"$USERNAME"'",
+    password="'"$PASSWORD"'"
+)
+client.do({"method":"calibrate"})
+'

@@ -3,7 +3,7 @@ package api
 import (
 	"encoding/json"
 	"errors"
-	"strings"
+	// "strings"
 	"time"
 
 	"github.com/garyburd/redigo/redis"
@@ -206,15 +206,16 @@ func (self *Api) importMeasurements(request *Request) error {
 		go func() {
 			err := self.AnalyzeData(request)
 			if nil != err {
-				// HACK
-				//  - determine if calibration is needed
-				if strings.Contains(err.Error(), "could not find") {
-					logger.Warn("Data not calibrated")
-					err = self.calibrate(request)
-					if nil != err {
-						logger.Error(err)
-					}
-				}
+				// // HACK
+				// //  - determine if calibration is needed
+				// if strings.Contains(err.Error(), "could not find") {
+				// 	logger.Warn("Data not calibrated")
+				// 	err = self.calibrate(request)
+				// 	if nil != err {
+				// 		logger.Error(err)
+				// 	}
+				// }
+				logger.Error(err)
 			}
 		}()
 		//.end

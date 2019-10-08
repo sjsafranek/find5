@@ -13,11 +13,8 @@ RUN pip install \
 	expiringdict \
 	scikit-learn \
 	tqdm
-	# flask
 
 
-# RUN pip install -r requirements.txt
+RUN mkdir /var/lib/findai
 
-CMD cd app/src && python3 server.py
-
-# CMD cd app && make serve
+CMD cd app/src && python3 server.py --host 0.0.0.0 --port 7005 -D /var/lib/findai

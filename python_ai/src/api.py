@@ -5,6 +5,8 @@ from expiringdict import ExpiringDict
 from learn import AI
 
 
+DEFAULT_DATA_DIRECTORY = '.'
+
 ai_cache = ExpiringDict(max_len=100000, max_age_seconds=60)
 
 
@@ -14,6 +16,9 @@ logger = NewLogger("api")
 
 def to_base58(family):
     return base58.b58encode(family.encode('utf-8')).decode('utf-8')
+
+def out_file(directory, family):
+    return os.path.join(directory, to_base58(family) + ".find3.ai")
 
 
 def classify(payload):
@@ -26,12 +31,9 @@ def classify(payload):
 
     t = time.time()
 
-    data_folder = '.'
-    if 'data_folder' in payload:
-        data_folder = payload['data_folder']
+    data_folder = (payload['data_folder'] if 'data_folder' in payload else DEFAULT_DATA_DIRECTORY)
 
-    fname = os.path.join(data_folder, to_base58(
-        payload['sensor_data']['f']) + ".find3.ai")
+    fname = out_file(data_folder, payload['sensor_data']['f'])
 
     ai = ai_cache.get(payload['sensor_data']['f'])
     if ai == None:
@@ -58,27 +60,24 @@ def learn(payload):
         return {'success': False, 'message': 'must provide family'}
     if 'csv_file' not in payload and 'file_data' not in payload:
         return {'success': False, 'message': 'must provide CSV file'}
-    data_folder = '.'
-    if 'data_folder' in payload:
-        data_folder = payload['data_folder']
-    else:
-        logger.debug("could not find data_folder in payload")
 
-    logger.debug(data_folder)
+    data_folder = (payload['data_folder'] if 'data_folder' in payload else DEFAULT_DATA_DIRECTORY)
 
     ai = AI(to_base58(payload['family']), data_folder)
 
+    # encoded file in request payload
     if 'file_data' in payload:
         ai.learn("", file_data=payload['file_data'])
+    # file on disk
+    # requires absolute path
     elif 'csv_file' in payload:
-        fname = os.path.join(data_folder, payload['csv_file'])
         try:
-            ai.learn(fname)
+            ai.learn( payload['csv_file'] )
         except FileNotFoundError:
-            return {"success": False, "message": "could not find '{}'".format(fname)}
+            return {"success": False, "message": "could not find '{0}'".format( payload['csv_file'] )}
 
-    print(payload['family'])
-    ai.save(os.path.join(data_folder, to_base58(
-        payload['family']) + ".find3.ai"))
+    fname = out_file(data_folder, payload['family'])
+    ai.save(fname)
+
     ai_cache[payload['family']] = ai
     return {"success": True, "message": "calibrated data"}

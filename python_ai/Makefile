@@ -1,10 +1,11 @@
 .PHONY: install test clean benchmark production serve
 
 serve: clean
-	export FLASK_APP=server.py && \
-	export FLASK_DEBUG=1 && \
-	cd src && \
-	flask run --debugger
+	cd src && python3 server.py
+	# export FLASK_APP=server.py && \
+	# export FLASK_DEBUG=1 && \
+	# cd src && \
+	# flask run --debugger
 
 # production: clean
 # 	export LC_ALL=C.UTF-8 && \

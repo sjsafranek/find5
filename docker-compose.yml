@@ -14,7 +14,7 @@ services:
      container_name: "finddb"
      build: finddb_schema/.
      volumes:
-       - ./pgdata/finddb_schema:/var/lib/postgresql/data
+       - ./docker_volumes/pgdata/finddb:/var/lib/postgresql/data
      restart: always
      networks:
        - webnet
@@ -24,6 +24,8 @@ services:
    findai:
      container_name: "findai"
      build: python_ai/.
+     volumes:
+       - ./docker_volumes/aidata:/var/lib/findai
      restart: always
      networks:
        - webnet
