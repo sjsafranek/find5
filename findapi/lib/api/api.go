@@ -3,6 +3,7 @@ package api
 import (
 	"encoding/json"
 	"errors"
+	"strings"
 	"time"
 
 	"github.com/garyburd/redigo/redis"
@@ -17,6 +18,12 @@ var (
 	logger = ligneous.AddLogger("api", "trace", "./log/find5")
 )
 
+func SetLoggingDirectory(directory string) {
+	logger = ligneous.AddLogger("api", "trace", directory)
+	database.SetLoggingDirectory(directory)
+	ai.SetLoggingDirectory(directory)
+}
+
 func New(dbConnStr, aiConnStr, redisAddr string) *Api {
 	return &Api{
 		db: database.New(dbConnStr),
@@ -27,6 +34,7 @@ func New(dbConnStr, aiConnStr, redisAddr string) *Api {
 		},
 		cache: ccache.Layered(ccache.Configure()),
 		ai:    ai.New(aiConnStr, redisAddr),
+		// logger: ligneous.AddLogger("api", "trace", fmt.Sprintf("%v/find5", logDir)),
 	}
 }
 
@@ -36,6 +44,7 @@ type Api struct {
 	cache          *ccache.LayeredCache
 	ai             *ai.AI
 	eventListeners map[string][]func(string, string, float64)
+	// logger         ligneous.Log
 }
 
 func (self *Api) RegisterEventListener(username string, clbk func(string, string, float64)) {
@@ -158,7 +167,6 @@ func (self *Api) AnalyzeData(request *Request) error {
 		}
 
 		aidata, err := self.ai.Analyze(sd, device.GetUser().Username)
-
 		// add location predictions
 		if nil == err {
 			go func() {
@@ -176,14 +184,40 @@ func (self *Api) AnalyzeData(request *Request) error {
 	})
 }
 
+// Calibrate
+func (self *Api) calibrate(request *Request) error {
+	return self.fetchUser(request, func(user *database.User) error {
+		measurements, err := user.ExportMeasurements()
+		if nil != err {
+			return err
+		}
+		return self.ai.Calibrate(measurements, user.Username, true)
+	})
+}
+
 // RecordMeasurements
 func (self *Api) importMeasurements(request *Request) error {
 	return self.fetchDevice(request, func(device *database.Device) error {
 		if !device.IsActive {
 			return errors.New("device is deactivated")
 		}
+
 		// TESTING
-		go self.AnalyzeData(request)
+		go func() {
+			err := self.AnalyzeData(request)
+			if nil != err {
+				// HACK
+				//  - determine if calibration is needed
+				if strings.Contains(err.Error(), "could not find") {
+					logger.Warn("Data not calibrated")
+					err = self.calibrate(request)
+					if nil != err {
+						logger.Error(err)
+					}
+				}
+			}
+		}()
+		//.end
 
 		for sensor_id := range request.Data {
 			sensor, err := device.GetSensorById(sensor_id)
@@ -461,14 +495,15 @@ func (self *Api) Do(request *Request) (*Response, error) {
 		case "calibrate":
 			// {"method":"calibrate","username":"admin"}
 			// {"apikey": "a0a1695e8cd13322f1acb312b40cddb6", "method": "calibrate"}
-			return self.fetchUser(request, func(user *database.User) error {
-				measurements, err := user.ExportMeasurements()
-				if nil != err {
-					return err
-				}
-				// TODO
-				return self.ai.Calibrate(measurements, user.Username, true)
-			})
+			return self.calibrate(request)
+			// return self.fetchUser(request, func(user *database.User) error {
+			// 	measurements, err := user.ExportMeasurements()
+			// 	if nil != err {
+			// 		return err
+			// 	}
+			// 	// TODO
+			// 	return self.ai.Calibrate(measurements, user.Username, true)
+			// })
 
 		default:
 			return errors.New("method not found")

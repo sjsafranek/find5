@@ -11,6 +11,10 @@ import (
 
 var logger = ligneous.AddLogger("server", "debug", "./log/find5")
 
+func SetLoggingDirectory(directory string) {
+	logger = ligneous.AddLogger("server", "trace", directory)
+}
+
 type Client struct {
 	api *api.Api
 }

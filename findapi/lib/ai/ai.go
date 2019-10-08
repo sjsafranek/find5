@@ -26,6 +26,10 @@ var (
 	logger = ligneous.AddLogger("ai", "trace", "./log/find5")
 )
 
+func SetLoggingDirectory(directory string) {
+	logger = ligneous.AddLogger("ai", "trace", directory)
+}
+
 func New(aiConnStr, redisAddr string) *AI {
 
 	factory := func() (net.Conn, error) { return net.Dial("tcp", aiConnStr) }

@@ -19,10 +19,11 @@
 		"sslmode": "disable"
 	},
 	"redis": {
-		"host": "",
+		"host": "localhost",
 		"port": 6379
 	},
 	"ai": {
-		"port": 8002
+		"host": "localhost",
+		"port": 7005
 	}
 }

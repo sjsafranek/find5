@@ -7,6 +7,7 @@ switch to json config files
 
 5.0.5
 created separate directory to track database schema and patches
+added logging directory command line argument
 
 5.0.4
 fixed tcp pool for retry on golang side
