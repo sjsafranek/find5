@@ -13,8 +13,11 @@ RUN pip install \
 	expiringdict \
 	scikit-learn \
 	tqdm
+	# flask
 
 
 # RUN pip install -r requirements.txt
 
-CMD cd app && make serve
+CMD cd app/src && python3 server.py
+
+# CMD cd app && make serve
