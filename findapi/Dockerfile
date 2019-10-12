@@ -17,6 +17,7 @@ RUN go get github.com/paulmach/orb/geojson
 RUN go get github.com/sjsafranek/lemur
 RUN go get github.com/sjsafranek/pool
 RUN go get github.com/pkg/errors
+RUN go get github.com/boltdb/bolt
 
 RUN cd /go/src/github.com/sjsafranek/find5/findapi && go build -o /go/find *.go
 

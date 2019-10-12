@@ -26,7 +26,7 @@ const (
 	DEFAULT_REDIS_HOST        string = ""
 	DEFAULT_AI_HOST           string = "localhost"
 	DEFAULT_AI_PORT           int64  = 7005
-	DEFAULT_LOGGING_DIRECTORY string = "./log/"
+	DEFAULT_LOGGING_DIRECTORY string = ""
 	DEFAULT_CONFIG_FILE       string = "config.json"
 )
 
@@ -55,7 +55,7 @@ func init() {
 
 	// flag.StringVar(&ACTION, "action", DEFAULT_ACTION, "Action")
 	// flag.StringVar(&CONFIG_FILE, "c", DEFAULT_CONFIG_FILE, "Config file")
-	// flag.BoolVar(&DEBUG, "debug", false, "debug mode")
+	// flag.BoolVar(&VERBOSE, "verbose", false, "verbose messaging")
 
 	flag.IntVar(&HTTP_PORT, "httpport", DEFAULT_HTTP_PORT, "Server port")
 	flag.StringVar(&DATABASE_HOST, "dbhost", DEFAULT_DATABASE_HOST, "database host")

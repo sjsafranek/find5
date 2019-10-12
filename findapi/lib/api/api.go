@@ -6,7 +6,7 @@ import (
 	// "strings"
 	"time"
 
-	"github.com/garyburd/redigo/redis"
+	// "github.com/garyburd/redigo/redis"
 	"github.com/karlseguin/ccache"
 	"github.com/sjsafranek/find5/findapi/lib/ai"
 	"github.com/sjsafranek/find5/findapi/lib/ai/models"
@@ -15,7 +15,7 @@ import (
 )
 
 var (
-	logger = ligneous.AddLogger("api", "trace", "./log/find5")
+	logger = ligneous.AddLogger("api", "trace", "")
 )
 
 func SetLoggingDirectory(directory string) {
@@ -27,24 +27,22 @@ func SetLoggingDirectory(directory string) {
 func New(dbConnStr, aiConnStr, redisAddr string) *Api {
 	return &Api{
 		db: database.New(dbConnStr),
-		redis: &redis.Pool{
-			MaxIdle:     3,
-			IdleTimeout: 240 * time.Second,
-			Dial:        func() (redis.Conn, error) { return redis.Dial("tcp", redisAddr) },
-		},
+		// redis: &redis.Pool{
+		// 	MaxIdle:     3,
+		// 	IdleTimeout: 240 * time.Second,
+		// 	Dial:        func() (redis.Conn, error) { return redis.Dial("tcp", redisAddr) },
+		// },
 		cache: ccache.Layered(ccache.Configure()),
 		ai:    ai.New(aiConnStr, redisAddr),
-		// logger: ligneous.AddLogger("api", "trace", fmt.Sprintf("%v/find5", logDir)),
 	}
 }
 
 type Api struct {
-	db             *database.Database
-	redis          *redis.Pool
+	db *database.Database
+	// redis          *redis.Pool
 	cache          *ccache.LayeredCache
 	ai             *ai.AI
 	eventListeners map[string][]func(string, string, float64)
-	// logger         ligneous.Log
 }
 
 func (self *Api) RegisterEventListener(username string, clbk func(string, string, float64)) {

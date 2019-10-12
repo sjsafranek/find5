@@ -23,7 +23,7 @@ import (
 )
 
 var (
-	logger = ligneous.AddLogger("ai", "trace", "./log/find5")
+	logger = ligneous.AddLogger("ai", "trace", "")
 )
 
 func SetLoggingDirectory(directory string) {
