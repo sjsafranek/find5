@@ -15,6 +15,7 @@ from io import StringIO
 from threading import Thread
 import functools
 import base64
+import redis
 import multiprocessing
 
 from log import NewLogger
@@ -67,12 +68,12 @@ def timeout(timeout):
 
 class AI(object):
 
-    def __init__(self, family, path_to_data):
+    def __init__(self, family):
         # self.logger = logging.getLogger('learn.AI')
         self.logger = NewLogger("learn.AI")
         self.naming = {'from': {}, 'to': {}}
         self.family = family
-        self.path_to_data = path_to_data
+        # self.path_to_data = path_to_data
 
     def classify(self, sensor_data):
         # print(self.header)
@@ -294,7 +295,9 @@ class AI(object):
         #     self.logger.error(str(e))
         self.logger.debug("{:d} ms".format(int(1000 * (t - time.time()))))
 
-    def save(self, save_file):
+    def save(self, save_file, redis_cache=False):
+        if redis_cache:
+            print(redis_cache)
         t = time.time()
         f = gzip.open(save_file, 'wb')
         pickle.dump(self.header, f)
@@ -304,7 +307,9 @@ class AI(object):
         f.close()
         self.logger.debug("{:d} ms".format(int(1000 * (t - time.time()))))
 
-    def load(self, save_file):
+    def load(self, save_file, redis_cache=False):
+        if redis_cache:
+            print(redis_cache)
         t = time.time()
         f = gzip.open(save_file, 'rb')
         self.header = pickle.load(f)
@@ -315,90 +320,91 @@ class AI(object):
         self.logger.debug("{:d} ms".format(int(1000 * (t - time.time()))))
 
 
-def do():
-    ai = AI()
-    ai.load()
-    # ai.learn()
-    params = {'quantile': .3,
-              'eps': .3,
-              'damping': .9,
-              'preference': -200,
-              'n_neighbors': 10,
-              'n_clusters': 3}
-    bandwidth = cluster.estimate_bandwidth(ai.x, quantile=params['quantile'])
-    connectivity = kneighbors_graph(
-        ai.x, n_neighbors=params['n_neighbors'], include_self=False)
-    # make connectivity symmetric
-    connectivity = 0.5 * (connectivity + connectivity.T)
-    ms = cluster.MeanShift(bandwidth=bandwidth, bin_seeding=True)
-    two_means = cluster.MiniBatchKMeans(n_clusters=params['n_clusters'])
-    ward = cluster.AgglomerativeClustering(
-        n_clusters=params['n_clusters'], linkage='ward',
-        connectivity=connectivity)
-    spectral = cluster.SpectralClustering(
-        n_clusters=params['n_clusters'], eigen_solver='arpack',
-        affinity="nearest_neighbors")
-    dbscan = cluster.DBSCAN(eps=params['eps'])
-    affinity_propagation = cluster.AffinityPropagation(
-        damping=params['damping'], preference=params['preference'])
-    average_linkage = cluster.AgglomerativeClustering(
-        linkage="average", affinity="cityblock",
-        n_clusters=params['n_clusters'], connectivity=connectivity)
-    birch = cluster.Birch(n_clusters=params['n_clusters'])
-    gmm = mixture.GaussianMixture(
-        n_components=params['n_clusters'], covariance_type='full')
-    clustering_algorithms = (
-        ('MiniBatchKMeans', two_means),
-        ('AffinityPropagation', affinity_propagation),
-        ('MeanShift', ms),
-        ('SpectralClustering', spectral),
-        ('Ward', ward),
-        ('AgglomerativeClustering', average_linkage),
-        ('DBSCAN', dbscan),
-        ('Birch', birch),
-        ('GaussianMixture', gmm)
-    )
 
-    for name, algorithm in clustering_algorithms:
-        with warnings.catch_warnings():
-            warnings.filterwarnings(
-                "ignore",
-                message="the number of connected components of the " +
-                "connectivity matrix is [0-9]{1,2}" +
-                " > 1. Completing it to avoid stopping the tree early.",
-                category=UserWarning)
-            warnings.filterwarnings(
-                "ignore",
-                message="Graph is not fully connected, spectral embedding" +
-                " may not work as expected.",
-                category=UserWarning)
-            try:
-                algorithm.fit(ai.x)
-            except:
-                continue
-
-        if hasattr(algorithm, 'labels_'):
-            y_pred = algorithm.labels_.astype(numpy.int)
-        else:
-            y_pred = algorithm.predict(ai.x)
-        if max(y_pred) > 3:
-            continue
-        known_groups = {}
-        for i, group in enumerate(ai.y):
-            group = int(group)
-            if group not in known_groups:
-                known_groups[group] = []
-            known_groups[group].append(i)
-        guessed_groups = {}
-        for i, group in enumerate(y_pred):
-            if group not in guessed_groups:
-                guessed_groups[group] = []
-            guessed_groups[group].append(i)
-        for k in known_groups:
-            for g in guessed_groups:
-                print(
-                    k, g, len(set(known_groups[k]).intersection(guessed_groups[g])))
-
+# def do():
+#     ai = AI()
+#     ai.load()
+#     # ai.learn()
+#     params = {'quantile': .3,
+#               'eps': .3,
+#               'damping': .9,
+#               'preference': -200,
+#               'n_neighbors': 10,
+#               'n_clusters': 3}
+#     bandwidth = cluster.estimate_bandwidth(ai.x, quantile=params['quantile'])
+#     connectivity = kneighbors_graph(
+#         ai.x, n_neighbors=params['n_neighbors'], include_self=False)
+#     # make connectivity symmetric
+#     connectivity = 0.5 * (connectivity + connectivity.T)
+#     ms = cluster.MeanShift(bandwidth=bandwidth, bin_seeding=True)
+#     two_means = cluster.MiniBatchKMeans(n_clusters=params['n_clusters'])
+#     ward = cluster.AgglomerativeClustering(
+#         n_clusters=params['n_clusters'], linkage='ward',
+#         connectivity=connectivity)
+#     spectral = cluster.SpectralClustering(
+#         n_clusters=params['n_clusters'], eigen_solver='arpack',
+#         affinity="nearest_neighbors")
+#     dbscan = cluster.DBSCAN(eps=params['eps'])
+#     affinity_propagation = cluster.AffinityPropagation(
+#         damping=params['damping'], preference=params['preference'])
+#     average_linkage = cluster.AgglomerativeClustering(
+#         linkage="average", affinity="cityblock",
+#         n_clusters=params['n_clusters'], connectivity=connectivity)
+#     birch = cluster.Birch(n_clusters=params['n_clusters'])
+#     gmm = mixture.GaussianMixture(
+#         n_components=params['n_clusters'], covariance_type='full')
+#     clustering_algorithms = (
+#         ('MiniBatchKMeans', two_means),
+#         ('AffinityPropagation', affinity_propagation),
+#         ('MeanShift', ms),
+#         ('SpectralClustering', spectral),
+#         ('Ward', ward),
+#         ('AgglomerativeClustering', average_linkage),
+#         ('DBSCAN', dbscan),
+#         ('Birch', birch),
+#         ('GaussianMixture', gmm)
+#     )
+#
+#     for name, algorithm in clustering_algorithms:
+#         with warnings.catch_warnings():
+#             warnings.filterwarnings(
+#                 "ignore",
+#                 message="the number of connected components of the " +
+#                 "connectivity matrix is [0-9]{1,2}" +
+#                 " > 1. Completing it to avoid stopping the tree early.",
+#                 category=UserWarning)
+#             warnings.filterwarnings(
+#                 "ignore",
+#                 message="Graph is not fully connected, spectral embedding" +
+#                 " may not work as expected.",
+#                 category=UserWarning)
+#             try:
+#                 algorithm.fit(ai.x)
+#             except:
+#                 continue
+#
+#         if hasattr(algorithm, 'labels_'):
+#             y_pred = algorithm.labels_.astype(numpy.int)
+#         else:
+#             y_pred = algorithm.predict(ai.x)
+#         if max(y_pred) > 3:
+#             continue
+#         known_groups = {}
+#         for i, group in enumerate(ai.y):
+#             group = int(group)
+#             if group not in known_groups:
+#                 known_groups[group] = []
+#             known_groups[group].append(i)
+#         guessed_groups = {}
+#         for i, group in enumerate(y_pred):
+#             if group not in guessed_groups:
+#                 guessed_groups[group] = []
+#             guessed_groups[group].append(i)
+#         for k in known_groups:
+#             for g in guessed_groups:
+#                 print(
+#                     k, g, len(set(known_groups[k]).intersection(guessed_groups[g])))
+#
 
 # ai = AI()
 # ai.learn("../testing/testdb.csv")

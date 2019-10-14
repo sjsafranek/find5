@@ -85,7 +85,9 @@ mac_address_pattern = re.compile(r"(?:[0-9a-fA-F]:?){12}")
 c = 0
 with open("wifi.tmp", "r") as fh:
     lines = fh.readlines()
+    print(len(lines)/3)
     for i in range(int(len(lines)/3)):
+        print(i)
         s = i*3
         e = i*3+3
         rows = lines[s:e]
@@ -107,7 +109,7 @@ print(resp.text)
 
 '
 
-    rm wifi.tmp
+    # rm wifi.tmp
     sleep 10
 done
 

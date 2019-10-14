@@ -8,19 +8,19 @@ import (
 )
 
 type Request struct {
-	Method     string                        `json:"method"`
-	Email      string                        `json:"email"`
-	Username   string                        `json:"username"`
-	Password   string                        `json:"password"`
-	Apikey     string                        `json:"apikey"`
-	DeviceId   string                        `json:"device_id"`
-	SensorId   string                        `json:"sensor_id"`
-	LocationId string                        `json:"location_id"`
-	Latitude   float64                       `json:"latitude"`
-	Longitude  float64                       `json:"longitude"`
-	Name       string                        `json:"name"`
-	Type       string                        `json:"type"`
-	Data       map[string]map[string]float64 `json:"data"`
+	Method     string                        `json:"method,omitempty"`
+	Email      string                        `json:"email,omitempty"`
+	Username   string                        `json:"username,omitempty"`
+	Password   string                        `json:"password,omitempty"`
+	Apikey     string                        `json:"apikey,omitempty"`
+	DeviceId   string                        `json:"device_id,omitempty"`
+	SensorId   string                        `json:"sensor_id,omitempty"`
+	LocationId string                        `json:"location_id,omitempty"`
+	Latitude   float64                       `json:"latitude,omitempty"`
+	Longitude  float64                       `json:"longitude,omitempty"`
+	Name       string                        `json:"name,omitempty"`
+	Type       string                        `json:"type,omitempty"`
+	Data       map[string]map[string]float64 `json:"data,omitempty"`
 }
 
 func (self *Request) Unmarshal(data string) error {

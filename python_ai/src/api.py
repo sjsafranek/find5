@@ -5,7 +5,7 @@ from expiringdict import ExpiringDict
 from learn import AI
 
 
-DEFAULT_DATA_DIRECTORY = '.'
+path_to_data = '.'
 
 ai_cache = ExpiringDict(max_len=100000, max_age_seconds=60)
 
@@ -37,10 +37,10 @@ def classify(payload):
 
     ai = ai_cache.get(payload['sensor_data']['f'])
     if ai == None:
-        ai = AI(to_base58(payload['sensor_data']['f']), data_folder)
+        ai = AI(to_base58(payload['sensor_data']['f']))
         logger.debug("loading {}".format(fname))
         try:
-            ai.load(fname)
+            ai.load(fname, redis_cache=True)
         except FileNotFoundError:
             logger.error('File not found')
             return {"success": False, "message": "could not find '{p}'".format(p=fname)}
@@ -61,23 +61,23 @@ def learn(payload):
     if 'csv_file' not in payload and 'file_data' not in payload:
         return {'success': False, 'message': 'must provide CSV file'}
 
-    data_folder = (payload['data_folder'] if 'data_folder' in payload else DEFAULT_DATA_DIRECTORY)
+    data_folder = (payload['data_folder'] if 'data_folder' in payload else path_to_data)
 
-    ai = AI(to_base58(payload['family']), data_folder)
+    ai = AI(to_base58(payload['family']))
 
     # encoded file in request payload
     if 'file_data' in payload:
         ai.learn("", file_data=payload['file_data'])
-    # file on disk
-    # requires absolute path
-    elif 'csv_file' in payload:
-        try:
-            ai.learn( payload['csv_file'] )
-        except FileNotFoundError:
-            return {"success": False, "message": "could not find '{0}'".format( payload['csv_file'] )}
+    # # file on disk
+    # # requires absolute path
+    # elif 'csv_file' in payload:
+    #     try:
+    #         ai.learn( payload['csv_file'] )
+    #     except FileNotFoundError:
+    #         return {"success": False, "message": "could not find '{0}'".format( payload['csv_file'] )}
 
     fname = out_file(data_folder, payload['family'])
-    ai.save(fname)
+    ai.save(fname, redis_cache=True)
 
     ai_cache[payload['family']] = ai
     return {"success": True, "message": "calibrated data"}

@@ -86,14 +86,14 @@ func (self *AI) Set(key string, v interface{}) error {
 	}
 	conn := self.redis.Get()
 	defer conn.Close()
-	_, err = redis.Bytes(conn.Do("SET", key, data))
+	_, err = redis.Bytes(conn.Do("SET", fmt.Sprintf("findapi_%v", key), data))
 	return err
 }
 
 func (self *AI) Get(key string, v interface{}) error {
 	conn := self.redis.Get()
 	defer conn.Close()
-	data, err := redis.Bytes(conn.Do("GET", key))
+	data, err := redis.Bytes(conn.Do("GET", fmt.Sprintf("findapi_%v", key)))
 	if err != nil {
 		return err
 	}

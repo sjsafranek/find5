@@ -12,7 +12,8 @@ RUN pip install \
 	base58 \
 	expiringdict \
 	scikit-learn \
-	tqdm
+	tqdm \
+	redis
 
 
 RUN mkdir /var/lib/findai
