@@ -2,6 +2,7 @@
 TODO
 python_ai starts up with default datafolder
 switch to json config files
+allow api client to set timestamps
 
 
 5.0.5

@@ -20,6 +20,10 @@ type Sensor struct {
 	device    *Device   `json:"-"`
 }
 
+// TODO
+//  - Insert Measurements With Timestamp
+//
+
 func (self *Sensor) ImportMeasurementAtLocation(location_id, key string, value float64) error {
 	if !self.IsActive {
 		return errors.New("sensor is deactivated")

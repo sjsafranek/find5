@@ -2,6 +2,7 @@ package api
 
 import (
 	"encoding/json"
+	"time"
 
 	"github.com/paulmach/orb/geojson"
 	"github.com/sjsafranek/find5/findapi/lib/database"
@@ -21,6 +22,7 @@ type Request struct {
 	Name       string                        `json:"name,omitempty"`
 	Type       string                        `json:"type,omitempty"`
 	Data       map[string]map[string]float64 `json:"data,omitempty"`
+	Timestamp  time.Time                     `json:"timestamp,string"`
 }
 
 func (self *Request) Unmarshal(data string) error {
