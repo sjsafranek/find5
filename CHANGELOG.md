@@ -1,6 +1,5 @@
 
 TODO
-remove ai datafolder requirement in api calls
 python_ai starts up with default datafolder
 switch to json config files
 
@@ -8,6 +7,8 @@ switch to json config files
 5.0.5
 created separate directory to track database schema and patches
 added logging directory command line argument
+cleanup of python ai
+removed ai datafolder requirement in api calls
 
 5.0.4
 fixed tcp pool for retry on golang side
