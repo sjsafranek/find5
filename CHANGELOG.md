@@ -5,6 +5,9 @@ switch to json config files
 allow api client to set timestamps
 
 
+5.0.6
+added unique constraint to database measurements table
+
 5.0.5
 created separate directory to track database schema and patches
 added logging directory command line argument

@@ -4,8 +4,9 @@ import (
 	"bytes"
 	"encoding/json"
 	"flag"
-	"fmt"
+	// "fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"time"
 
@@ -40,7 +41,7 @@ func send(apiRequest api.Request) (string, error) {
 		return "", err
 	}
 
-	fmt.Println(string(requestBody))
+	log.Println("[OUT]", string(requestBody))
 
 	request, err := http.NewRequest("POST", API_SERVER, bytes.NewBuffer(requestBody))
 	if nil != err {
@@ -61,7 +62,7 @@ func send(apiRequest api.Request) (string, error) {
 		return "", err
 	}
 
-	fmt.Println(resp)
+	log.Println("[IN] ", body)
 
 	return string(body), nil
 }
@@ -88,23 +89,32 @@ func init() {
 }
 
 func main() {
-	data, err := scan(WIFI_INTERFACE)
-	if nil != err {
-		panic(err)
+
+	for {
+		data, err := scan(WIFI_INTERFACE)
+		if nil != err {
+			panic(err)
+		}
+
+		var apiRequest api.Request
+		apiRequest.Method = "import_measurements"
+		apiRequest.Apikey = APIKEY
+		apiRequest.DeviceId = DEVICE_ID
+		apiRequest.LocationId = LOCATION_ID
+		apiRequest.Data = make(map[string]map[string]float64)
+		apiRequest.Data[SENSOR_ID] = data
+		apiRequest.Timestamp = time.Now()
+
+		result, err := send(apiRequest)
+		if nil != err {
+			log.Println(err)
+			log.Println("TODO: store request for future use....")
+			time.Sleep(5 * time.Second)
+			continue
+		}
+		log.Println(result)
+
+		time.Sleep(5 * time.Second)
 	}
 
-	var apiRequest api.Request
-	apiRequest.Method = "import_measurements"
-	apiRequest.Apikey = APIKEY
-	apiRequest.DeviceId = DEVICE_ID
-	apiRequest.LocationId = LOCATION_ID
-	apiRequest.Data = make(map[string]map[string]float64)
-	apiRequest.Data[SENSOR_ID] = data
-
-	result, err := send(apiRequest)
-	if nil != err {
-		panic(err)
-	}
-
-	fmt.Println(result, err)
 }

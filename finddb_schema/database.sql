@@ -214,7 +214,9 @@ CREATE TABLE IF NOT EXISTS measurements (
     key             VARCHAR(50),
     value           DOUBLE PRECISION,
     created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (sensor_id) REFERENCES sensors(id) ON DELETE CASCADE
+    FOREIGN KEY (sensor_id) REFERENCES sensors(id) ON DELETE CASCADE,
+    -- TODO: should be down in a database patch
+    UNIQUE(sensor_id, value, key, created_at)
 );
 
 COMMENT ON TABLE measurements IS 'measurements collected by device sensors at a given location';
