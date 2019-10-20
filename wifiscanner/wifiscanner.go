@@ -80,6 +80,8 @@ func scan(wifiInterface string) (map[string]float64, error) {
 }
 
 func init() {
+
+	flag.StringVar(&API_SERVER, "api_server", DEFAULT_API_SERVER, "Api server")
 	flag.StringVar(&WIFI_INTERFACE, "wifi_interface", DEFAULT_WIFI_INTERFACE, "")
 	flag.StringVar(&SENSOR_ID, "sensor_id", DEFAULT_SENSOR_ID, "")
 	flag.StringVar(&DEVICE_ID, "device_id", DEFAULT_DEVICE_ID, "")
