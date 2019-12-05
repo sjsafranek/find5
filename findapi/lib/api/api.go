@@ -306,6 +306,22 @@ func (self *Api) Do(request *Request) (*Response, error) {
 				return user.Delete()
 			})
 
+		case "activate_user":
+			// {"method":"activate_user","username":"admin_user"}
+			// {"method":"activate_user","apikey":"<apikey>"}
+			return self.fetchUser(request, func(user *database.User) error {
+				self.cache.Delete("user", user.Apikey)
+				return user.Activate()
+			})
+
+		case "deactivate_user":
+			// {"method":"deactivate_user","username":"admin_user"}
+			// {"method":"deactivate_user","apikey":"<apikey>"}
+			return self.fetchUser(request, func(user *database.User) error {
+				self.cache.Delete("user", user.Apikey)
+				return user.Deactivate()
+			})
+
 		case "set_password":
 			// {"method":"set_password","username":"admin_user","password":"1234"}
 			// {"method":"set_password","apikey":"<apikey>","password":"1234"}

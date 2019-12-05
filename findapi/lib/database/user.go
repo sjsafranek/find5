@@ -17,6 +17,7 @@ type User struct {
 	Apikey      string    `json:"apikey,omitempty"`
 	SecretToken string    `json:"secret_token,omitempty"`
 	IsDeleted   bool      `json:"is_deleted"`
+	IsActive    bool      `json:"is_active"`
 	CreatedAt   time.Time `json:"created_at,string"`
 	UpdatedAt   time.Time `json:"updated_at,string"`
 	db          *Database `json:"-"`
@@ -56,6 +57,19 @@ func (self *User) Delete() error {
 	return nil
 }
 
+// Activate deletes user
+func (self *User) Activate() error {
+	self.IsActive = true
+	logger.Info(self.IsActive)
+	return self.Update()
+}
+
+// Deactivate deletes user
+func (self *User) Deactivate() error {
+	self.IsActive = false
+	return self.Update()
+}
+
 // Update updates user data in database
 func (self *User) Update() error {
 	return self.db.Insert(`
@@ -63,8 +77,9 @@ func (self *User) Update() error {
 			SET
 				email=$1,
 				password=$2,
-				is_deleted=$3
-			WHERE username=$4;`, self.Email, self.Password, self.IsDeleted, self.Username)
+				is_deleted=$3,
+				is_active=$4
+			WHERE username=$5;`, self.Email, self.Password, self.IsDeleted, self.IsActive, self.Username)
 }
 
 func (self *User) Marshal() (string, error) {
@@ -83,16 +98,7 @@ func (self *User) Unmarshal(data string) error {
 func (self *User) IsPassword(password string) (bool, error) {
 	match := false
 	return match, self.db.Exec(func(conn *sql.DB) error {
-		rows, err := conn.Query(`
-		SELECT
-			-- back door for using hashed password for login
-			CASE
-				WHEN password = $2 THEN TRUE
-				ELSE password = crypt($2, salt)
-			END AS matched
-			-- hash = crypt($2, salt) AS matched
-		FROM users
-		WHERE username=$1;`, self.Username, password)
+		rows, err := conn.Query(`SELECT is_password($1, $2);`, self.Username, password)
 
 		if nil != err {
 			return err
