@@ -12,6 +12,8 @@ import (
 	"sync"
 	"time"
 
+	// TODO use keystore instead of redis
+	// 	"github.com/sjsafranek/keystore"
 	"github.com/garyburd/redigo/redis"
 	"github.com/pkg/errors"
 	"github.com/sjsafranek/find5/findapi/lib/ai/learning/nb1"

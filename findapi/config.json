@@ -25,5 +25,8 @@
 	"ai": {
 		"host": "localhost",
 		"port": 7005
+	},
+	"api": {
+		"public_methods": []
 	}
 }
