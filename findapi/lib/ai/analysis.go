@@ -9,6 +9,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/sjsafranek/find5/findapi/lib/ai/learning/nb1"
 	"github.com/sjsafranek/find5/findapi/lib/ai/models"
+	"github.com/sjsafranek/logger"
 )
 
 // AIPort designates the port for the AI processing

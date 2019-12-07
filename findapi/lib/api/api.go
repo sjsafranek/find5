@@ -11,18 +11,18 @@ import (
 	"github.com/sjsafranek/find5/findapi/lib/ai"
 	"github.com/sjsafranek/find5/findapi/lib/ai/models"
 	"github.com/sjsafranek/find5/findapi/lib/database"
-	"github.com/sjsafranek/ligneous"
+	"github.com/sjsafranek/logger"
 )
 
-var (
-	logger = ligneous.AddLogger("api", "trace", "")
-)
-
-func SetLoggingDirectory(directory string) {
-	logger = ligneous.AddLogger("api", "trace", directory)
-	database.SetLoggingDirectory(directory)
-	ai.SetLoggingDirectory(directory)
-}
+// var (
+// 	logger = ligneous.AddLogger("api", "trace", "")
+// )
+//
+// func SetLoggingDirectory(directory string) {
+// 	logger = ligneous.AddLogger("api", "trace", directory)
+// 	database.SetLoggingDirectory(directory)
+// 	ai.SetLoggingDirectory(directory)
+// }
 
 func New(dbConnStr, aiConnStr, redisAddr string) *Api {
 	return &Api{

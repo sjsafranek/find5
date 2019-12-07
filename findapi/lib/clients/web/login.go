@@ -9,6 +9,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/gorilla/sessions"
 	"github.com/sjsafranek/find5/findapi/lib/api"
+		"github.com/sjsafranek/logger"
 )
 
 // const cookiename = "chocolate-chip"

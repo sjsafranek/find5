@@ -3,6 +3,8 @@ package web
 import (
 	"fmt"
 	"net/http"
+
+		"github.com/sjsafranek/logger"
 )
 
 type Broker struct {

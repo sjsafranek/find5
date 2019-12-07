@@ -8,6 +8,7 @@ import (
 
 	"github.com/sjsafranek/find5/findapi/lib/ai/models"
 	"github.com/sjsafranek/pool"
+	"github.com/sjsafranek/logger"
 )
 
 type ClassifyPayload struct {

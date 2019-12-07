@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/paulmach/orb/geojson"
+	"github.com/sjsafranek/logger"
 )
 
 type User struct {

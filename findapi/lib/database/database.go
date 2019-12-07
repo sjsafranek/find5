@@ -7,16 +7,9 @@ import (
 	"fmt"
 
 	_ "github.com/lib/pq"
-	"github.com/sjsafranek/ligneous"
+	"github.com/sjsafranek/logger"
 )
 
-var (
-	logger = ligneous.AddLogger("database", "trace", "./log/find5")
-)
-
-func SetLoggingDirectory(directory string) {
-	logger = ligneous.AddLogger("database", "trace", directory)
-}
 
 func New(connString string) *Database {
 	db, err := sql.Open("postgres", connString)

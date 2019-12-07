@@ -8,14 +8,8 @@ import (
 
 	"github.com/chzyer/readline"
 	"github.com/sjsafranek/find5/findapi/lib/api"
-	"github.com/sjsafranek/ligneous"
+	// "github.com/sjsafranek/logger"
 )
-
-var logger = ligneous.AddLogger("repl", "trace", "./log/find5")
-
-func SetLoggingDirectory(directory string) {
-	logger = ligneous.AddLogger("repl", "trace", directory)
-}
 
 func usage(w io.Writer) {
 	io.WriteString(w, "commands:\n")

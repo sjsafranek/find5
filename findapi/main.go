@@ -9,7 +9,7 @@ import (
 	"github.com/sjsafranek/find5/findapi/lib/api"
 	"github.com/sjsafranek/find5/findapi/lib/clients/repl"
 	"github.com/sjsafranek/find5/findapi/lib/clients/web"
-	"github.com/sjsafranek/ligneous"
+	// "github.com/sjsafranek/logger"
 )
 
 const (
@@ -26,7 +26,7 @@ const (
 	DEFAULT_REDIS_HOST        string = ""
 	DEFAULT_AI_HOST           string = "localhost"
 	DEFAULT_AI_PORT           int64  = 7005
-	DEFAULT_LOGGING_DIRECTORY string = ""
+	// DEFAULT_LOGGING_DIRECTORY string = ""
 	DEFAULT_CONFIG_FILE       string = "config.json"
 )
 
@@ -40,18 +40,18 @@ var (
 	DATABASE_PORT     int64  = DEFAULT_DATABASE_PORT
 	REDIS_PORT        int64  = DEFAULT_REDIS_PORT
 	REDIS_HOST        string = DEFAULT_REDIS_HOST
-	LOGGING_DIRECTORY string = DEFAULT_LOGGING_DIRECTORY
+	// LOGGING_DIRECTORY string = DEFAULT_LOGGING_DIRECTORY
 	AI_HOST           string = DEFAULT_AI_HOST
 	AI_PORT           int64  = DEFAULT_AI_PORT
 	CONFIG_FILE       string = DEFAULT_CONFIG_FILE
 	REQUEST           string = ""
 	MODE              string = "web"
-	logger            ligneous.Log
+	// logger            ligneous.Log
 	findapi           *api.Api
 )
 
 func init() {
-	var print_version bool
+	var printVersion bool
 
 	// flag.StringVar(&ACTION, "action", DEFAULT_ACTION, "Action")
 	// flag.StringVar(&CONFIG_FILE, "c", DEFAULT_CONFIG_FILE, "Config file")
@@ -67,15 +67,15 @@ func init() {
 	flag.Int64Var(&REDIS_PORT, "redisport", DEFAULT_REDIS_PORT, "Redis port")
 	flag.StringVar(&AI_HOST, "aihost", DEFAULT_AI_HOST, "AI host")
 	flag.Int64Var(&AI_PORT, "aiport", DEFAULT_AI_PORT, "AI port")
-	flag.StringVar(&LOGGING_DIRECTORY, "L", DEFAULT_LOGGING_DIRECTORY, "Logging directory")
+	// flag.StringVar(&LOGGING_DIRECTORY, "L", DEFAULT_LOGGING_DIRECTORY, "Logging directory")
 	flag.StringVar(&CONFIG_FILE, "c", DEFAULT_CONFIG_FILE, "config file")
 	flag.StringVar(&REQUEST, "query", "", "Api query to execute")
-	flag.BoolVar(&print_version, "V", false, "Print version and exit")
+	flag.BoolVar(&printVersion, "V", false, "Print version and exit")
 	flag.Parse()
 
-	logger = ligneous.AddLogger("server", "trace", fmt.Sprintf("%v/find5", LOGGING_DIRECTORY))
+	// logger = ligneous.AddLogger("server", "trace", fmt.Sprintf("%v/find5", LOGGING_DIRECTORY))
 
-	if print_version {
+	if printVersion {
 		fmt.Println(PROJECT, VERSION)
 		os.Exit(0)
 	}
@@ -88,9 +88,9 @@ func init() {
 }
 
 func main() {
-	api.SetLoggingDirectory(LOGGING_DIRECTORY)
-	web.SetLoggingDirectory(LOGGING_DIRECTORY)
-	repl.SetLoggingDirectory(LOGGING_DIRECTORY)
+	// api.SetLoggingDirectory(LOGGING_DIRECTORY)
+	// web.SetLoggingDirectory(LOGGING_DIRECTORY)
+	// repl.SetLoggingDirectory(LOGGING_DIRECTORY)
 
 	dbConnectionString := fmt.Sprintf("%v://%v:%v@%v:%v/%v?sslmode=disable", DATABASE_ENGINE, DATABASE_USERNAME, DATABASE_PASSWORD, DATABASE_HOST, DATABASE_PORT, DATABASE_DATABASE)
 	redisAddr := fmt.Sprintf("%v:%v", REDIS_HOST, REDIS_PORT)

@@ -3,6 +3,8 @@ package web
 import (
 	"fmt"
 	"net/http"
+
+		"github.com/sjsafranek/logger"
 )
 
 func apiFormatError(err error) string {

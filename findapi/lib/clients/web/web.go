@@ -6,14 +6,8 @@ import (
 
 	"github.com/sjsafranek/find5/findapi/lib/api"
 	"github.com/sjsafranek/lemur"
-	"github.com/sjsafranek/ligneous"
+	"github.com/sjsafranek/logger"
 )
-
-var logger = ligneous.AddLogger("server", "debug", "./log/find5")
-
-func SetLoggingDirectory(directory string) {
-	logger = ligneous.AddLogger("server", "trace", directory)
-}
 
 type Client struct {
 	api *api.Api
@@ -28,7 +22,7 @@ func (self *Client) Run(HTTP_PORT int) {
 	logger.Debug("Go Compiler: ", runtime.Compiler)
 	logger.Debug("NumGoroutine: ", runtime.NumGoroutine())
 
-	server, _ := lemur.NewServer(ligneous.AddLogger("server", "debug", "./log/find5"))
+	server, _ := lemur.NewServer()
 	server.AttachFileServer("/static/", "static")
 
 	authMiddleware := NewAuthenticationHandlers("chocolate-chip", self.api)

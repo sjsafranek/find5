@@ -20,17 +20,9 @@ import (
 	"github.com/sjsafranek/find5/findapi/lib/ai/learning/nb2"
 	"github.com/sjsafranek/find5/findapi/lib/ai/models"
 	"github.com/sjsafranek/find5/findapi/lib/database"
-	"github.com/sjsafranek/ligneous"
+	"github.com/sjsafranek/logger"
 	"github.com/sjsafranek/pool"
 )
-
-var (
-	logger = ligneous.AddLogger("ai", "trace", "")
-)
-
-func SetLoggingDirectory(directory string) {
-	logger = ligneous.AddLogger("ai", "trace", directory)
-}
 
 func New(aiConnStr, redisAddr string) *AI {
 
