@@ -37,15 +37,19 @@ class HttpClient(object):
     def createUser(self, username="", password=""):
         return self.do({
             "method": "create_user",
-            "username": username,
-            "password": password
+            "parmas": {
+                "username": username,
+                "password": password
+            }
         })
 
     def createDevice(self, name="", type=""):
         return self.do({
             "method": "create_device",
-            "name": name,
-            "type": type
+            "params": {
+                "name": name,
+                "type": type
+            }
         })
 
     def fetchDevices(self):
@@ -56,23 +60,29 @@ class HttpClient(object):
     def createSensor(self, device_id="", name="", type=""):
         return self.do({
             "method": "create_sensor",
-            "device_id": device_id,
-            "name": name,
-            "type": type
+            "params": {
+                "device_id": device_id,
+                "name": name,
+                "type": type
+            }
         })
 
     def fetchSensors(self, device_id=""):
         return self.do({
             "method": "get_sensors",
-            "device_id": device_id
+            "params": {
+                "device_id": device_id
+            }
         })
 
     def createLocation(self, name="", longitude=0.0, latitude=0.0):
         return self.do({
             "method": "create_location",
-            "name": name,
-            "longitude": longitude,
-            "latitude": latitude
+            "params": {
+                "name": name,
+                "longitude": longitude,
+                "latitude": latitude
+            }
         })
 
     def fetchLocations(self):
@@ -83,9 +93,11 @@ class HttpClient(object):
     def importMeasurements(self,  device_id=None, location_id=None, data={}):
         return self.do({
             "method": "import_measurements",
-            "location_id": location_id,
-            "device_id": device_id,
-            "data": data
+            "params": {
+                "location_id": location_id,
+                "device_id": device_id,
+                "data": data
+            }
         })
 
     # def analyzeMeasurements(self,  device_id=None, location_id=None, data={}):

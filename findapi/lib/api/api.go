@@ -3,46 +3,35 @@ package api
 import (
 	"encoding/json"
 	"errors"
-	// "strings"
 	"time"
 
-	// "github.com/garyburd/redigo/redis"
 	"github.com/karlseguin/ccache"
 	"github.com/sjsafranek/find5/findapi/lib/ai"
 	"github.com/sjsafranek/find5/findapi/lib/ai/models"
+	"github.com/sjsafranek/find5/findapi/lib/config"
 	"github.com/sjsafranek/find5/findapi/lib/database"
 	"github.com/sjsafranek/logger"
 )
 
-// var (
-// 	logger = ligneous.AddLogger("api", "trace", "")
-// )
-//
-// func SetLoggingDirectory(directory string) {
-// 	logger = ligneous.AddLogger("api", "trace", directory)
-// 	database.SetLoggingDirectory(directory)
-// 	ai.SetLoggingDirectory(directory)
-// }
-
-func New(dbConnStr, aiConnStr, redisAddr string) *Api {
+func New(conf *config.Config) *Api {
 	return &Api{
-		db: database.New(dbConnStr),
-		// redis: &redis.Pool{
-		// 	MaxIdle:     3,
-		// 	IdleTimeout: 240 * time.Second,
-		// 	Dial:        func() (redis.Conn, error) { return redis.Dial("tcp", redisAddr) },
-		// },
-		cache: ccache.Layered(ccache.Configure()),
-		ai:    ai.New(aiConnStr, redisAddr),
+		config: conf,
+		db:     database.New(conf.Database.GetDatabaseConnection()),
+		cache:  ccache.Layered(ccache.Configure()),
+		ai:     ai.New(conf.Ai.GetConnectionString(), conf.Redis.GetConnectionString()),
 	}
 }
 
 type Api struct {
-	db *database.Database
-	// redis          *redis.Pool
+	config         *config.Config
+	db             *database.Database
 	cache          *ccache.LayeredCache
 	ai             *ai.AI
 	eventListeners map[string][]func(string, string, float64)
+}
+
+func (self *Api) IsPublicMethod(method string) bool {
+	return self.config.Api.IsPublicMethod(method)
 }
 
 func (self *Api) RegisterEventListener(username string, clbk func(string, string, float64)) {
@@ -64,10 +53,10 @@ func (self *Api) fireEvent(username, device_id, location_id string, probability 
 func (self *Api) fetchUser(request *Request, clbk func(*database.User) error) error {
 	var user *database.User
 	var err error
-	if "" != request.Apikey {
-		user, err = self.getUserByApikey(request.Apikey)
-	} else if "" != request.Username {
-		user, err = self.getUserByUsername(request.Username)
+	if "" != request.Params.Apikey {
+		user, err = self.getUserByApikey(request.Params.Apikey)
+	} else if "" != request.Params.Username {
+		user, err = self.getUserByUsername(request.Params.Username)
 	} else {
 		err = errors.New("Missing parameters")
 	}
@@ -79,17 +68,20 @@ func (self *Api) fetchUser(request *Request, clbk func(*database.User) error) er
 
 // CreateUser
 func (self *Api) createUser(email, username, password string) (*database.User, error) {
-	user, err := self.db.CreateUser(email, username, password)
+	user, err := self.db.CreateUser(email, username)
 	if nil == err {
 		// cache apikey user pair
-		self.cache.Set("user", user.Apikey, user, 5*time.Minute)
+		err = user.SetPassword(password)
+		if nil == err {
+			self.cache.Set("user", user.Apikey, user, 5*time.Minute)
+		}
 	}
 	return user, err
 }
 
 // GetUserByUserName
 func (self *Api) getUserByUsername(username string) (*database.User, error) {
-	return self.db.GetUserFromUsername(username)
+	return self.db.GetUserByUsername(username)
 }
 
 // GetUserByApikey fetches user via apikey. This method uses an inmemory LRU cache to
@@ -101,7 +93,7 @@ func (self *Api) getUserByApikey(apikey string) (*database.User, error) {
 		return item.Value().(*database.User), nil
 	}
 
-	user, err := self.db.GetUserFromApikey(apikey)
+	user, err := self.db.GetUserByApikey(apikey)
 	if nil == err {
 		// cache apikey user pair
 		self.cache.Set("user", apikey, user, 5*time.Minute)
@@ -113,13 +105,13 @@ func (self *Api) getUserByApikey(apikey string) (*database.User, error) {
 func (self *Api) fetchDevice(request *Request, clbk func(*database.Device) error) error {
 	var device *database.Device
 
-	item := self.cache.Get("device_id", request.DeviceId)
+	item := self.cache.Get("device_id", request.Params.DeviceId)
 	if nil != item {
 		device = item.Value().(*database.Device)
 	} else {
 		err := self.fetchUser(request, func(user *database.User) error {
 			var err error
-			device, err = user.GetDeviceById(request.DeviceId)
+			device, err = user.GetDeviceById(request.Params.DeviceId)
 			return err
 		})
 
@@ -127,7 +119,7 @@ func (self *Api) fetchDevice(request *Request, clbk func(*database.Device) error
 			return err
 		}
 
-		self.cache.Set("device", request.DeviceId, device, 5*time.Minute)
+		self.cache.Set("device", request.Params.DeviceId, device, 5*time.Minute)
 	}
 
 	return clbk(device)
@@ -136,7 +128,7 @@ func (self *Api) fetchDevice(request *Request, clbk func(*database.Device) error
 //
 func (self *Api) fetchSensor(request *Request, clbk func(*database.Sensor) error) error {
 	return self.fetchDevice(request, func(device *database.Device) error {
-		sensor, err := device.GetSensorById(request.SensorId)
+		sensor, err := device.GetSensorById(request.Params.SensorId)
 		if nil != err {
 			return err
 		}
@@ -149,18 +141,18 @@ func (self *Api) AnalyzeData(request *Request) error {
 
 		sd := models.SensorData{
 			Family:    device.GetUser().Username,
-			Device:    request.DeviceId,
-			Location:  request.LocationId,
+			Device:    request.Params.DeviceId,
+			Location:  request.Params.LocationId,
 			Timestamp: time.Now().Unix(),
 			Sensors:   make(map[string]map[string]interface{}),
 		}
 
-		for i := range request.Data {
+		for i := range request.Params.Data {
 			if _, ok := sd.Sensors[i]; !ok {
 				sd.Sensors[i] = make(map[string]interface{})
 			}
-			for j := range request.Data[i] {
-				sd.Sensors[i][j] = request.Data[i][j]
+			for j := range request.Params.Data[i] {
+				sd.Sensors[i][j] = request.Params.Data[i][j]
 			}
 		}
 
@@ -218,7 +210,7 @@ func (self *Api) importMeasurements(request *Request) error {
 		}()
 		//.end
 
-		for sensor_id := range request.Data {
+		for sensor_id := range request.Params.Data {
 			sensor, err := device.GetSensorById(sensor_id)
 			if nil != err {
 				return err
@@ -227,10 +219,10 @@ func (self *Api) importMeasurements(request *Request) error {
 				return errors.New("sensor is deactivated")
 			}
 
-			if "" != request.LocationId {
-				err = sensor.ImportMeasurementsAtLocation(request.LocationId, request.Data[sensor_id])
+			if "" != request.Params.LocationId {
+				err = sensor.ImportMeasurementsAtLocation(request.Params.LocationId, request.Params.Data[sensor_id])
 			} else {
-				err = sensor.ImportMeasurements(request.Data[sensor_id])
+				err = sensor.ImportMeasurements(request.Params.Data[sensor_id])
 			}
 
 			if nil != err {
@@ -257,10 +249,27 @@ func (self *Api) DoJSON(jdata string) (*Response, error) {
 func (self *Api) Do(request *Request) (*Response, error) {
 	var response Response
 
+	// TODO HANDLE API VERSIONS
+	response.Version = request.Version
+	if "" == request.Version {
+		response.Version = VERSION
+		request.Version = VERSION
+	}
+
 	response.Status = "ok"
+	response.Id = request.Id
 
 	err := func() error {
 		switch request.Method {
+
+		case "get_database_version":
+			// {"method":"get_database_version"}
+			version, err := self.db.GetVersion()
+			if nil != err {
+				return err
+			}
+			response.Message = version
+			return nil
 
 		case "ping":
 			// {"method":"ping"}
@@ -269,11 +278,11 @@ func (self *Api) Do(request *Request) (*Response, error) {
 
 		case "create_user":
 			// {"method":"create_user","username": "admin_user" "email":"admin@email.com","password":"1234"}
-			if "" == request.Username {
+			if "" == request.Params.Username {
 				return errors.New("missing parameters")
 			}
 
-			user, err := self.createUser(request.Email, request.Username, request.Password)
+			user, err := self.createUser(request.Params.Email, request.Params.Username, request.Params.Password)
 			if nil != err {
 				return err
 			}
@@ -326,14 +335,14 @@ func (self *Api) Do(request *Request) (*Response, error) {
 			// {"method":"set_password","username":"admin_user","password":"1234"}
 			// {"method":"set_password","apikey":"<apikey>","password":"1234"}
 			return self.fetchUser(request, func(user *database.User) error {
-				return user.SetPassword(request.Password)
+				return user.SetPassword(request.Params.Password)
 			})
 
 		case "create_device":
 			// {"method":"create_device","username":"admin_user","name":"laptop","type":"computer"}
 			// {"method":"create_device","apikey":"<apikey>","name":"laptop","type":"computer"}
 			return self.fetchUser(request, func(user *database.User) error {
-				device, err := user.CreateDevice(request.Name, request.Type)
+				device, err := user.CreateDevice(request.Params.Name, request.Params.Type)
 				if nil != err {
 					return err
 				}
@@ -368,7 +377,7 @@ func (self *Api) Do(request *Request) (*Response, error) {
 			// {"method":"delete_device","username":"admin_user","device_id":"<uuid>"}
 			// {"method":"delete_device","apikey":"<apikey>","device_id":"<uuid>"}
 			return self.fetchDevice(request, func(device *database.Device) error {
-				self.cache.Delete("device", request.DeviceId)
+				self.cache.Delete("device", request.Params.DeviceId)
 				return device.Delete()
 			})
 
@@ -377,7 +386,7 @@ func (self *Api) Do(request *Request) (*Response, error) {
 			// {"method":"activate_device","apikey":"<apikey>","device_id":"<uuid>"}
 			return self.fetchDevice(request, func(device *database.Device) error {
 				err := device.Activate()
-				self.cache.Replace("device", request.DeviceId, device)
+				self.cache.Replace("device", request.Params.DeviceId, device)
 				return err
 			})
 
@@ -386,7 +395,7 @@ func (self *Api) Do(request *Request) (*Response, error) {
 			// {"method":"deactivate_device","apikey":"<apikey>","device_id":"<uuid>"}
 			return self.fetchDevice(request, func(device *database.Device) error {
 				err := device.Deactivate()
-				self.cache.Replace("device", request.DeviceId, device)
+				self.cache.Replace("device", request.Params.DeviceId, device)
 				return err
 			})
 
@@ -397,7 +406,7 @@ func (self *Api) Do(request *Request) (*Response, error) {
 				if !device.IsActive {
 					return errors.New("device is deactivated")
 				}
-				return device.CreateSensor(request.Name, request.Type)
+				return device.CreateSensor(request.Params.Name, request.Params.Type)
 			})
 
 		case "get_sensors":
@@ -424,7 +433,7 @@ func (self *Api) Do(request *Request) (*Response, error) {
 			// {"method":"delete_sensor","username":"admin_user","sensor_id":"<uuid>"}
 			// {"method":"delete_sensor","apikey":"<apikey>","sensor_id":"<uuid>"}
 			return self.fetchSensor(request, func(sensor *database.Sensor) error {
-				self.cache.Delete("sensor", request.SensorId)
+				self.cache.Delete("sensor", request.Params.SensorId)
 				return sensor.Delete()
 			})
 
@@ -433,7 +442,7 @@ func (self *Api) Do(request *Request) (*Response, error) {
 			// {"method":"activate_sensor","apikey":"<apikey>","sensor_id":"<uuid>"}
 			return self.fetchSensor(request, func(sensor *database.Sensor) error {
 				err := sensor.Activate()
-				self.cache.Replace("sensor", request.SensorId, sensor)
+				self.cache.Replace("sensor", request.Params.SensorId, sensor)
 				return err
 			})
 
@@ -442,7 +451,7 @@ func (self *Api) Do(request *Request) (*Response, error) {
 			// {"method":"deactivate_sensor","apikey":"<apikey>","sensor_id":"<uuid>"}
 			return self.fetchSensor(request, func(sensor *database.Sensor) error {
 				err := sensor.Deactivate()
-				self.cache.Replace("sensor", request.SensorId, sensor)
+				self.cache.Replace("sensor", request.Params.SensorId, sensor)
 				return err
 			})
 
@@ -450,7 +459,7 @@ func (self *Api) Do(request *Request) (*Response, error) {
 			// {"method":"create_location","username":"admin_user","name":"MyHouse","longitude":0.0,"latitude":0.0}
 			// {"method":"create_location","apikey":"<apikey>","name":"MyHouse","longitude":0.0,"latitude":0.0}
 			return self.fetchUser(request, func(user *database.User) error {
-				return user.CreateLocation(request.Name, request.Longitude, request.Latitude)
+				return user.CreateLocation(request.Params.Name, request.Params.Longitude, request.Params.Latitude)
 			})
 
 		case "get_locations":

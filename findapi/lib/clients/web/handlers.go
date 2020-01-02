@@ -9,9 +9,9 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/sjsafranek/logger"
 	"github.com/gorilla/mux"
 	"github.com/sjsafranek/find5/findapi/lib/api"
+	"github.com/sjsafranek/logger"
 )
 
 var startTime time.Time

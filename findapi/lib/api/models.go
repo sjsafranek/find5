@@ -8,8 +8,18 @@ import (
 	"github.com/sjsafranek/find5/findapi/lib/database"
 )
 
+const (
+	VERSION = "5.0.1"
+)
+
 type Request struct {
-	Method     string                        `json:"method,omitempty"`
+	Method  string `json:"method,omitempty"`
+	Version string `json:"version"`
+	Params  Params `json:"params"`
+	Id      string `json:"id,ompitempty"`
+}
+
+type Params struct {
 	Email      string                        `json:"email,omitempty"`
 	Username   string                        `json:"username,omitempty"`
 	Password   string                        `json:"password,omitempty"`
@@ -43,6 +53,8 @@ type ResponseData struct {
 }
 
 type Response struct {
+	Id      string       `json:"id"`
+	Version string       `json:"version"`
 	Status  string       `json:"status"`
 	Message string       `json:"message,omitempty"`
 	Error   string       `json:"error,omitempty"`
