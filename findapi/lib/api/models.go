@@ -2,6 +2,7 @@ package api
 
 import (
 	"encoding/json"
+	"io"
 	"time"
 
 	"github.com/paulmach/orb/geojson"
@@ -72,4 +73,13 @@ func (self *Response) Marshal() (string, error) {
 func (self *Response) SetError(err error) {
 	self.Status = "error"
 	self.Error = err.Error()
+}
+
+func (self *Response) Write(w io.Writer) error {
+	payload, err := self.Marshal()
+	if nil != err {
+		return err
+	}
+	_, err = fmt.Fprintln(w, payload)
+	return err
 }
