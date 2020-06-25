@@ -6,12 +6,26 @@ import (
 
 // Config configures the app
 type Config struct {
-	Facebook   Facebook
+
+	OAuth2 OAuth2
 	Server   Server
 	Database Database
 	Api      Api
 	Redis    Redis
 	Ai       Ai
+}
+
+type OAuth2 struct {
+	Facebook SocialOAuth2
+	Google SocialOAuth2
+}
+
+func (self *OAuth2) HasFacebook() bool {
+	return "" != self.Facebook.ClientID && "" != self.Facebook.ClientSecret
+}
+
+func (self *OAuth2) HasGoogle() bool {
+	return "" != self.Google.ClientID && "" != self.Google.ClientSecret
 }
 
 type Api struct {
@@ -31,7 +45,7 @@ type Server struct {
 	HttpPort int
 }
 
-type Facebook struct {
+type SocialOAuth2 struct {
 	ClientID     string
 	ClientSecret string
 }

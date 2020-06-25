@@ -37,27 +37,43 @@ func New(findapi *api.Api, conf *config.Config) *App {
 		mux: http.NewServeMux(),
 	}
 
-	apiHandler := NewApiHandler(findapi, conf)
+	// apiHandler := NewApiHandler(findapi, conf)
 
-	app.mux.Handle("/", middleware.Attach(http.HandlerFunc(welcomeHandler)))
+	// app.mux.Handle("/", middleware.Attach(http.HandlerFunc(welcomeHandler)))
+	app.mux.Handle("/", middleware.Attach(http.HandlerFunc(app.indexHandler)))
 	app.mux.Handle("/profile", middleware.Attach(sessionManager.RequireLogin(http.HandlerFunc(app.profileHandler))))
-	app.mux.Handle("/api", middleware.Attach(sessionManager.RequireLogin(http.HandlerFunc(apiHandler))))
-	// app.mux.Handle("/api/v1", middleware.Attach(sessionManager.RequireLogin(http.HandlerFunc(apiHandler))))
+	app.mux.Handle("/api", middleware.Attach(sessionManager.RequireLogin(http.HandlerFunc(app.apiWithSessionHandler))))
+	app.mux.Handle("/api/v1", middleware.Attach(http.HandlerFunc(app.apiHandler)))
 	app.mux.Handle("/logout", middleware.Attach(http.HandlerFunc(sessionManager.LogoutHandler)))
 
 	// Static files
 	fsvr := http.FileServer(http.Dir("static"))
 	app.mux.Handle("/static/", http.StripPrefix("/static/", fsvr))
 
-	// get facebook login handlers
-	loginHandler, callbackHandler := sessionManager.GetFacebookLoginHandlers(
-		conf.Facebook.ClientID,
-		conf.Facebook.ClientSecret,
-		"http://localhost:8080/facebook/callback")
+	// Enable FaceBook login
+	if conf.OAuth2.HasFacebook() {
+		// get facebook login handlers
+		loginHandler, callbackHandler := sessionManager.GetFacebookLoginHandlers(
+			conf.OAuth2.Facebook.ClientID,
+			conf.OAuth2.Facebook.ClientSecret,
+			"http://localhost:8080/facebook/callback")
 
-	// attach facebook login handlers to mux
-	app.mux.Handle("/facebook/login", middleware.Attach(loginHandler))
-	app.mux.Handle("/facebook/callback", middleware.Attach(callbackHandler))
+		// attach facebook login handlers to mux
+		app.mux.Handle("/facebook/login", middleware.Attach(loginHandler))
+		app.mux.Handle("/facebook/callback", middleware.Attach(callbackHandler))
+	}
+
+	if conf.OAuth2.HasGoogle() {
+		// get facebook login handlers
+		loginHandler, callbackHandler := sessionManager.GetGoogleLoginHandlers(
+			conf.OAuth2.Google.ClientID,
+			conf.OAuth2.Google.ClientSecret,
+			"http://localhost:8080/google/callback")
+
+		// attach facebook login handlers to mux
+		app.mux.Handle("/google/login", middleware.Attach(loginHandler))
+		app.mux.Handle("/google/callback", middleware.Attach(callbackHandler))
+	}
 
 	// websockets
 	hub, _ := websockets.New(findapi)

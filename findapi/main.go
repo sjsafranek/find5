@@ -35,6 +35,8 @@ var (
 	HTTP_PORT         int    = DEFAULT_HTTP_PORT
 	FACEBOOK_CLIENT_ID       string = os.Getenv("FACEBOOK_CLIENT_ID")
 	FACEBOOK_CLIENT_SECRET   string = os.Getenv("FACEBOOK_CLIENT_SECRET")
+	GOOGLE_CLIENT_ID string = os.Getenv("GOOGLE_CLIENT_ID")
+	GOOGLE_CLIENT_SECRET string = os.Getenv("GOOGLE_CLIENT_SECRET")
 	DATABASE_ENGINE   string = DEFAULT_DATABASE_ENGINE
 	DATABASE_DATABASE string = DEFAULT_DATABASE_DATABASE
 	DATABASE_PASSWORD string = DEFAULT_DATABASE_PASSWORD
@@ -60,15 +62,24 @@ func init() {
 		Api: config.Api{
 			PublicMethods: []string{
 				"get_devices",
+				"create_device",
+				"create_sensor",
+				"get_sensors",
 				"get_locations",
 			},
 		},
 		Server: config.Server{
-		HttpPort: DEFAULT_HTTP_PORT,
-	},
-		Facebook: config.Facebook{
-			ClientID:     FACEBOOK_CLIENT_ID,
-			ClientSecret: FACEBOOK_CLIENT_SECRET,
+			HttpPort: DEFAULT_HTTP_PORT,
+		},
+		OAuth2: config.OAuth2{
+			Facebook: config.SocialOAuth2{
+				ClientID:     FACEBOOK_CLIENT_ID,
+				ClientSecret: FACEBOOK_CLIENT_SECRET,
+			},
+			Google: config.SocialOAuth2{
+				ClientID:     GOOGLE_CLIENT_ID,
+				ClientSecret: GOOGLE_CLIENT_SECRET,
+			},
 		},
 		Database: config.Database{
 			DatabaseEngine: DATABASE_ENGINE,
@@ -89,8 +100,10 @@ func init() {
 	}
 
 	flag.IntVar(&conf.Server.HttpPort, "httpport", DEFAULT_HTTP_PORT, "Server port")
-	flag.StringVar(&conf.Facebook.ClientID, "facebook-client-id", FACEBOOK_CLIENT_ID, "Facebook Client ID")
-	flag.StringVar(&conf.Facebook.ClientSecret, "facebook-client-secret", FACEBOOK_CLIENT_SECRET, "Facebook Client Secret")
+	flag.StringVar(&conf.OAuth2.Facebook.ClientID, "facebook-client-id", FACEBOOK_CLIENT_ID, "Facebook Client ID")
+	flag.StringVar(&conf.OAuth2.Facebook.ClientSecret, "facebook-client-secret", FACEBOOK_CLIENT_SECRET, "Facebook Client Secret")
+	flag.StringVar(&conf.OAuth2.Google.ClientID, "gmail-client-id", GOOGLE_CLIENT_ID, "Google Client ID")
+	flag.StringVar(&conf.OAuth2.Google.ClientSecret, "gmail-client-secret", GOOGLE_CLIENT_SECRET, "Google Client Secret")
 	flag.StringVar(&conf.Database.DatabaseHost, "dbhost", DEFAULT_DATABASE_HOST, "database host")
 	flag.StringVar(&conf.Database.DatabaseName, "dbname", DEFAULT_DATABASE_DATABASE, "database name")
 	flag.StringVar(&conf.Database.DatabasePass, "dbpass", DEFAULT_DATABASE_PASSWORD, "database password")

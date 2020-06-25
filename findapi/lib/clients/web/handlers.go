@@ -13,7 +13,7 @@ var (
 )
 
 // welcomeHandler shows a welcome message and login button.
-func welcomeHandler(w http.ResponseWriter, req *http.Request) {
+func (self *App) indexHandler(w http.ResponseWriter, req *http.Request) {
 	if req.URL.Path != "/" {
 		http.NotFound(w, req)
 		return
@@ -24,7 +24,11 @@ func welcomeHandler(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	err := LOGIN_TEMPLATE.ExecuteTemplate(w, "login", nil)
+	options := make(map[string]interface{})
+	options["facebook"] = self.config.OAuth2.HasFacebook()
+	options["google"] = self.config.OAuth2.HasGoogle()
+
+	err := LOGIN_TEMPLATE.ExecuteTemplate(w, "login", options)
 	if nil != err {
 		logger.Error(err)
 		apiBasicResponse(w, http.StatusInternalServerError, err)
@@ -40,8 +44,8 @@ func (self *App) profileHandler(w http.ResponseWriter, req *http.Request) {
 	userid := val.Values["userid"].(string)
 	useremail := val.Values["useremail"].(string)
 
-	args := make(map[string]interface{})
-	args["username"] = username
+	options := make(map[string]interface{})
+	options["username"] = username
 
 	user, err := self.api.GetDatabase().CreateUserIfNotExists(useremail, useremail)
 	if nil != err {
@@ -50,7 +54,7 @@ func (self *App) profileHandler(w http.ResponseWriter, req *http.Request) {
 	}
 	user.CreateSocialAccountIfNotExists(userid, username, usertype)
 
-	err = PROFILE_TEMPLATE.ExecuteTemplate(w, "profile", args)
+	err = PROFILE_TEMPLATE.ExecuteTemplate(w, "profile", options)
 	if nil != err {
 		logger.Error(err)
 		apiBasicResponse(w, http.StatusInternalServerError, err)

@@ -28,6 +28,7 @@
 
             .form-signin {
                 width: 100%;
+                padding: 4px;
             }
 
             .btn-social {
@@ -59,12 +60,34 @@
                     <div class="card card-signin my-5">
                         <div class="card-body">
                             <h5 class="card-title text-center">Sign In</h5>
-                            <form class="form-signin" action="/facebook/login" method="get">
+
+                            <!-- basic login -->
+                            <!-- <label for="username" class="sr-only">Username</label>
+                			<input class="form-control form-control-sm" id="username" name="username" placeholder="username" type="text" required autofocus />
+
+                			<label for="password" class="sr-only">Password</label>
+                			<input class="form-control form-control-sm" id="password" name="password" placeholder="password" type="password" required />
+
+                            <button id="login" class="btn btn-sm btn-primary btn-block" >
+                				<i class="fas fa-sign-in-alt"></i>
+                				Login
+                			</button> -->
+                            <!--.end -->
+
+                            <form class="form-signin facebook-signin" action="/facebook/login" method="get">
                                 <button type="button" class="btn btn-lg btn-primary btn-block btn-social btn-facebook" type="submit" value="submit">
                                     <i class="fab fa-facebook"></i>
                                     Login with Facebook
                                 </button>
                             </form>
+
+                            <form class="form-signin google-signin" action="/google/login" method="get">
+                                <button type="button" class="btn btn-lg btn-primary btn-block btn-social btn-google" type="submit" value="submit">
+                                    <i class="fab fa-google"></i>
+                                    Login with Google
+                                </button>
+                            </form>
+
                         </div>
                     </div>
                 </div>
@@ -75,6 +98,43 @@
             $('.btn-facebook').on('click', function(e){
                 window.location.href = "facebook/login"
             });
+
+            $('.btn-google').on('click', function(e){
+                window.location.href = "google/login"
+            });
+
+            // TODO HANDLE IN TEMPALTE...
+            var options = {{ index . }};
+            if (!options.facebook) {
+                $('.facebook-signin').remove();
+            }
+            if (!options.google) {
+                $('.google-signin').remove();
+            }
+
+
+            // function login(){
+            //     var usr = $('#username').val();
+            //     var psw = $('#password').val();
+            //     $.ajax({
+            //         method: 'POST',
+            //         url: '/login',
+            //         username: usr,
+            //         password: psw,
+            //         headers: {
+            //             Authorization: 'Basic ' + btoa(usr+':'+psw)
+            //         }
+            //     }).done(function(data){
+            //         console.log(data);
+            //         window.location = '`+redirectUrl+`'
+            //     }).fail(function(xhr){
+            //         console.log(xhr.responseText);
+            //         $('.message').append(xhr.responseText);
+            //     });
+            // }
+            // $("#login").on('click', login);
+
+
         </script>
 
         {{template "global_footer" .}}

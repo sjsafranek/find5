@@ -4,33 +4,33 @@ import (
 	"net/http"
 
 	"github.com/dghubble/gologin/v2"
-	"github.com/dghubble/gologin/v2/facebook"
+	"github.com/dghubble/gologin/v2/google"
 	"golang.org/x/oauth2"
-	facebookOAuth2 "golang.org/x/oauth2/facebook"
+	googleOAuth2 "golang.org/x/oauth2/google"
 )
 
-func (self *SessionManager) GetFacebookLoginHandlers(clientID, clientSecret, callbackUrl string) (http.Handler, http.Handler) {
+func (self *SessionManager) GetGoogleLoginHandlers(clientID, clientSecret, callbackUrl string) (http.Handler, http.Handler) {
 	// 1. Register Login and Callback handlers
 	oauth2Config := &oauth2.Config{
 		ClientID:     clientID,
 		ClientSecret: clientSecret,
 		RedirectURL:  callbackUrl,
-		Endpoint:     facebookOAuth2.Endpoint,
+		Endpoint:     googleOAuth2.Endpoint,
 		Scopes:       []string{"email"},
 	}
 
 	// state param cookies require HTTPS by default; disable for localhost development
 	stateConfig := gologin.DebugOnlyCookieConfig
-	loginHandler := facebook.StateHandler(stateConfig, facebook.LoginHandler(oauth2Config, nil))
-	callbackHandler := facebook.StateHandler(stateConfig, facebook.CallbackHandler(oauth2Config, self.issueFacebookSession(), nil))
+	loginHandler := google.StateHandler(stateConfig, google.LoginHandler(oauth2Config, nil))
+	callbackHandler := google.StateHandler(stateConfig, google.CallbackHandler(oauth2Config, self.issueGoogleSession(), nil))
 	return loginHandler, callbackHandler
 }
 
 // issueSession issues a cookie session after successful Facebook login
-func (self *SessionManager) issueFacebookSession() http.Handler {
+func (self *SessionManager) issueGoogleSession() http.Handler {
 	fn := func(w http.ResponseWriter, req *http.Request) {
 		ctx := req.Context()
-		facebookUser, err := facebook.UserFromContext(ctx)
+		googleUser, err := google.UserFromContext(ctx)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
@@ -38,10 +38,10 @@ func (self *SessionManager) issueFacebookSession() http.Handler {
 
 		// 2. Implement a success handler to issue some form of session
 		session := self.issueSession()
-		session.Values["userid"] = facebookUser.ID
-		session.Values["username"] = facebookUser.Name
-		session.Values["useremail"] = facebookUser.Email
-		session.Values["usertype"] = "facebook"
+		session.Values["userid"] = googleUser.Id
+		session.Values["username"] = googleUser.Name
+		session.Values["useremail"] = googleUser.Email
+		session.Values["usertype"] = "google"
 		session.Save(w)
 		http.Redirect(w, req, "/profile", http.StatusFound)
 	}

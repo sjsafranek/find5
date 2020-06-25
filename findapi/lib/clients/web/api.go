@@ -8,65 +8,60 @@ import (
 
 	"github.com/sjsafranek/logger"
 	"github.com/sjsafranek/find5/findapi/lib/api"
-	"github.com/sjsafranek/find5/findapi/lib/config"
 )
 
-func NewApiHandler(rpcApi *api.Api, conf *config.Config) func(w http.ResponseWriter, r *http.Request) {
 
-// func apiHandler(w http.ResponseWriter, r *http.Request) {
-return func(w http.ResponseWriter, r *http.Request) {
-	var data string
+func (self *App) getApiRequestFromHttpRequest(r *http.Request) (*api.Request, error) {
+	var request api.Request
 
-	val, _ := sessionManager.Get(r)
-	useremail := val.Values["useremail"].(string)
-	if 0 == len(useremail) {
-		apiBasicResponse(w, http.StatusUnauthorized, errors.New(http.StatusText(http.StatusUnauthorized)))
-		return
+	body, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		return &request, err
 	}
+	r.Body.Close()
+
+	logger.Debug(string(body))
+
+	// TODO
+	//  - use request.Unmarshal
+	return &request, json.Unmarshal(body, &request)
+}
+
+func (self *App) execApiRequest(request *api.Request) (string, int, error) {
+	// run api request
+	response, err := self.api.Do(request)
+	results, _ := response.Marshal()
+
+	if nil != err {
+		return results, http.StatusBadRequest, nil
+	}
+
+	return results, http.StatusOK, nil
+}
+
+func (self *App) apiHandler(w http.ResponseWriter, r *http.Request) {
+
+	var data string
 
 	status_code, err := func() (int, error) {
 		switch r.Method {
 		case "POST":
-			body, err := ioutil.ReadAll(r.Body)
+			// get api request
+			request, err := self.getApiRequestFromHttpRequest(r)
 			if err != nil {
 				return http.StatusBadRequest, err
 			}
-			r.Body.Close()
 
-			var request api.Request
-
-			// TODO
-			//  - use request.Unmarshal
-			json.Unmarshal(body, &request)
-
-			// WARNING - protect against request hijacking!
-			if nil == request.Params {
-				request.Params = &api.RequestParams{}
-			}
-			request.Params.Username = useremail
-			request.Params.Apikey = ""
-			//.END
-
-			logger.Info(string(body))
-			// logger.Info(request)
-
-			if !conf.Api.IsPublicMethod(request.Method) {
+			// check against allowed methods
+			if !self.api.IsPublicMethod(request.Method) {
 				logger.Warnf("Not a public api method: %v", request.Method)
 				return http.StatusMethodNotAllowed, errors.New(http.StatusText(http.StatusMethodNotAllowed))
 			}
 
 			// run api request
-			response, err := rpcApi.Do(&request)
-
-			if nil != err {
-				results, _ := response.Marshal()
-				data = results
-				return http.StatusBadRequest, nil
-			}
-
-			results, _ := response.Marshal()
+			results, statusCode, err := self.execApiRequest(request)
 			data = results
-			return http.StatusOK, nil
+			return statusCode, err
 
 		default:
 			return http.StatusMethodNotAllowed, errors.New(http.StatusText(http.StatusMethodNotAllowed))
@@ -80,4 +75,55 @@ return func(w http.ResponseWriter, r *http.Request) {
 
 	apiJSONResponse(w, []byte(data), status_code)
 }
+
+
+func (self *App) apiWithSessionHandler(w http.ResponseWriter, r *http.Request) {
+
+	var data string
+
+	val, _ := sessionManager.Get(r)
+	useremail := val.Values["useremail"].(string)
+	if 0 == len(useremail) {
+		apiBasicResponse(w, http.StatusUnauthorized, errors.New(http.StatusText(http.StatusUnauthorized)))
+		return
+	}
+
+	status_code, err := func() (int, error) {
+		switch r.Method {
+		case "POST":
+			// get api request
+			request, err := self.getApiRequestFromHttpRequest(r)
+			if err != nil {
+				return http.StatusBadRequest, err
+			}
+
+			// WARNING - protect against request hijacking!
+			if nil == request.Params {
+				request.Params = &api.RequestParams{}
+			}
+			request.Params.Username = useremail
+			request.Params.Apikey = ""
+
+			// check against allowed methods
+			if !self.api.IsPublicMethod(request.Method) {
+				logger.Warnf("Not a public api method: %v", request.Method)
+				return http.StatusMethodNotAllowed, errors.New(http.StatusText(http.StatusMethodNotAllowed))
+			}
+
+			// run api request
+			results, statusCode, err := self.execApiRequest(request)
+			data = results
+			return statusCode, err
+
+		default:
+			return http.StatusMethodNotAllowed, errors.New(http.StatusText(http.StatusMethodNotAllowed))
+		}
+	}()
+
+	if nil != err {
+		apiBasicResponse(w, status_code, err)
+		return
+	}
+
+	apiJSONResponse(w, []byte(data), status_code)
 }

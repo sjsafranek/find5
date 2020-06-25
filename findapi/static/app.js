@@ -47,7 +47,7 @@ function App(user, api) {
 					$(app.views.sensor.$el).hide();
 
 					this.device_id = device_id;
-					this.sensors = data;
+					this.sensors = data.sensors = [];
 					var $sensorsContainer = $(this.$el).find('.objects');
 					$sensorsContainer.empty();
 					data && data.map(function(d) {
@@ -83,7 +83,7 @@ function App(user, api) {
 								if (err) return new swal('Error', JSON.stringify(err), 'error');
 								api.getSensors(self.device_id, function(err, data) {
 									if (err) return new swal('Error', JSON.stringify(err), 'error');
-									self.setData(self.device_id, data.data.sensors);
+									self.setData(self.device_id, data.sensors || []);
 								});
 							});
 						}
@@ -148,7 +148,7 @@ function App(user, api) {
 				fetchDevices: function() {
 					var self = this;
 					api.getDevices(function(err, data) {
-						self.devices = data.data.devices;
+						self.devices = data.devices || [];
 						var $devicesContainer = $(self.$el).find('.objects');
 						$devicesContainer.empty();
 						self.devices.map(function(d) {
