@@ -76,3 +76,23 @@ BEGIN
 END;
 $BODY$
 LANGUAGE 'plpgsql';
+
+
+
+
+-- This example cleans the input before it’s put into the database, in case someone accidentally put a space in their email address, or a line-break in their name.
+-- Source: https://sivers.org/pg
+-- TODO figure out line break issue...?
+CREATE OR REPLACE FUNCTION clean_user()
+RETURNS TRIGGER AS $$
+    BEGIN
+        NEW.username = btrim(regexp_replace(NEW.username, '\s+', ' ', 'g'));
+        NEW.email = lower(regexp_replace(NEW.email, '\s', '', 'g'));
+        RETURN NEW;
+    END;
+$$ LANGUAGE 'plpgsql';
+
+DROP TRIGGER IF EXISTS users_clean ON users;
+CREATE TRIGGER users_clean
+    BEFORE INSERT OR UPDATE OF username, email ON users
+        FOR EACH ROW EXECUTE PROCEDURE clean_user();

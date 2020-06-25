@@ -249,6 +249,8 @@ func (self *Api) DoJSON(jdata string) (*Response, error) {
 func (self *Api) Do(request *Request) (*Response, error) {
 	var response Response
 
+	logger.Debug(request.Marshal())
+
 	// TODO HANDLE API VERSIONS
 	response.Version = request.Version
 	if "" == request.Version {
@@ -277,7 +279,8 @@ func (self *Api) Do(request *Request) (*Response, error) {
 			return nil
 
 		case "create_user":
-			// {"method":"create_user","username": "admin_user" "email":"admin@email.com","password":"1234"}
+			// {"method":"create_user","params":{"username":"admin_user","email":"admin@email.com","password":"1234"}}
+			logger.Info(request)
 			if "" == request.Params.Username {
 				return errors.New("missing parameters")
 			}
@@ -300,8 +303,11 @@ func (self *Api) Do(request *Request) (*Response, error) {
 			return nil
 
 		case "get_user":
-			// {"method":"get_user","username":"admin_user"}
-			// {"method":"get_user","apikey":"<apikey>"}
+			// {"method":"get_user","params":{"username":"admin_user"}}
+			// {"method":"get_user","params":{"apikey":"<apikey>"}}
+			if "" == request.Params.Username && "" == request.Params.Apikey {
+				return errors.New("missing parameters")
+			}
 			return self.fetchUser(request, func(user *database.User) error {
 				response.Data.User = user
 				return nil

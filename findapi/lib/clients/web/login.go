@@ -52,7 +52,7 @@ func (self *AuthenticationHandlers) HasSession(r *http.Request) bool {
 func (self *AuthenticationHandlers) GetUserFromSession(r *http.Request) (*api.Response, error) {
 	session, _ := self.store.Get(r, self.cookieName)
 	username := session.Values["username"].(string)
-	return self.api.Do(&api.Request{Method: "get_user", Params: api.Params{Username: username}})
+	return self.api.Do(&api.Request{Method: "get_user", Params: api.RequestParams{Username: username}})
 }
 
 func (self *AuthenticationHandlers) LoginHandler(redirectUrl string) func(http.ResponseWriter, *http.Request) {
@@ -75,7 +75,7 @@ func (self *AuthenticationHandlers) LoginHandler(redirectUrl string) func(http.R
 				return
 			}
 
-			results, err := self.api.Do(&api.Request{Method: "get_user", Params: api.Params{Username: username}})
+			results, err := self.api.Do(&api.Request{Method: "get_user", Params: api.RequestParams{Username: username}})
 			if nil != err {
 				apiBasicResponse(w, http.StatusBadRequest, err)
 				return

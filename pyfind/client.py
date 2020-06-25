@@ -20,8 +20,10 @@ class HttpClient(object):
         self._login(password)
 
     def do(self, payload):
+        if 'params' not in payload:
+            payload['params'] = {}
         if self.apikey:
-            payload['apikey'] = self.apikey
+            payload['params']['apikey'] = self.apikey
         print(json.dumps(payload))
         return requests.post("{0}/api/v1/find".format(self.api_url), json=payload)
 

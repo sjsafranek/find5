@@ -27,7 +27,7 @@ const (
 	DEFAULT_REDIS_HOST        string = ""
 	DEFAULT_AI_HOST           string = "localhost"
 	DEFAULT_AI_PORT           int64  = 7005
-	// DEFAULT_CONFIG_FILE string = "config.json"
+	DEFAULT_CONFIG_FILE string = "config.json"
 )
 
 var (
@@ -42,7 +42,7 @@ var (
 	REDIS_HOST        string = DEFAULT_REDIS_HOST
 	AI_HOST           string = DEFAULT_AI_HOST
 	AI_PORT           int64  = DEFAULT_AI_PORT
-	// CONFIG_FILE string = DEFAULT_CONFIG_FILE
+	CONFIG_FILE string = DEFAULT_CONFIG_FILE
 	REQUEST string = ""
 	MODE    string = "web"
 	findapi *api.Api
@@ -55,15 +55,7 @@ func init() {
 	// read credentials from environment variables if available
 	conf = &config.Config{
 		Api: config.Api{
-			PublicMethods: []string{
-				// 	"create_crawl",
-				// 	"get_crawl",
-				// 	"get_crawls",
-				// 	"delete_crawl",
-				// 	"get_venues",
-				// 	"up_vote",
-				// 	"down_vote",
-			},
+			PublicMethods: []string{},
 		},
 		// Facebook: config.Facebook{
 		// 	ClientID:     FACEBOOK_CLIENT_ID,
@@ -99,7 +91,8 @@ func init() {
 	flag.StringVar(&conf.Ai.Host, "aihost", DEFAULT_AI_HOST, "AI host")
 	flag.Int64Var(&conf.Ai.Port, "aiport", DEFAULT_AI_PORT, "AI port")
 
-	// flag.StringVar(&CONFIG_FILE, "c", DEFAULT_CONFIG_FILE, "config file")
+	flag.StringVar(&CONFIG_FILE, "c", DEFAULT_CONFIG_FILE, "config file")
+
 	flag.StringVar(&REQUEST, "query", "", "Api query to execute")
 	flag.BoolVar(&printVersion, "V", false, "Print version and exit")
 	flag.Parse()

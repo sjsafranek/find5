@@ -5,10 +5,11 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/paulmach/orb/geojson"
-	"github.com/sjsafranek/logger"
+	// "github.com/sjsafranek/logger"
 )
 
 type User struct {
@@ -39,29 +40,31 @@ func (self *User) SetPassword(password string) error {
 // Delete deletes user
 func (self *User) Delete() error {
 	self.IsDeleted = true
-	err := self.Update()
-	if nil != err {
-		return err
-	}
-	// TODO move this logic into database
-	// cascade "delete" all devices
-	devices, err := self.GetDevices()
-	if nil != err {
-		return err
-	}
-	for _, device := range devices {
-		err = device.Delete()
-		if nil != err {
-			return err
-		}
-	}
-	return nil
+	return self.Update()
+
+	// err := self.Update()
+	// if nil != err {
+	// 	return err
+	// }
+	//
+	// // TODO move this logic into database
+	// // cascade "delete" all devices
+	// devices, err := self.GetDevices()
+	// if nil != err {
+	// 	return err
+	// }
+	// for _, device := range devices {
+	// 	err = device.Delete()
+	// 	if nil != err {
+	// 		return err
+	// 	}
+	// }
+	// return nil
 }
 
 // Activate deletes user
 func (self *User) Activate() error {
 	self.IsActive = true
-	logger.Info(self.IsActive)
 	return self.Update()
 }
 
@@ -114,6 +117,28 @@ func (self *User) IsPassword(password string) (bool, error) {
 	})
 }
 
+/**
+ * Social Accounts
+ */
+// CreateSocialAccountIfNotExists
+// https://stackoverflow.com/questions/4069718/postgres-insert-if-does-not-exist-already
+// ON CONFLICT DO NOTHING/UPDATE
+// http://www.postgresqltutorial.com/postgresql-upsert/
+func (self *User) CreateSocialAccountIfNotExists(user_id, username, account_type string) error {
+	err := self.db.Insert(`
+		INSERT INTO social_accounts(id, name, type, email)
+			VALUES ($1, $2, $3, $4)
+				ON CONFLICT DO NOTHING;
+	`, user_id, username, account_type, self.Username)
+	if nil != err && strings.Contains(err.Error(), "duplicate key value violates unique constraint") {
+		return nil
+	}
+	return nil
+}
+
+/**
+ * APP FUNCTIONS
+ */
 func (self *User) CreateDevice(dname, dtype string) (*Device, error) {
 	err := self.db.Insert(`
 		INSERT INTO devices(username, name, type)

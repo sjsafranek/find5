@@ -13,7 +13,11 @@ set client_min_messages to 'warning';
 \i create_extensions.sql
 \i create_general_functions.sql
 \i create_config_table.sql
+
 \i create_users_table.sql
+\i create_social_accounts_table.sql
+\i create_users_view.sql
+
 \i create_devices_table.sql
 \i create_locations_table.sql
 \i create_location_history_table.sql

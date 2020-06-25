@@ -2,6 +2,7 @@ package api
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"time"
 
@@ -14,13 +15,13 @@ const (
 )
 
 type Request struct {
-	Method  string `json:"method,omitempty"`
-	Version string `json:"version"`
-	Params  Params `json:"params"`
-	Id      string `json:"id,ompitempty"`
+	Id      string        `json:"id,omitempty"`
+	Version string        `json:"version,omitempty"`
+	Method  string        `json:"method,omitempty"`
+	Params  RequestParams `json:"params,omitempty"`
 }
 
-type Params struct {
+type RequestParams struct {
 	Email      string                        `json:"email,omitempty"`
 	Username   string                        `json:"username,omitempty"`
 	Password   string                        `json:"password,omitempty"`
@@ -34,10 +35,28 @@ type Params struct {
 	Type       string                        `json:"type,omitempty"`
 	Data       map[string]map[string]float64 `json:"data,omitempty"`
 	Timestamp  time.Time                     `json:"timestamp,string"`
+	Filter     *database.Filter              `json:"filter,omitempty"`
 }
 
 func (self *Request) Unmarshal(data string) error {
 	return json.Unmarshal([]byte(data), self)
+}
+
+func (self *Request) Marshal() (string, error) {
+	b, err := json.Marshal(self)
+	if nil != err {
+		return "", err
+	}
+	return string(b), err
+}
+
+type Response struct {
+	Id      string       `json:"id"`
+	Version string       `json:"version"`
+	Status  string       `json:"status"`
+	Message string       `json:"message,omitempty"`
+	Error   string       `json:"error,omitempty"`
+	Data    ResponseData `json:"data,omitempty"`
 }
 
 type ResponseData struct {
@@ -53,13 +72,8 @@ type ResponseData struct {
 	MeasurementLocations []*database.MeasurementLocations `json:"measurements_locations,omitempty"`
 }
 
-type Response struct {
-	Id      string       `json:"id"`
-	Version string       `json:"version"`
-	Status  string       `json:"status"`
-	Message string       `json:"message,omitempty"`
-	Error   string       `json:"error,omitempty"`
-	Data    ResponseData `json:"data,omitempty"`
+func (self *Response) Unmarshal(data string) error {
+	return json.Unmarshal([]byte(data), self)
 }
 
 func (self *Response) Marshal() (string, error) {

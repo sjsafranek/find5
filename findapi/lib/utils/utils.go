@@ -29,6 +29,7 @@ func GetVendorFromOUI(s string) (string, error) {
 	return "", errors.New("not a mac address")
 }
 
+/*
 // src is seeds the random generator for generating random strings
 var src = rand.NewSource(time.Now().UnixNano())
 
@@ -57,6 +58,8 @@ func RandomString(n int) string {
 
 	return string(b)
 }
+
+*/
 
 // IsMacRandomized takes a mac address like "wifi-60:57:18:3d:b8:14"
 // or "60:57:18:3d:b8:14" and pulls the first hex digit "60" and computes

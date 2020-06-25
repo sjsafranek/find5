@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
-		"github.com/sjsafranek/logger"
+	"github.com/sjsafranek/logger"
 )
 
 type Broker struct {

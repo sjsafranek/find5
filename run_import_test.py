@@ -3,8 +3,9 @@ import time
 
 from pyfind import client
 client = client.HttpClient(
-    username="admin",
-    password="test1234"
+    username="admin_user",
+    password="1234",
+    api_url='http://localhost:8081'
 )
 
 
