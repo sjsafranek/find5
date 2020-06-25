@@ -1,0 +1,92 @@
+{{define "global_footer"}}
+
+<script>
+
+	var Api = function() {
+		this.callbacks = {};
+		this.ws = null;
+		// this.init();
+	}
+
+	Api.prototype.fetch = function(data, callback) {
+		// try websocket
+		if (this.ws && WebSocket.OPEN == this.ws.readyState) {
+			var hsh = md5(callback);
+			this.callbacks[hsh] = callback;
+			data.id = hsh;
+			var payload = JSON.stringify(data);
+			this.ws.send(payload);
+			return;
+		}
+
+		// fallback to ajax
+		return this.ajax(data, callback);
+	}
+
+	Api.prototype.ajax = function(data, callback) {
+		var payload = JSON.stringify(data);
+		return $.ajax({
+			method: "POST",
+			url: '/api',
+			contentType: "application/json",
+			data: payload,
+			success: function(data) {
+				callback && callback(null, data);
+			},
+			error: function(jqXHR, textStatus, errorThrown) {
+				console.log(jqXHR, textStatus, errorThrown);
+				callback && callback(jqXHR.responseJSON || jqXHR.responseText);
+			}
+		});
+	}
+
+	Api.prototype.init = function() {
+		var self = this;
+		// open socket connection
+		this.ws = new WebSocket(window.origin.replace("http", "ws") + '/ws');
+		// retry on socket close
+		this.ws.onclose = function(event) {
+			setTimeout(function() {
+				self.init();
+			}, 1000);
+		}
+		this.ws.onopen = function(event) {
+			console.log("WebSocket is open");
+		}
+		this.ws.onmessage = function(event) {
+			var data = JSON.parse(event.data);
+			self.callbacks[data.id](null, data);
+		}
+	}
+
+
+	var api = new Api();
+
+
+</script>
+
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-154565146-1"></script>
+<script>
+	window.dataLayer = window.dataLayer || [];
+	function gtag(){
+		dataLayer.push(arguments);
+	}
+	gtag('js', new Date());
+	gtag('config', 'UA-154565146-1');
+</script>
+
+
+
+
+<footer class="footer">
+	<div class="container">
+		<!-- <span class="text-muted">Place sticky footer content here.</span> -->
+		<div>Icons made by <a href="https://www.flaticon.com/authors/freepik" title="Freepik">Freepik</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a></div>
+	</div>
+</footer>
+
+
+
+
+{{end}}

@@ -154,50 +154,65 @@ func (self *User) CreateDevice(dname, dtype string) (*Device, error) {
 func (self *User) GetDevices() ([]*Device, error) {
 	var devices []*Device
 	return devices, self.db.Exec(func(conn *sql.DB) error {
+		// rows, err := conn.Query(`
+		// SELECT json_agg(d) FROM (
+		// 	SELECT
+		// 		devices.id,
+		// 		devices.name,
+		// 		devices.type,
+		// 		devices.username,
+		// 		devices.is_active,
+		// 		devices.is_deleted,
+		// 		to_char(devices.created_at, 'YYYY-MM-DD"T"HH:MI:SS"Z"') as created_at,
+		//         to_char(devices.updated_at, 'YYYY-MM-DD"T"HH:MI:SS"Z"') as updated_at,
+		// 		(
+		// 			SELECT json_agg(s) FROM (
+		// 				SELECT
+		// 					sensors.id,
+		// 					sensors.name,
+		// 					sensors.type,
+		// 					sensors.device_id,
+		// 					sensors.is_active,
+		// 					sensors.is_deleted,
+		// 					to_char(sensors.created_at, 'YYYY-MM-DD"T"HH:MI:SS"Z"') as created_at,
+		// 					to_char(sensors.updated_at, 'YYYY-MM-DD"T"HH:MI:SS"Z"') as updated_at
+		// 				FROM sensors
+		// 				WHERE device_id=devices.id
+		// 				AND sensors.is_deleted = false
+		// 			) s
+		// 		) AS sensors
+		// 	FROM devices
+		// 	WHERE devices.username = $1
+		// 	AND devices.is_deleted = false
+		// ) d;`, self.Username)
+
 		rows, err := conn.Query(`
-		SELECT json_agg(d) FROM (
-			SELECT
-				devices.id,
-				devices.name,
-				devices.type,
-				devices.username,
-				devices.is_active,
-				devices.is_deleted,
-				to_char(devices.created_at, 'YYYY-MM-DD"T"HH:MI:SS"Z"') as created_at,
-		        to_char(devices.updated_at, 'YYYY-MM-DD"T"HH:MI:SS"Z"') as updated_at,
-				(
-					SELECT json_agg(s) FROM (
-						SELECT
-							sensors.id,
-							sensors.name,
-							sensors.type,
-							sensors.device_id,
-							sensors.is_active,
-							sensors.is_deleted,
-							to_char(sensors.created_at, 'YYYY-MM-DD"T"HH:MI:SS"Z"') as created_at,
-							to_char(sensors.updated_at, 'YYYY-MM-DD"T"HH:MI:SS"Z"') as updated_at
-						FROM sensors
-						WHERE device_id=devices.id
-						AND sensors.is_deleted = false
-					) s
-				) AS sensors
-			FROM devices
-			WHERE devices.username = $1
-			AND devices.is_deleted = false
-		) d;`, self.Username)
+		SELECT
+		    json_agg(devices_json)
+		FROM devices_view
+		WHERE username = $1
+		AND is_deleted = false
+		;`, self.Username)
 
 		if nil != err {
-			return err
+			return checkError(err)
 		}
 
 		for rows.Next() {
 			var temp string
 			rows.Scan(&temp)
+
+			// handle no records being returned
+			if "" == temp {
+				return nil
+			}
+
 			err = json.Unmarshal([]byte(temp), &devices)
 			if nil != err {
 				return err
 			}
 		}
+
 
 		// add database to objects
 		for i := range devices {
@@ -265,7 +280,6 @@ func (self *User) GetLocations() (*geojson.FeatureCollection, error) {
 				json_build_object(
 					'id', id,
 					'name', name,
-					'username', username,
 					'created_at', to_char(locations.created_at, 'YYYY-MM-DD"T"HH:MI:SS"Z"'),
 					'updated_at', to_char(locations.updated_at, 'YYYY-MM-DD"T"HH:MI:SS"Z"')
 				) AS properties
@@ -277,6 +291,22 @@ func (self *User) GetLocations() (*geojson.FeatureCollection, error) {
 				AND
 					locations.is_deleted = false
 		) c;`, self.Username)
+
+		// rows, err := conn.Query(`
+		// SELECT
+		// 	json_build_object(
+		// 		'type', 'FeatureCollection',
+		// 		'features', json_agg(c)
+		// 	) AS geojson
+		// FROM (
+		// 	SELECT
+		// 		location_json
+		// 	FROM locations_view AS locations
+		// 	WHERE
+		// 			locations.username = $1
+		// 		AND
+		// 			locations.is_deleted = false
+		// ) c;`, self.Username)
 
 		if nil != err {
 			return err

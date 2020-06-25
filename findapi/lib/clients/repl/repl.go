@@ -80,7 +80,6 @@ func (self *Client) Run() {
 
 		switch {
 
-		// case "run" == command:
 		case strings.HasPrefix(line, "{") && strings.HasSuffix(line, "}"):
 			request := api.Request{}
 			request.Unmarshal(line)

@@ -4,13 +4,14 @@ import (
 	"errors"
 	"flag"
 	"fmt"
+	"runtime"
 	"os"
 
 	"github.com/sjsafranek/find5/findapi/lib/api"
 	"github.com/sjsafranek/find5/findapi/lib/clients/repl"
 	"github.com/sjsafranek/find5/findapi/lib/clients/web"
 	"github.com/sjsafranek/find5/findapi/lib/config"
-	// "github.com/sjsafranek/logger"
+	"github.com/sjsafranek/logger"
 )
 
 const (
@@ -32,6 +33,8 @@ const (
 
 var (
 	HTTP_PORT         int    = DEFAULT_HTTP_PORT
+	FACEBOOK_CLIENT_ID       string = os.Getenv("FACEBOOK_CLIENT_ID")
+	FACEBOOK_CLIENT_SECRET   string = os.Getenv("FACEBOOK_CLIENT_SECRET")
 	DATABASE_ENGINE   string = DEFAULT_DATABASE_ENGINE
 	DATABASE_DATABASE string = DEFAULT_DATABASE_DATABASE
 	DATABASE_PASSWORD string = DEFAULT_DATABASE_PASSWORD
@@ -43,7 +46,7 @@ var (
 	AI_HOST           string = DEFAULT_AI_HOST
 	AI_PORT           int64  = DEFAULT_AI_PORT
 	CONFIG_FILE string = DEFAULT_CONFIG_FILE
-	REQUEST string = ""
+	API_REQUEST string = ""
 	MODE    string = "web"
 	findapi *api.Api
 	conf    *config.Config
@@ -55,12 +58,18 @@ func init() {
 	// read credentials from environment variables if available
 	conf = &config.Config{
 		Api: config.Api{
-			PublicMethods: []string{},
+			PublicMethods: []string{
+				"get_devices",
+				"get_locations",
+			},
 		},
-		// Facebook: config.Facebook{
-		// 	ClientID:     FACEBOOK_CLIENT_ID,
-		// 	ClientSecret: FACEBOOK_CLIENT_SECRET,
-		// },
+		Server: config.Server{
+		HttpPort: DEFAULT_HTTP_PORT,
+	},
+		Facebook: config.Facebook{
+			ClientID:     FACEBOOK_CLIENT_ID,
+			ClientSecret: FACEBOOK_CLIENT_SECRET,
+		},
 		Database: config.Database{
 			DatabaseEngine: DATABASE_ENGINE,
 			DatabaseHost:   DEFAULT_DATABASE_HOST,
@@ -79,7 +88,9 @@ func init() {
 		},
 	}
 
-	flag.IntVar(&HTTP_PORT, "httpport", DEFAULT_HTTP_PORT, "Server port")
+	flag.IntVar(&conf.Server.HttpPort, "httpport", DEFAULT_HTTP_PORT, "Server port")
+	flag.StringVar(&conf.Facebook.ClientID, "facebook-client-id", FACEBOOK_CLIENT_ID, "Facebook Client ID")
+	flag.StringVar(&conf.Facebook.ClientSecret, "facebook-client-secret", FACEBOOK_CLIENT_SECRET, "Facebook Client Secret")
 	flag.StringVar(&conf.Database.DatabaseHost, "dbhost", DEFAULT_DATABASE_HOST, "database host")
 	flag.StringVar(&conf.Database.DatabaseName, "dbname", DEFAULT_DATABASE_DATABASE, "database name")
 	flag.StringVar(&conf.Database.DatabasePass, "dbpass", DEFAULT_DATABASE_PASSWORD, "database password")
@@ -93,7 +104,7 @@ func init() {
 
 	flag.StringVar(&CONFIG_FILE, "c", DEFAULT_CONFIG_FILE, "config file")
 
-	flag.StringVar(&REQUEST, "query", "", "Api query to execute")
+	flag.StringVar(&API_REQUEST, "query", "", "Api query to execute")
 	flag.BoolVar(&printVersion, "V", false, "Print version and exit")
 	flag.Parse()
 
@@ -113,9 +124,9 @@ func main() {
 
 	findapi = api.New(conf)
 
-	if "" != REQUEST {
+	if "" != API_REQUEST {
 		request := api.Request{}
-		request.Unmarshal(REQUEST)
+		request.Unmarshal(API_REQUEST)
 		response, err := findapi.Do(&request)
 		if nil != err {
 			panic(err)
@@ -129,13 +140,34 @@ func main() {
 		return
 	}
 
+	logger.Debug("GOOS: ", runtime.GOOS)
+	logger.Debug("CPUS: ", runtime.NumCPU())
+	logger.Debug("PID: ", os.Getpid())
+	logger.Debug("Go Version: ", runtime.Version())
+	logger.Debug("Go Arch: ", runtime.GOARCH)
+	logger.Debug("Go Compiler: ", runtime.Compiler)
+	logger.Debug("NumGoroutine: ", runtime.NumGoroutine())
+
+	resp, err := findapi.DoJSON(`{"method":"get_database_version"}`)
+	if nil != err {
+		panic(err)
+	}
+	logger.Debugf("Database version: %v", resp.Message)
+
 	switch MODE {
+
 	case "repl":
 		repl.New(findapi).Run()
 		break
+
 	case "web":
-		web.New(findapi).Run(HTTP_PORT)
+		app := web.New(findapi, conf)
+		err = app.ListenAndServe(fmt.Sprintf(":%v", conf.Server.HttpPort))
+		if err != nil {
+			panic(err)
+		}
 		break
+
 	default:
 		panic(errors.New("api client not found"))
 	}

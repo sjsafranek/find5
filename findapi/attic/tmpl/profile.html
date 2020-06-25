@@ -1,0 +1,291 @@
+{{define "profile"}}
+
+<!doctype html>
+<html lang="en">
+    <head>
+
+        <title>Profile</title>
+
+        {{template "global_header" .}}
+
+        <!-- LeafletJS -->
+        <link rel="stylesheet" href="/static/leaflet/leaflet-1.6.0.css">
+        <script src="/static/leaflet/leaflet-1.6.0.js"></script>
+
+        <!-- Utils Library -->
+        <script src="/static/js/utils.js"></script>
+        <script src="/static/js/geoutils.js"></script>
+        <script src="/static/js/md5.min.js"></script>
+
+        <style>
+
+            .body {
+                padding-bottom: 20px;
+            }
+
+            .devices-list,
+            .device-sensors-list {
+                font-size: 0.8em;
+            }
+
+            .device-sensors-list {
+                height: 100%;
+                max-height: 56em;
+                overflow-y: scroll;
+            }
+
+            #map {
+                width: auto;
+                height: 400px;
+            }
+
+
+
+            .pulsate {
+                -webkit-animation: pulsate 1.5s ease-out;
+                -webkit-animation-iteration-count: infinite;
+                background-color: rgb(198,200,202,0.1);
+            }
+
+            @-webkit-keyframes pulsate {
+                0% {
+                    background-color: rgb(198,200,202,0.1);
+                }
+                50% {
+                    background-color: rgb(198,200,202,1.0);
+                }
+                100% {
+                    background-color: rgb(198,200,202,0.1);
+                }
+            }
+
+
+
+            .throbPath {
+                -webkit-animation: throbPath 1.5s ease-out;
+                -webkit-animation-iteration-count: infinite;
+                stroke-width: 1;
+            }
+
+            @-webkit-keyframes throbPath {
+                0% {
+                    stroke-width: 1;
+                }
+                50% {
+                    stroke-width: 4;
+                }
+                100% {
+                    stroke-width: 1;
+                }
+            }
+
+        </style>
+
+
+    </head>
+
+    <body>
+
+        {{template "navbar" .}}
+
+        <div class="container">
+
+            <div class="row">
+                <div class="col-lg-3">
+                    Devices
+                    <div class="list-group list-group-flush devices-list">
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    Sensors
+                    <div class="list-group list-group-flush device-sensors-list">
+                    </div>
+                </div>
+                <div id="map" class="col">
+                </div>
+            </div>
+
+
+        </div>
+
+        {{template "global_footer" .}}
+
+        <script>
+
+            var app;
+            var api;
+
+
+            var Api = function() {
+                // this.callbacks = {};
+                // this.ws = null;
+                // this.init();
+            }
+
+        /*
+            Api.prototype.init = function() {
+                var self = this;
+                // open socket connection
+                this.ws = new WebSocket(window.origin.replace("http", "ws") + '/ws');
+                // retry on socket close
+                this.ws.onclose = function(event) {
+                    setTimeout(function() {
+                        self.init();
+                    }, 1000);
+                }
+                this.ws.onopen = function(event) {
+                    console.log("WebSocket is open");
+                }
+                this.ws.onmessage = function(event) {
+                    var data = JSON.parse(event.data);
+                    self.callbacks[data.callback](null, data);
+                }
+            }
+        */
+
+            Api.prototype.ajax = function(data, callback) {
+                var payload = JSON.stringify(data);
+                return $.ajax({
+                    method: "POST",
+                    url: '/api',
+                    contentType: "application/json",
+                    data: payload,
+                    success: function(data) {
+                        callback && callback(null, data.data);
+                    },
+                    error: function(jqXHR, textStatus, errorThrown) {
+                        console.log(jqXHR, textStatus, errorThrown);
+                        callback && callback(jqXHR.responseJSON || jqXHR.responseText);
+                    }
+                });
+            }
+
+            Api.prototype.fetch = function(data, callback) {
+                // try websocket
+                if (this.ws && WebSocket.OPEN == this.ws.readyState) {
+                    var hsh = md5(callback);
+                    this.callbacks[hsh] = callback;
+                    data.callback = hsh;
+                    var payload = JSON.stringify(data);
+                    this.ws.send(payload);
+                    return;
+                }
+
+                // fallback to ajax
+                return this.ajax(data, callback);
+            }
+
+            Api.prototype.fetchDevices = function(callback) {
+                this.fetch({"method": "get_devices"}, function(err, data) {
+                    if (err) throw err;
+                    callback && callback(data.devices || []);
+                });
+            }
+
+            Api.prototype.fetchLocations = function(callback) {
+                this.fetch({"method": "get_locations"}, function(err, data) {
+                    if (err) throw err;
+                    callback && callback(data.locations || []);
+                });
+            }
+
+
+
+
+
+            var App = function() {
+                var self = this;
+
+                this.elements = {
+                    devicesList: $('.devices-list'),
+                    sensorsList: $('.device-sensors-list')
+                }
+
+                // init map
+                this.popup = L.popup();
+                this.map = L.map('map').setView([0, 0], 2);
+                this.map.on('contextmenu', function(event) {
+                    var popup = self.getPopup();
+                    var $crawlNameInputElem = $('<input>', {type: 'text', placeholder: 'New pub crawl'});
+                    popup.setLatLng(event.latlng)
+                        .setContent(
+                            $('<div>').append(
+                                $crawlNameInputElem,
+                                $('<br>'),
+                                $('<button>')
+                                    .append('Create')
+                                    .on('click', function(e) {
+                                        popup.remove();
+                                        self.createCrawl(
+                                            $crawlNameInputElem.val(),
+                                            event.latlng.lng,
+                                            event.latlng.lat
+                                        )
+                                    })
+                            ).get(0)
+                        )
+                        .openOn(
+                            self.getMap()
+                        );
+                });
+
+                L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
+                    attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+                    maxZoom: 18,
+                    id: 'mapbox/streets-v11',
+                    accessToken: 'pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw'
+                }).addTo(this.map);
+
+                this.venuesLayer;
+            }
+
+            App.prototype.getElement = function(key) {
+                return this.elements[key];
+            }
+
+            App.prototype.getMap = function() {
+                return this.map;
+            }
+
+            App.prototype.getPopup = function() {
+                return this.popup;
+            }
+
+            App.prototype.updateDevices = function() {
+                api.fetchDevices(function(devices) {
+                    console.log(devices);
+                });
+            }
+
+            App.prototype.updateLocations = function() {
+                api.fetchLocations(function(locations) {
+                    console.log(locations);
+                });
+            }
+
+
+
+
+
+            $(document).ready(function(event){
+                app = new App();
+                api = new Api();
+                app.updateDevices();
+                app.updateLocations();
+                GeoUtils.getGeoLocation(function(err, coords){
+                    if (err) throw err;
+                    app.getMap().setView({
+                                    lng: coords.longitude,
+                                    lat: coords.latitude
+                                }, 13);
+                });
+            });
+
+
+
+        </script>
+
+    </body>
+</html>
+
+{{end}}

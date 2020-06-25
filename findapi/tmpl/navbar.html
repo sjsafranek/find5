@@ -1,0 +1,22 @@
+{{define "navbar"}}
+
+	<nav class="navbar navbar-dark bg-dark sticky-top">
+		<a class="navbar-brand" href="#">
+			<!-- <img src="/static/images/beer.svg" width="30" height="30" alt=""> -->
+		</a>
+
+		<form class="form-inline my-2 my-lg-0" action="/logout" method="post">
+	        <span class="text-muted">{{.username}} </span>
+			<button class="btn btn-default" type="submit" value="Logout">
+				<i data-feather="log-out"></i>
+			</button>
+		</form>
+
+	</nav>
+
+	<!-- Enable feather log-out icon -->
+	<script>
+		feather.replace({class: 'log-out'});
+	</script>
+
+{{end}}

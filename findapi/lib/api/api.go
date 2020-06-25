@@ -34,6 +34,10 @@ func (self *Api) IsPublicMethod(method string) bool {
 	return self.config.Api.IsPublicMethod(method)
 }
 
+func (self *Api) GetDatabase() *database.Database {
+	return self.db
+}
+
 func (self *Api) RegisterEventListener(username string, clbk func(string, string, float64)) {
 	if nil == self.eventListeners {
 		self.eventListeners = make(map[string][]func(string, string, float64))
@@ -249,7 +253,8 @@ func (self *Api) DoJSON(jdata string) (*Response, error) {
 func (self *Api) Do(request *Request) (*Response, error) {
 	var response Response
 
-	logger.Debug(request.Marshal())
+	payload, _ := request.Marshal()
+	logger.Debug(payload)
 
 	// TODO HANDLE API VERSIONS
 	response.Version = request.Version
@@ -486,11 +491,11 @@ func (self *Api) Do(request *Request) (*Response, error) {
 			return nil
 
 		case "import_measurements":
-			// {"method":"record_measurements","username":"admin","device_id":"dada27ee-f57b-e9c0-4ac0-1b2eda8af6fb","data":{"5c434f17-3095-7f74-7688-9de7f7853c2d":{"thing1":1,"thing2":2, "thing3":3}}}
+			// {"method":"record_measurements","params":{"username":"admin","device_id":"dada27ee-f57b-e9c0-4ac0-1b2eda8af6fb","data":{"5c434f17-3095-7f74-7688-9de7f7853c2d":{"thing1":1,"thing2":2, "thing3":3}}}}
 			return self.importMeasurements(request)
 
 		case "export_measurements":
-			// {"method":"export_measurements","username":"admin"}
+			// {"method":"export_measurements","params":{"username":"admin"}}
 			return self.fetchUser(request, func(user *database.User) error {
 				measurements, err := user.ExportMeasurements()
 				if nil != err {
@@ -501,7 +506,7 @@ func (self *Api) Do(request *Request) (*Response, error) {
 			})
 
 		case "export_devices_by_location":
-			// {"method":"export_devices_by_location","username":"admin"}
+			// {"method":"export_devices_by_location","params":{"username":"admin_user"}}
 			return self.fetchUser(request, func(user *database.User) error {
 				deviceLocations, err := user.ExportDevicesByLocation()
 				if nil != err {
@@ -512,7 +517,7 @@ func (self *Api) Do(request *Request) (*Response, error) {
 			})
 
 		case "export_measurement_stats_by_location":
-			// {"method":"export_measurement_stats_by_location","username":"admin"}
+			// {"method":"export_measurement_stats_by_location","params":{"username":"admin"}}
 			return self.fetchUser(request, func(user *database.User) error {
 				measurementLocations, err := user.ExportMeasurementStatsByLocation()
 				if nil != err {
@@ -523,7 +528,7 @@ func (self *Api) Do(request *Request) (*Response, error) {
 			})
 
 		case "calibrate":
-			// {"method":"calibrate","username":"admin"}
+			// {"method":"calibrate","params":{"username":"admin_user"}}
 			// {"apikey": "a0a1695e8cd13322f1acb312b40cddb6", "method": "calibrate"}
 			return self.calibrate(request)
 			// return self.fetchUser(request, func(user *database.User) error {

@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS location_history (
     created_at              TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     unique_ts               INTEGER DEFAULT EXTRACT(epoch FROM CURRENT_TIMESTAMP)::INTEGER,
     FOREIGN KEY (device_id) REFERENCES devices(id) ON DELETE CASCADE,
-    FOREIGN KEY (location_id) REFERENCES locations(id) ON DELETE CASCADE,-- ,
+    FOREIGN KEY (location_id) REFERENCES locations(id) ON DELETE CASCADE,
     CONSTRAINT unique_device_location UNIQUE(device_id, location_id, probability, unique_ts)
 );
 

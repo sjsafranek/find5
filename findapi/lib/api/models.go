@@ -11,14 +11,14 @@ import (
 )
 
 const (
-	VERSION = "5.0.1"
+	VERSION = "5.1.1"
 )
 
 type Request struct {
 	Id      string        `json:"id,omitempty"`
 	Version string        `json:"version,omitempty"`
 	Method  string        `json:"method,omitempty"`
-	Params  RequestParams `json:"params,omitempty"`
+	Params  *RequestParams `json:"params,omitempty"`
 }
 
 type RequestParams struct {
@@ -33,9 +33,9 @@ type RequestParams struct {
 	Longitude  float64                       `json:"longitude,omitempty"`
 	Name       string                        `json:"name,omitempty"`
 	Type       string                        `json:"type,omitempty"`
-	Data       map[string]map[string]float64 `json:"data,omitempty"`
-	Timestamp  time.Time                     `json:"timestamp,string"`
+	Timestamp  *time.Time                     `json:"timestamp,string,omitempty"`
 	Filter     *database.Filter              `json:"filter,omitempty"`
+	Data       map[string]map[string]float64 `json:"data,omitempty"`
 }
 
 func (self *Request) Unmarshal(data string) error {
@@ -51,7 +51,7 @@ func (self *Request) Marshal() (string, error) {
 }
 
 type Response struct {
-	Id      string       `json:"id"`
+	Id      string       `json:"id,omitempty"`
 	Version string       `json:"version"`
 	Status  string       `json:"status"`
 	Message string       `json:"message,omitempty"`

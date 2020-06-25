@@ -19,7 +19,11 @@ set client_min_messages to 'warning';
 \i create_users_view.sql
 
 \i create_devices_table.sql
+\i create_devices_view.sql
+
 \i create_locations_table.sql
+-- \i create_locations_view.sql
 \i create_location_history_table.sql
+
 \i create_sensors_table.sql
 \i create_measurements_table.sql

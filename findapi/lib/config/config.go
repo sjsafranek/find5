@@ -6,7 +6,7 @@ import (
 
 // Config configures the app
 type Config struct {
-	// Facebook   Facebook
+	Facebook   Facebook
 	Server   Server
 	Database Database
 	Api      Api

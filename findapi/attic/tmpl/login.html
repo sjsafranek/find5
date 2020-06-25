@@ -1,0 +1,85 @@
+{{define "login"}}
+
+<!doctype html>
+<html lang="en">
+    <head>
+
+        <title>Login</title>
+
+        {{template "global_header" .}}
+
+        <style>
+
+            .card-signin {
+                border: 0;
+                border-radius: 1rem;
+                box-shadow: 0 0.5rem 1rem 0 rgba(0, 0, 0, 0.1);
+            }
+
+            .card-signin .card-title {
+                margin-bottom: 2rem;
+                font-weight: 300;
+                font-size: 1.5rem;
+            }
+
+            .card-signin .card-body {
+                padding: 2rem;
+            }
+
+            .form-signin {
+                width: 100%;
+            }
+
+            .btn-social {
+                border-radius: 5rem;
+            }
+
+            .logo {
+                padding: 3rem 1.5rem;
+                text-align: center;
+            }
+
+        </style>
+
+
+    </head>
+
+    <body>
+
+        <div class="container">
+
+            <div class="row">
+                <div class="col-sm-9 col-md-7 col-lg-5 mx-auto logo">
+                    <h1>F.I.N.D 5</h1>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-sm-9 col-md-7 col-lg-5 mx-auto">
+                    <div class="card card-signin my-5">
+                        <div class="card-body">
+                            <h5 class="card-title text-center">Sign In</h5>
+                            <form class="form-signin" action="/facebook/login" method="get">
+                                <button type="button" class="btn btn-lg btn-primary btn-block btn-social btn-facebook" type="submit" value="submit">
+                                    <i class="fab fa-facebook"></i>
+                                    Login with Facebook
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            $('.btn-facebook').on('click', function(e){
+                window.location.href = "facebook/login"
+            });
+        </script>
+
+        {{template "global_footer" .}}
+
+    </body>
+</html>
+
+{{end}}
