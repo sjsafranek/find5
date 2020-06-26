@@ -3,8 +3,8 @@ DROP TABLE IF EXISTS social_accounts CASCADE;
 CREATE TABLE social_accounts (
 	id		        VARCHAR,
 	name	        VARCHAR,
-	type	        VARCHAR,
-	email			VARCHAR,
+	type	        VARCHAR DEFAULT 'unknown',
+	email			VARCHAR NOT NULL CHECK(email != ''),
     created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 	CONSTRAINT account PRIMARY KEY(email, type),

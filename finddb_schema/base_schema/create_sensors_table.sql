@@ -6,9 +6,9 @@ DROP TABLE IF EXISTS sensors CASCADE;
 -- @description stores device sensor metadata
 CREATE TABLE IF NOT EXISTS sensors (
     id              VARCHAR(36) PRIMARY KEY DEFAULT md5(random()::text || now()::text)::uuid,
-    device_id       VARCHAR(36),
-    name            VARCHAR(50),
-    type            VARCHAR(50),
+    device_id       VARCHAR(36) NOT NULL CHECK(device_id != ''),
+    name            VARCHAR(50) NOT NULL CHECK(name != ''),
+    type            VARCHAR(50) DEFAULT 'unknown',
     created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     is_deleted      BOOLEAN DEFAULT false,

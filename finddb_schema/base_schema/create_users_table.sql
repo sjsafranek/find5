@@ -4,8 +4,8 @@ DROP TABLE IF EXISTS users CASCADE;
 -- @table users
 -- @description stores users for find system
 CREATE TABLE IF NOT EXISTS users (
-    username        VARCHAR(50) NOT NULL PRIMARY KEY,
-    email           VARCHAR(50) NOT NULL,
+    username        VARCHAR(50) NOT NULL PRIMARY KEY CHECK(username != ''),
+    email           VARCHAR(50) NOT NULL CHECK(email != ''),
     apikey          VARCHAR(32) NOT NULL UNIQUE DEFAULT md5(random()::text),
     secret_token    VARCHAR(32) NOT NULL DEFAULT md5(random()::text),
     is_active       BOOLEAN DEFAULT TRUE,

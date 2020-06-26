@@ -5,10 +5,10 @@ DROP TABLE IF EXISTS measurements CASCADE;
 -- @description stores measurements collected by sensors at a given location
 CREATE TABLE IF NOT EXISTS measurements (
     id              SERIAL PRIMARY KEY,
-    location_id     VARCHAR(36) REFERENCES locations(id) ON DELETE CASCADE,
-    sensor_id       VARCHAR(36),
-    key             VARCHAR(50),
-    value           DOUBLE PRECISION,
+    location_id     VARCHAR(36) NOT NULL REFERENCES locations(id) ON DELETE CASCADE,
+    sensor_id       VARCHAR(36) NOT NULL CHECK(sensor_id != ''),
+    key             VARCHAR(50) NOT NULL CHECK(key != ''),
+    value           DOUBLE PRECISION NOT NULL,
     created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (sensor_id) REFERENCES sensors(id) ON DELETE CASCADE,
     -- TODO: should be down in a database patch

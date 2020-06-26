@@ -47,7 +47,7 @@ function App(user, api) {
 					$(app.views.sensor.$el).hide();
 
 					this.device_id = device_id;
-					this.sensors = data.sensors = [];
+					this.sensors = data || [];
 					var $sensorsContainer = $(this.$el).find('.objects');
 					$sensorsContainer.empty();
 					data && data.map(function(d) {
