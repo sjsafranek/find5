@@ -5,8 +5,8 @@ DROP TABLE IF EXISTS location_history CASCADE;
 -- @description stores device location history
 CREATE TABLE IF NOT EXISTS location_history (
     id                      SERIAL PRIMARY KEY,
-    device_id               VARCHAR(36),
-    location_id             VARCHAR(36),
+    device_id               VARCHAR(36) NOT NULL,
+    location_id             VARCHAR(36) NOT NULL,
     probability             REAL,
     created_at              TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     unique_ts               INTEGER DEFAULT EXTRACT(epoch FROM CURRENT_TIMESTAMP)::INTEGER,

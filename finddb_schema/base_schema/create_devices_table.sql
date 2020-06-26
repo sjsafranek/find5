@@ -5,9 +5,9 @@ DROP TABLE IF EXISTS devices CASCADE;
 -- @description stores users devices
 CREATE TABLE IF NOT EXISTS devices (
     id              VARCHAR(36) PRIMARY KEY DEFAULT md5(random()::text || now()::text)::uuid,
-    name            VARCHAR(50),
-    type            VARCHAR(50),
-    username        VARCHAR(50),
+    name            VARCHAR(50) NOT NULL,
+    type            VARCHAR(50) NOT NULL,
+    username        VARCHAR(50) NOT NULL,
     created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     is_deleted      BOOLEAN DEFAULT false,

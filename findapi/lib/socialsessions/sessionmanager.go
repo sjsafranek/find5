@@ -25,8 +25,16 @@ func (self *SessionManager) Get(req *http.Request) (*sessions.Session, error) {
 	return self.sessionStore.Get(req, self.sessionName)
 }
 
+func (self *SessionManager) IssueSession() *sessions.Session {
+	return self.issueSession()
+}
+
 func (self *SessionManager) issueSession() *sessions.Session {
 	return self.sessionStore.New(self.sessionName)
+}
+
+func (self *SessionManager) DestroySession(w http.ResponseWriter) {
+	self.destroySession(w)
 }
 
 func (self *SessionManager) destroySession(w http.ResponseWriter) {

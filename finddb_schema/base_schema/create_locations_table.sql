@@ -5,8 +5,8 @@ DROP TABLE IF EXISTS locations CASCADE;
 -- @description stores location info for location_history and predictions
 CREATE TABLE IF NOT EXISTS locations (
     id              VARCHAR(36) PRIMARY KEY DEFAULT md5(random()::text || now()::text)::uuid,
-    name            VARCHAR(50),
-    username        VARCHAR(50),
+    name            VARCHAR(50) NOT NULL,
+    username        VARCHAR(50) NOT NULL,
     longitude       DOUBLE PRECISION,
     latitude        DOUBLE PRECISION,
     created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

@@ -4,8 +4,8 @@ import (
 	"errors"
 	"flag"
 	"fmt"
-	"runtime"
 	"os"
+	"runtime"
 
 	"github.com/sjsafranek/find5/findapi/lib/api"
 	"github.com/sjsafranek/find5/findapi/lib/clients/repl"
@@ -28,30 +28,30 @@ const (
 	DEFAULT_REDIS_HOST        string = ""
 	DEFAULT_AI_HOST           string = "localhost"
 	DEFAULT_AI_PORT           int64  = 7005
-	DEFAULT_CONFIG_FILE string = "config.json"
+	DEFAULT_CONFIG_FILE       string = "config.json"
 )
 
 var (
-	HTTP_PORT         int    = DEFAULT_HTTP_PORT
-	FACEBOOK_CLIENT_ID       string = os.Getenv("FACEBOOK_CLIENT_ID")
-	FACEBOOK_CLIENT_SECRET   string = os.Getenv("FACEBOOK_CLIENT_SECRET")
-	GOOGLE_CLIENT_ID string = os.Getenv("GOOGLE_CLIENT_ID")
-	GOOGLE_CLIENT_SECRET string = os.Getenv("GOOGLE_CLIENT_SECRET")
-	DATABASE_ENGINE   string = DEFAULT_DATABASE_ENGINE
-	DATABASE_DATABASE string = DEFAULT_DATABASE_DATABASE
-	DATABASE_PASSWORD string = DEFAULT_DATABASE_PASSWORD
-	DATABASE_USERNAME string = DEFAULT_DATABASE_USERNAME
-	DATABASE_HOST     string = DEFAULT_DATABASE_HOST
-	DATABASE_PORT     int64  = DEFAULT_DATABASE_PORT
-	REDIS_PORT        int64  = DEFAULT_REDIS_PORT
-	REDIS_HOST        string = DEFAULT_REDIS_HOST
-	AI_HOST           string = DEFAULT_AI_HOST
-	AI_PORT           int64  = DEFAULT_AI_PORT
-	CONFIG_FILE string = DEFAULT_CONFIG_FILE
-	API_REQUEST string = ""
-	MODE    string = "web"
-	findapi *api.Api
-	conf    *config.Config
+	HTTP_PORT              int    = DEFAULT_HTTP_PORT
+	FACEBOOK_CLIENT_ID     string = os.Getenv("FACEBOOK_CLIENT_ID")
+	FACEBOOK_CLIENT_SECRET string = os.Getenv("FACEBOOK_CLIENT_SECRET")
+	GOOGLE_CLIENT_ID       string = os.Getenv("GOOGLE_CLIENT_ID")
+	GOOGLE_CLIENT_SECRET   string = os.Getenv("GOOGLE_CLIENT_SECRET")
+	DATABASE_ENGINE        string = DEFAULT_DATABASE_ENGINE
+	DATABASE_DATABASE      string = DEFAULT_DATABASE_DATABASE
+	DATABASE_PASSWORD      string = DEFAULT_DATABASE_PASSWORD
+	DATABASE_USERNAME      string = DEFAULT_DATABASE_USERNAME
+	DATABASE_HOST          string = DEFAULT_DATABASE_HOST
+	DATABASE_PORT          int64  = DEFAULT_DATABASE_PORT
+	REDIS_PORT             int64  = DEFAULT_REDIS_PORT
+	REDIS_HOST             string = DEFAULT_REDIS_HOST
+	AI_HOST                string = DEFAULT_AI_HOST
+	AI_PORT                int64  = DEFAULT_AI_PORT
+	CONFIG_FILE            string = DEFAULT_CONFIG_FILE
+	API_REQUEST            string = ""
+	MODE                   string = "web"
+	findapi                *api.Api
+	conf                   *config.Config
 )
 
 func init() {
@@ -66,6 +66,7 @@ func init() {
 				"create_sensor",
 				"get_sensors",
 				"get_locations",
+				"set_password",
 			},
 		},
 		Server: config.Server{

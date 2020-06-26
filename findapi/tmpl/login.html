@@ -8,37 +8,158 @@
 
         {{template "global_header" .}}
 
+        <!-- Cookie warning -->
+        <link rel="stylesheet" href="/static/Bootstrap-Cookie-Alert/cookiealert.css">
+
+        <!-- Tempalte Source: https://bootsnipp.com/snippets/vl4R7 -->
+
+        <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet">
+
         <style>
 
-            .card-signin {
-                border: 0;
-                border-radius: 1rem;
-                box-shadow: 0 0.5rem 1rem 0 rgba(0, 0, 0, 0.1);
+            /* Made with love by Mutiullah Samim*/
+
+            /*@import url('https://fonts.googleapis.com/css?family=Numans');*/
+
+            html,body {
+                /*background-image: url('http://getwallpapers.com/wallpaper/full/a/5/d/544750.jpg');*/
+                /*background-image: url('/static/images/splash.gif');*/
+                /*background-size: cover;*/
+                /*background-repeat: no-repeat;*/
+                height: 100%;
+                font-family: 'Numans', sans-serif;
+
+                background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab );
+            	background-size: 400% 400%;
+            	-webkit-animation: gradientBG 20s ease infinite;
+            	        animation: gradientBG 20s ease infinite;
             }
 
-            .card-signin .card-title {
-                margin-bottom: 2rem;
-                font-weight: 300;
-                font-size: 1.5rem;
+            @-webkit-keyframes gradientBG {
+            	0% {
+            		background-position: 0% 50%;
+            	}
+            	50% {
+            		background-position: 100% 50%;
+            	}
+            	100% {
+            		background-position: 0% 50%;
+            	}
+            }
+            @keyframes gradientBG {
+            	0% {
+            		background-position: 0% 50%;
+            	}
+            	50% {
+            		background-position: 100% 50%;
+            	}
+            	100% {
+            		background-position: 0% 50%;
+            	}
             }
 
-            .card-signin .card-body {
-                padding: 2rem;
+
+            .container {
+                height: 100%;
+                align-content: center;
             }
 
-            .form-signin {
-                width: 100%;
-                padding: 4px;
+            .card {
+                height: 370px;
+                margin-top: auto;
+                margin-bottom: auto;
+                width: 400px;
+                background-color: rgba(0,0,0,0.5) !important;
             }
 
-            .btn-social {
-                border-radius: 5rem;
+            .social_icon span {
+                font-size: 60px;
+                margin-left: 10px;
+                color: #FFC312;
             }
 
-            .logo {
-                padding: 3rem 1.5rem;
-                text-align: center;
+            .social_icon span:hover {
+                color: white;
+                cursor: pointer;
             }
+
+            .card-header h3 {
+                color: white;
+            }
+
+            .social_icon {
+                position: absolute;
+                right: 20px;
+                top: -45px;
+            }
+
+            .input-group-prepend span {
+                width: 50px;
+                background-color: #FFC312;
+                color: black;
+                border:0 !important;
+            }
+
+            input:focus {
+                outline: 0 0 0 0  !important;
+                box-shadow: 0 0 0 0 !important;
+            }
+
+            .remember {
+                color: white;
+            }
+
+            .remember input  {
+                width: 20px;
+                height: 20px;
+                margin-left: 15px;
+                margin-right: 5px;
+            }
+
+            .btn-login {
+                color: black;
+                background-color: #FFC312;
+                width: 100px;
+            }
+
+            .login_btn:hover {
+                color: black;
+                background-color: white;
+            }
+
+            .links {
+                color: white;
+            }
+
+            .links a {
+                margin-left: 4px;
+            }
+
+
+
+
+            .pulsate {
+                -webkit-animation: pulsate 2s ease-out;
+                -webkit-animation-iteration-count: infinite;
+            }
+            @-webkit-keyframes pulsate {
+                0% {
+                    color: black;
+                }
+                50% {
+                    color: red;
+                }
+                100% {
+                    color: black;
+                }
+            }
+
+            .capsLockWarning {
+                display: none;
+            }
+
+
+
 
         </style>
 
@@ -48,59 +169,112 @@
     <body>
 
         <div class="container">
+        	<div class="d-flex justify-content-center h-100">
+        		<div class="card">
+        			<div class="card-header">
+        				<h3>Sign In</h3>
+        				<div class="d-flex justify-content-end social_icon">
+        					<span><i class="fab fa-facebook-square btn-facebook"></i></span>
+        					<span><i class="fab fa-google-plus-square btn-google"></i></span>
+        				</div>
+        			</div>
+        			<div class="card-body">
+    					<div class="input-group form-group">
+    						<div class="input-group-prepend">
+    							<span class="input-group-text"><i class="fas fa-user"></i></span>
+    						</div>
+    						<input id="username" type="text" class="form-control" placeholder="username">
 
-            <div class="row">
-                <div class="col-sm-9 col-md-7 col-lg-5 mx-auto logo">
-                    <h1>F.I.N.D 5</h1>
-                </div>
-            </div>
+    					</div>
+    					<div class="input-group form-group">
+    						<div class="input-group-prepend">
+    							<span class="input-group-text"><i class="fas fa-key"></i></span>
+    						</div>
+    						<input id="password" type="password" class="form-control" placeholder="password">
+    					</div>
+    					<div class="row align-items-center remember">
+    						<input type="checkbox">Remember Me
+    					</div>
+    					<div class="form-group">
+    						<input type="submit" value="Login" class="btn float-right btn-login">
+    					</div>
+        			</div>
+        			<div class="card-footer">
+        				<div class="d-flex justify-content-center links">
+        					Don't have an account?<a href="#">Sign Up</a>
+        				</div>
+        				<div class="d-flex justify-content-center">
+        					<a href="#">Forgot your password?</a>
+        				</div>
+        			</div>
 
-            <div class="row">
-                <div class="col-sm-9 col-md-7 col-lg-5 mx-auto">
-                    <div class="card card-signin my-5">
-                        <div class="card-body">
-                            <h5 class="card-title text-center">Sign In</h5>
 
-                            <!-- basic login -->
-                            <!-- <label for="username" class="sr-only">Username</label>
-                			<input class="form-control form-control-sm" id="username" name="username" placeholder="username" type="text" required autofocus />
-
-                			<label for="password" class="sr-only">Password</label>
-                			<input class="form-control form-control-sm" id="password" name="password" placeholder="password" type="password" required />
-
-                            <button id="login" class="btn btn-sm btn-primary btn-block" >
-                				<i class="fas fa-sign-in-alt"></i>
-                				Login
-                			</button> -->
-                            <!--.end -->
-
-                            <form class="form-signin facebook-signin" action="/facebook/login" method="get">
-                                <button type="button" class="btn btn-lg btn-primary btn-block btn-social btn-facebook" type="submit" value="submit">
-                                    <i class="fab fa-facebook"></i>
-                                    Login with Facebook
-                                </button>
-                            </form>
-
-                            <form class="form-signin google-signin" action="/google/login" method="get">
-                                <button type="button" class="btn btn-lg btn-primary btn-block btn-social btn-google" type="submit" value="submit">
-                                    <i class="fab fa-google"></i>
-                                    Login with Google
-                                </button>
-                            </form>
-
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="error-message pulsate">
+                                {{if .Error}}
+                                    Error: {{ .Error }}
+                                {{end}}
+                                <span class="capsLockWarning">Caps Lock is on.</span>
+                            </div>
                         </div>
                     </div>
-                </div>
-            </div>
+
+
+        		</div>
+        	</div>
         </div>
 
+
+
+
+        <!-- START Bootstrap-Cookie-Alert -->
+        <div class="row alert text-center cookiealert" role="alert">
+            <div class="col-md-10 cookiedescription">
+                We use cookies to ensure you get the best experience on our website.
+                These cookies are used to enabling basic functions like page navigation and access to secure areas of the website.
+                The website cannot function properly without these cookies.
+                <!-- <a href="http://www.moonshadowmobile.com/cookie-policy/" target="_blank">Learn more</a> -->
+            </div>
+            <div class="col-md-2">
+                <button type="button" class="btn btn-warning acceptcookies" aria-label="Close">
+                    Accept
+                </button>
+            </div>
+        </div>
+        <!-- END Bootstrap-Cookie-Alert -->
+
+        <!-- Cookie warning -->
         <script>
+            // clear old cookie
+            document.cookie = "acceptCookies=false; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+        </script>
+
+        <script src="/static/Bootstrap-Cookie-Alert/cookiealert.js"></script>
+
+
+
+
+
+        <script>
+
+            $('.btn-login').attr('disabled', true);
+            $('.btn-facebook').attr('disabled', true);
+            $('.btn-google').attr('disabled', true);
+
+            $('.acceptcookies').on('click', function(event) {
+                $('.btn-login').attr('disabled', false);
+                $('.btn-facebook').attr('disabled', false);
+                $('.btn-google').attr('disabled', false);
+            });
+
+
             $('.btn-facebook').on('click', function(e){
-                window.location.href = "facebook/login"
+                window.location.href = "facebook/login";
             });
 
             $('.btn-google').on('click', function(e){
-                window.location.href = "google/login"
+                window.location.href = "google/login";
             });
 
             // TODO HANDLE IN TEMPALTE...
@@ -113,26 +287,42 @@
             }
 
 
-            // function login(){
-            //     var usr = $('#username').val();
-            //     var psw = $('#password').val();
-            //     $.ajax({
-            //         method: 'POST',
-            //         url: '/login',
-            //         username: usr,
-            //         password: psw,
-            //         headers: {
-            //             Authorization: 'Basic ' + btoa(usr+':'+psw)
-            //         }
-            //     }).done(function(data){
-            //         console.log(data);
-            //         window.location = '`+redirectUrl+`'
-            //     }).fail(function(xhr){
-            //         console.log(xhr.responseText);
-            //         $('.message').append(xhr.responseText);
-            //     });
-            // }
-            // $("#login").on('click', login);
+            function login(){
+                var usr = $('#username').val();
+                var psw = $('#password').val();
+                $.ajax({
+                    method: 'POST',
+                    url: '/login',
+                    username: usr,
+                    password: psw,
+                    headers: {
+                        Authorization: 'Basic ' + btoa(usr+':'+psw)
+                    }
+                }).done(function(data){
+                    console.log(data);
+                    window.location = '/profile';
+                }).fail(function(xhr){
+                    console.log(xhr.responseText);
+                    $('.message').append(xhr.responseText);
+                });
+            }
+            $(".btn-login").on('click', login);
+
+
+
+
+
+            function capLockIsOn(event) {
+    			var kc = event.keyCode ? event.keyCode : event.which;
+    			var sk = event.shiftKey ? event.shiftKey : kc === 16;
+    			return ((kc >= 65 && kc <= 90) && !sk) ||
+    				((kc >= 97 && kc <= 122) && sk) ? true : false;
+    		}
+
+            $('input').on('keypress', function(event) {
+                capLockIsOn(event) ? $('.capsLockWarning').show() : $('.capsLockWarning').hide();
+            });
+
 
 
         </script>

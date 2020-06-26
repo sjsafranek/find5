@@ -11,6 +11,7 @@ CREATE OR REPLACE VIEW users_view AS (
             'secret_token', secret_token,
             'is_active', is_active,
             'is_deleted', is_deleted,
+            'is_superuser', is_superuser,
             'created_at', to_char(created_at, 'YYYY-MM-DD"T"HH:MI:SS"Z"'),
             'updated_at', to_char(updated_at, 'YYYY-MM-DD"T"HH:MI:SS"Z"')
         ) AS user_json

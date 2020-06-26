@@ -20,6 +20,7 @@ type User struct {
 	SecretToken string    `json:"secret_token,omitempty"`
 	IsDeleted   bool      `json:"is_deleted"`
 	IsActive    bool      `json:"is_active"`
+	IsSuperuser bool	  `json:"is_superuser"`
 	CreatedAt   time.Time `json:"created_at,string"`
 	UpdatedAt   time.Time `json:"updated_at,string"`
 	db          *Database `json:"-"`

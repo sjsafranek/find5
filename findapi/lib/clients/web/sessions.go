@@ -44,6 +44,7 @@ func New(findapi *api.Api, conf *config.Config) *App {
 	app.mux.Handle("/profile", middleware.Attach(sessionManager.RequireLogin(http.HandlerFunc(app.profileHandler))))
 	app.mux.Handle("/api", middleware.Attach(sessionManager.RequireLogin(http.HandlerFunc(app.apiWithSessionHandler))))
 	app.mux.Handle("/api/v1", middleware.Attach(http.HandlerFunc(app.apiHandler)))
+	app.mux.Handle("/login", middleware.Attach(http.HandlerFunc(app.loginHandler)))
 	app.mux.Handle("/logout", middleware.Attach(http.HandlerFunc(sessionManager.LogoutHandler)))
 
 	// Static files

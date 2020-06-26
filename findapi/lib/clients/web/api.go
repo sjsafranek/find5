@@ -20,8 +20,6 @@ func (self *App) getApiRequestFromHttpRequest(r *http.Request) (*api.Request, er
 	}
 	r.Body.Close()
 
-	logger.Debug(string(body))
-
 	// TODO
 	//  - use request.Unmarshal
 	return &request, json.Unmarshal(body, &request)
@@ -52,8 +50,14 @@ func (self *App) apiHandler(w http.ResponseWriter, r *http.Request) {
 				return http.StatusBadRequest, err
 			}
 
+			userResult, err := self.api.Do(&api.Request{Method: "get_user", Params: &api.RequestParams{Apikey: request.Params.Apikey}})
+			if nil != err {
+				return http.StatusUnauthorized, errors.New(http.StatusText(http.StatusUnauthorized))
+			}
+			user := userResult.Data.User
+
 			// check against allowed methods
-			if !self.api.IsPublicMethod(request.Method) {
+			if !user.IsSuperuser && !self.api.IsPublicMethod(request.Method) {
 				logger.Warnf("Not a public api method: %v", request.Method)
 				return http.StatusMethodNotAllowed, errors.New(http.StatusText(http.StatusMethodNotAllowed))
 			}
@@ -76,7 +80,6 @@ func (self *App) apiHandler(w http.ResponseWriter, r *http.Request) {
 	apiJSONResponse(w, []byte(data), status_code)
 }
 
-
 func (self *App) apiWithSessionHandler(w http.ResponseWriter, r *http.Request) {
 
 	var data string
@@ -87,6 +90,13 @@ func (self *App) apiWithSessionHandler(w http.ResponseWriter, r *http.Request) {
 		apiBasicResponse(w, http.StatusUnauthorized, errors.New(http.StatusText(http.StatusUnauthorized)))
 		return
 	}
+
+	userResult, err := self.api.Do(&api.Request{Method: "get_user", Params: &api.RequestParams{Username: useremail}})
+	if nil != err {
+		apiBasicResponse(w, http.StatusUnauthorized, errors.New(http.StatusText(http.StatusUnauthorized)))
+		return
+	}
+	user := userResult.Data.User
 
 	status_code, err := func() (int, error) {
 		switch r.Method {
@@ -101,11 +111,10 @@ func (self *App) apiWithSessionHandler(w http.ResponseWriter, r *http.Request) {
 			if nil == request.Params {
 				request.Params = &api.RequestParams{}
 			}
-			request.Params.Username = useremail
-			request.Params.Apikey = ""
+			request.Params.Apikey = user.Apikey
 
 			// check against allowed methods
-			if !self.api.IsPublicMethod(request.Method) {
+			if !user.IsSuperuser && !self.api.IsPublicMethod(request.Method) {
 				logger.Warnf("Not a public api method: %v", request.Method)
 				return http.StatusMethodNotAllowed, errors.New(http.StatusText(http.StatusMethodNotAllowed))
 			}

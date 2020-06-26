@@ -9,21 +9,22 @@
 \set ON_ERROR_STOP on
 set client_min_messages to 'warning';
 
-
+-- add extentions
 \i create_extensions.sql
-\i create_general_functions.sql
-\i create_config_table.sql
 
+-- add function handlers
+\i create_general_functions.sql
+
+-- create tables
+\i create_config_table.sql
 \i create_users_table.sql
 \i create_social_accounts_table.sql
-\i create_users_view.sql
-
 \i create_devices_table.sql
-\i create_devices_view.sql
-
 \i create_locations_table.sql
--- \i create_locations_view.sql
 \i create_location_history_table.sql
-
 \i create_sensors_table.sql
 \i create_measurements_table.sql
+
+-- create views
+\i create_users_view.sql
+\i create_devices_view.sql

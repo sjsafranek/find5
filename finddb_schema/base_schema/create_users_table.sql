@@ -4,16 +4,17 @@ DROP TABLE IF EXISTS users CASCADE;
 -- @table users
 -- @description stores users for find system
 CREATE TABLE IF NOT EXISTS users (
-    username        VARCHAR(50) PRIMARY KEY,
-    email           VARCHAR(50),
+    username        VARCHAR(50) NOT NULL PRIMARY KEY,
+    email           VARCHAR(50) NOT NULL,
     apikey          VARCHAR(32) NOT NULL UNIQUE DEFAULT md5(random()::text),
     secret_token    VARCHAR(32) NOT NULL DEFAULT md5(random()::text),
-    is_active       BOOLEAN DEFAULT true,
-    created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    is_deleted      BOOLEAN DEFAULT false,
+    is_active       BOOLEAN DEFAULT TRUE,
+    is_deleted      BOOLEAN DEFAULT FALSE,
+    is_superuser    BOOLEAN DEFAULT FALSE,
     salt            VARCHAR DEFAULT gen_salt('bf', 8),
-    password        VARCHAR
+    password        VARCHAR,
+    created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 COMMENT ON TABLE users IS 'username and password info';
@@ -96,3 +97,7 @@ DROP TRIGGER IF EXISTS users_clean ON users;
 CREATE TRIGGER users_clean
     BEFORE INSERT OR UPDATE OF username, email ON users
         FOR EACH ROW EXECUTE PROCEDURE clean_user();
+
+
+
+INSERT INTO users (username, email, password, is_superuser) VALUES('admin_user', 'admin_user', 'dev', TRUE);
