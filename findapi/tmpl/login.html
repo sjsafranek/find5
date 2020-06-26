@@ -179,47 +179,51 @@
         				</div>
         			</div>
         			<div class="card-body">
-    					<div class="input-group form-group">
-    						<div class="input-group-prepend">
-    							<span class="input-group-text"><i class="fas fa-user"></i></span>
-    						</div>
-    						<input id="username" type="text" class="form-control" placeholder="username">
 
-    					</div>
-    					<div class="input-group form-group">
-    						<div class="input-group-prepend">
-    							<span class="input-group-text"><i class="fas fa-key"></i></span>
-    						</div>
-    						<input id="password" type="password" class="form-control" placeholder="password">
-    					</div>
-    					<div class="row align-items-center remember">
-    						<input type="checkbox">Remember Me
-    					</div>
-    					<div class="form-group">
-    						<input type="submit" value="Login" class="btn float-right btn-login">
-    					</div>
-        			</div>
-        			<div class="card-footer">
-        				<div class="d-flex justify-content-center links">
-        					Don't have an account?<a href="#">Sign Up</a>
-        				</div>
-        				<div class="d-flex justify-content-center">
-        					<a href="#">Forgot your password?</a>
-        				</div>
-        			</div>
-
+                        <!-- <form method="POST" action="/login" onsubmit="javascript:document.location = window.location.protocol + '//' + $('#username').val() + ':' + $('#password').val() + '@' + window.location.host + '/login';"> -->
+                        <!-- <form method="POST" onsubmit="login();"> -->
+                        <form method="POST">
+        					<div class="input-group form-group">
+        						<div class="input-group-prepend">
+        							<span class="input-group-text"><i class="fas fa-user"></i></span>
+        						</div>
+        						<input id="username" type="text" class="form-control" placeholder="username" name="username">
+        					</div>
+        					<div class="input-group form-group">
+        						<div class="input-group-prepend">
+        							<span class="input-group-text"><i class="fas fa-key"></i></span>
+        						</div>
+        						<input id="password" type="password" class="form-control" placeholder="password" name="password">
+        					</div>
+        					<div class="row align-items-center remember">
+        						<input type="checkbox">Remember Me
+        					</div>
+        					<div class="form-group">
+        						<input type="submit" value="Login" class="btn float-right btn-login">
+        					</div>
+            			</div>
+            			<div class="card-footer">
+            				<div class="d-flex justify-content-center links">
+            					Don't have an account?<a href="#">Sign Up</a>
+            				</div>
+            				<div class="d-flex justify-content-center">
+            					<a href="#">Forgot your password?</a>
+            				</div>
+            			</div>
+                    </form>
 
                     <div class="row">
                         <div class="col-md-12">
                             <div class="error-message pulsate">
-                                {{if .Error}}
-                                    Error: {{ .Error }}
-                                {{end}}
+                                <div class="message">
+                                    {{if .error}}
+                                        Error: {{ .error }}
+                                    {{end}}
+                                </div>
                                 <span class="capsLockWarning">Caps Lock is on.</span>
                             </div>
                         </div>
                     </div>
-
 
         		</div>
         	</div>
@@ -253,9 +257,6 @@
         <script src="/static/Bootstrap-Cookie-Alert/cookiealert.js"></script>
 
 
-
-
-
         <script>
 
             $('.btn-login').attr('disabled', true);
@@ -268,7 +269,6 @@
                 $('.btn-google').attr('disabled', false);
             });
 
-
             $('.btn-facebook').on('click', function(e){
                 window.location.href = "facebook/login";
             });
@@ -278,39 +278,13 @@
             });
 
             // TODO HANDLE IN TEMPALTE...
-            var options = {{ index . }};
-            if (!options.facebook) {
-                $('.facebook-signin').remove();
+			var config = {{ index . }};
+            if (!config.oauth2.facebook) {
+                $('.btn-facebook').remove();
             }
-            if (!options.google) {
-                $('.google-signin').remove();
+            if (!config.oauth2.google) {
+                $('.btn-google').remove();
             }
-
-
-            function login(){
-                var usr = $('#username').val();
-                var psw = $('#password').val();
-                $.ajax({
-                    method: 'POST',
-                    url: '/login',
-                    username: usr,
-                    password: psw,
-                    headers: {
-                        Authorization: 'Basic ' + btoa(usr+':'+psw)
-                    }
-                }).done(function(data){
-                    console.log(data);
-                    window.location = '/profile';
-                }).fail(function(xhr){
-                    console.log(xhr.responseText);
-                    $('.message').append(xhr.responseText);
-                });
-            }
-            $(".btn-login").on('click', login);
-
-
-
-
 
             function capLockIsOn(event) {
     			var kc = event.keyCode ? event.keyCode : event.which;
@@ -322,7 +296,6 @@
             $('input').on('keypress', function(event) {
                 capLockIsOn(event) ? $('.capsLockWarning').show() : $('.capsLockWarning').hide();
             });
-
 
 
         </script>

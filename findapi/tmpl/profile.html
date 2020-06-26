@@ -4,23 +4,13 @@
 <html>
 	<head>
 		<title>FIND 5</title>
-		<!-- <meta charset="utf-8">
-		<meta http-equiv="X-UA-Compatible" content="IE=edge">
-		<meta name="viewport" content="width=device-width, initial-scale=1"> -->
 
         {{template "global_header" .}}
 
-		<!-- <script src="/static/jquery/3.4.1/jquery.min.js"></script> -->
 		<script src="/static/vue/vue.min.js"></script>
 
-		<!-- Font Awesome CSS -->
-		<!-- <link rel="stylesheet" href="/static/fontawesome/5.9.0/css/all.css"> -->
-
-		<!-- Bootstrap -->
-        <!-- <link rel="stylesheet" href="/static/bootstrap/4.1.3/css/bootstrap.min.css">
-		<script src="/static/bootstrap/4.1.3/js/bootstrap.min.js"></script> -->
-
-
+		<script src="/static/config.js"></script>
+		<script src="/static/api.js"></script>
 		<script src="/static/app.js"></script>
 		<style>
 
@@ -29,7 +19,7 @@
 			}
 
 			.selected {
-				background-color: darkred;
+				background-color: #faa64d;
 				color: white;
 			}
 
@@ -39,9 +29,9 @@
 			}
 
 			.objects div {
+				transition: 0.3s;
 				cursor: pointer;
 			}
-
 
             .pulsate {
                 -webkit-animation: pulsate 1.5s ease-out;
@@ -62,24 +52,13 @@
             }
 
 
+			.btn {
+				transition: 0.3s;
+			}
 
-            /*.throbPath {
-                -webkit-animation: throbPath 1.5s ease-out;
-                -webkit-animation-iteration-count: infinite;
-                stroke-width: 1;
-            }
-
-            @-webkit-keyframes throbPath {
-                0% {
-                    stroke-width: 1;
-                }
-                50% {
-                    stroke-width: 4;
-                }
-                100% {
-                    stroke-width: 1;
-                }
-            }*/
+			.btn:hover {
+				color: #f4511e;
+			}
 
 
 		</style>
@@ -99,9 +78,9 @@
 
 				<div class="col col-2" id="devices">
 					<label>Devices</label>
-					<button class="btn btn-sm btn-default" v-on:click="createDevice()">
+					<span class="btn btn-sm btn-default" v-on:click="createDevice()">
 						<i class="fa fa-plus"></i>
-					</button>
+					</span>
 					<div class="objects"></div>
 				</div>
 
@@ -120,9 +99,9 @@
 
 				<div class="col col-2" id="sensors" style="display: none;">
 					<label>sensors</label>
-					<button class="btn btn-sm btn-default" v-on:click="createSensor()">
+					<span class="btn btn-sm btn-default" v-on:click="createSensor()">
 						<i class="fa fa-plus"></i>
-					</button>
+					</span>
 					<div class="objects"></div>
 				</div>
 
@@ -146,53 +125,14 @@
 		<script>
 
 			var api,
-				app;
-
-
-			function FindApi(user) {
-				this.user = user;
-			}
-
-			FindApi.prototype.do = function(payload, callback) {
-				payload.params = payload.params || {};
-				payload.params.apikey = this.user.apikey;		// <-- always add apikey to api call
-				payload.params.username = this.user.username;		// <-- always add apikey to api call
-				callback = callback || console.log; 	// <-- default callback
-				return $.ajax({
-					method: "POST",
-					url: '/api',
-					contentType: "application/json",
-					data: JSON.stringify(payload),
-					success: function(data) {
-						callback && callback(null, data.data);
-					},
-					error: function(jqXHR, textStatus, errorThrown) {
-						console.log(jqXHR, textStatus, errorThrown);
-						callback && callback(jqXHR.responseJSON || jqXHR.responseText);
-					}
-				});
-			}
-
-			FindApi.prototype.getDevices = function(callback) {
-				return this.do({"method":"get_devices"}, callback);
-			}
-
-			FindApi.prototype.createDevice = function(name, type, callback) {
-				return this.do({"method":"create_device", "params": {"name":name, "type":type}}, callback);
-			}
-
-			FindApi.prototype.createSensor = function(device_id, name, type, callback) {
-				return this.do({"method":"create_sensor", "params": {"device_id": device_id, "name":name, "type":type}}, callback);
-			}
-
-			FindApi.prototype.getSensors = function(device_id, callback) {
-				return this.do({"method":"get_sensors", "params": {"device_id": device_id}}, callback);
-			}
-
+				app,
+				config;
 
 			$(document).ready(function(){
-				api = new FindApi({{ index . }});
-				app = new App({{ index . }}, api);
+				config = new Config({{ index . }});
+				let user = config.get("user");
+				api = new FindApi(user);
+				app = new App(user, api);
 			});
 
 		</script>

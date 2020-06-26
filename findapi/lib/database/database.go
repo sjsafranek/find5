@@ -3,7 +3,7 @@ package database
 import (
 	"database/sql"
 	"encoding/json"
-	// "errors"
+	"errors"
 	"fmt"
 	"strings"
 
@@ -93,6 +93,9 @@ func (self *Database) getUser(query string, args ...interface{}) (*User, error) 
 	var temp string
 	err := self.db.QueryRow(query, args...).Scan(&temp)
 	if nil != err {
+		if "sql: no rows in result set" == err.Error() {
+			return &user, errors.New("Not found")
+		}
 		return &user, err
 	}
 

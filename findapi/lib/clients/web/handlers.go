@@ -15,22 +15,8 @@ var (
 	PROFILE_TEMPLATE *template.Template = template.Must(template.ParseFiles("tmpl/global_header.html", "tmpl/global_footer.html", "tmpl/navbar.html", "tmpl/profile.html"))
 )
 
-// welcomeHandler shows a welcome message and login button.
-func (self *App) indexHandler(w http.ResponseWriter, req *http.Request) {
-	if req.URL.Path != "/" {
-		http.NotFound(w, req)
-		return
-	}
-
-	if sessionManager.IsAuthenticated(req) {
-		http.Redirect(w, req, "/profile", http.StatusFound)
-		return
-	}
-
-	options := make(map[string]interface{})
-	options["facebook"] = self.config.OAuth2.HasFacebook()
-	options["google"] = self.config.OAuth2.HasGoogle()
-
+func (self *App) executeLoginTemplate(w http.ResponseWriter, options map[string]interface{}) {
+	logger.Info(options)
 	err := LOGIN_TEMPLATE.ExecuteTemplate(w, "login", options)
 	if nil != err {
 		logger.Error(err)
@@ -38,34 +24,69 @@ func (self *App) indexHandler(w http.ResponseWriter, req *http.Request) {
 	}
 }
 
-func (self *App) loginHandler(w http.ResponseWriter, r *http.Request) {
+func (self *App) getHandlerOptions(r *http.Request) map[string]interface{} {
+	options := make(map[string]interface{})
+
+	oauth2Options := make(map[string]bool)
+	oauth2Options["facebook"] = self.config.OAuth2.HasFacebook()
+	oauth2Options["google"] = self.config.OAuth2.HasGoogle()
+	options["oauth2"] = oauth2Options
+
+	val, _ := sessionManager.Get(r)
+	if nil != val {
+		useremail := val.Values["useremail"]
+		username := useremail.(string)
+		userOptions := make(map[string]string)
+		userOptions["username"] = username
+		results, err := self.api.Do(&api.Request{Method: "get_user", Params: &api.RequestParams{Username: username}})
+		if nil == err {
+			userOptions["apikey"] = results.Data.User.Apikey
+		}
+
+		options["user"] = userOptions
+	}
+
+	return options
+}
+
+// welcomeHandler shows a welcome message and login button.
+func (self *App) indexHandler(w http.ResponseWriter, r *http.Request) {
+
+	if sessionManager.IsAuthenticated(r) {
+		http.Redirect(w, r, "/profile", http.StatusFound)
+		return
+	}
+
+	options := self.getHandlerOptions(r)
 
 	if "POST" == r.Method {
 
-		err := r.ParseForm()
-		if nil != err {
-			logger.Error(err)
-			http.Error(w, "Unable to parse form", http.StatusInternalServerError)
-			return
-		}
-
-		username, password, ok := r.BasicAuth()
-		if !ok {
-			err = errors.New("Unable to get credentials")
-			apiBasicResponse(w, http.StatusBadRequest, err)
-			return
+		username := r.FormValue("username")
+		password := r.FormValue("password")
+		if "" == username && "" == password {
+			usr, psw, ok := r.BasicAuth()
+			if !ok {
+				err := errors.New("Unable to get credentials")
+				options["error"] = err.Error()
+				self.executeLoginTemplate(w, options)
+				return
+			}
+			username = usr
+			password = psw
 		}
 
 		results, err := self.api.Do(&api.Request{Method: "get_user", Params: &api.RequestParams{Username: username}})
 		if nil != err {
-			apiBasicResponse(w, http.StatusBadRequest, err)
+			options["error"] = err.Error()
+			self.executeLoginTemplate(w, options)
 			return
 		}
 
 		is_password, _ := results.Data.User.IsPassword(password)
 		if !is_password {
 			err = errors.New("Incorrect password")
-			apiBasicResponse(w, http.StatusBadRequest, err)
+			options["error"] = err.Error()
+			self.executeLoginTemplate(w, options)
 			return
 		}
 
@@ -79,19 +100,20 @@ func (self *App) loginHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	http.Redirect(w, r, "/", http.StatusFound)
+	self.executeLoginTemplate(w, options)
 }
 
 // profileHandler shows protected user content.
-func (self *App) profileHandler(w http.ResponseWriter, req *http.Request) {
-	val, _ := sessionManager.Get(req)
+func (self *App) profileHandler(w http.ResponseWriter, r *http.Request) {
+	val, _ := sessionManager.Get(r)
 	username := val.Values["username"].(string)
 	usertype := val.Values["usertype"].(string)
 	userid := val.Values["userid"].(string)
 	useremail := val.Values["useremail"].(string)
 
-	options := make(map[string]interface{})
-	options["username"] = username
+	// options := make(map[string]interface{})
+	// options["username"] = username
+	options := self.getHandlerOptions(r)
 
 	user, err := self.api.GetDatabase().CreateUserIfNotExists(useremail, useremail)
 	if nil != err {

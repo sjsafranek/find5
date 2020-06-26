@@ -26,9 +26,7 @@ func (self *App) ListenAndServe(address string) error {
 	return http.ListenAndServe(address, self.mux)
 }
 
-
 // New returns a new ServeMux with app routes.
-// func New(findapi *api.Api, conf *config.Config) *http.ServeMux {
 func New(findapi *api.Api, conf *config.Config) *App {
 
 	app := App{
@@ -37,15 +35,12 @@ func New(findapi *api.Api, conf *config.Config) *App {
 		mux: http.NewServeMux(),
 	}
 
-	// apiHandler := NewApiHandler(findapi, conf)
-
-	// app.mux.Handle("/", middleware.Attach(http.HandlerFunc(welcomeHandler)))
 	app.mux.Handle("/", middleware.Attach(http.HandlerFunc(app.indexHandler)))
+	app.mux.Handle("/login", middleware.Attach(http.HandlerFunc(app.indexHandler)))
+	app.mux.Handle("/logout", middleware.Attach(http.HandlerFunc(sessionManager.LogoutHandler)))
 	app.mux.Handle("/profile", middleware.Attach(sessionManager.RequireLogin(http.HandlerFunc(app.profileHandler))))
 	app.mux.Handle("/api", middleware.Attach(sessionManager.RequireLogin(http.HandlerFunc(app.apiWithSessionHandler))))
 	app.mux.Handle("/api/v1", middleware.Attach(http.HandlerFunc(app.apiHandler)))
-	app.mux.Handle("/login", middleware.Attach(http.HandlerFunc(app.loginHandler)))
-	app.mux.Handle("/logout", middleware.Attach(http.HandlerFunc(sessionManager.LogoutHandler)))
 
 	// Static files
 	fsvr := http.FileServer(http.Dir("static"))

@@ -71,6 +71,7 @@ function App(user, api) {
 							'<input id="swal-input1" class="swal2-input" placeholder="name">' +
 							'<input id="swal-input2" class="swal2-input" placeholder="type">',
 						focusConfirm: false,
+						showCancelButton: true,
 						preConfirm: () => {
 							return {
 								'name': document.getElementById('swal-input1').value,
@@ -129,6 +130,7 @@ function App(user, api) {
 							'<input id="swal-input1" class="swal2-input" placeholder="name">' +
 							'<input id="swal-input2" class="swal2-input" placeholder="type">',
 						focusConfirm: false,
+						showCancelButton: true,
 						preConfirm: () => {
 							return {
 								'name': document.getElementById('swal-input1').value,
