@@ -9,59 +9,16 @@
 
 		<script src="/static/vue/vue.min.js"></script>
 
+		<link rel="stylesheet" href="/static/ui/scroll2top.css" />
+		<script src="/static/ui/scroll2top.js"></script>
+
+		<link rel="stylesheet" href="/static/ui/stickyNavBar.css" />
+		<script src="/static/ui/stickyNavBar.js"></script>
+
+		<link rel="stylesheet" href="/static/style.css" />
 		<script src="/static/config.js"></script>
 		<script src="/static/api.js"></script>
 		<script src="/static/app.js"></script>
-		<style>
-
-			body {
-				font-size: 0.75rem;
-			}
-
-			.selected {
-				background-color: #faa64d;
-				color: white;
-			}
-
-			.objects label {
-				margin: 0.5rem;
-				pointer-events: none;
-			}
-
-			.objects div {
-				transition: 0.3s;
-				cursor: pointer;
-			}
-
-            .pulsate {
-                -webkit-animation: pulsate 1.5s ease-out;
-                -webkit-animation-iteration-count: infinite;
-                background-color: rgb(198,200,202,0.1);
-            }
-
-            @-webkit-keyframes pulsate {
-                0% {
-                    background-color: rgb(198,200,202,0.1);
-                }
-                50% {
-                    background-color: rgb(198,200,202,1.0);
-                }
-                100% {
-                    background-color: rgb(198,200,202,0.1);
-                }
-            }
-
-
-			.btn {
-				transition: 0.3s;
-			}
-
-			.btn:hover {
-				color: #f4511e;
-			}
-
-
-		</style>
 
 	</head>
 	<body>
@@ -133,6 +90,12 @@
 				let user = config.get("user");
 				api = new FindApi(user);
 				app = new App(user, api);
+
+
+				enableToTop();
+				enableStickyNavBar();
+
+				$('body').height(2000);
 			});
 
 		</script>

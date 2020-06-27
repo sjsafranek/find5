@@ -1,0 +1,13 @@
+
+.btn-scroll2top {
+	transition: 0.3s;
+    color: white;
+	background-color: #e45a6a;
+    border-color: #e45a6a;
+}
+
+.btn-scroll2top:hover {
+    color: white;    
+	background-color: #d54253;
+    border-color: #d54253;
+}
