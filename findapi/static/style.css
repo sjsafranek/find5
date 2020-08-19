@@ -4,7 +4,6 @@ body {
 }
 
 .selected {
-	/*background-color: #faa64d;*/
 	background-color: #e45a6a;
 	color: white;
 }
@@ -15,8 +14,21 @@ body {
 }
 
 .objects div {
+	margin-top: 6px;
 	transition: 0.3s;
 	cursor: pointer;
+	border-style: solid;
+	border-radius: 4px;
+	border-width: 1px;
+	border-color: black;
+}
+
+.objects div:hover {
+	border-color: #ef9ca5;
+}
+
+.objects div.selected {
+	border-color: #dd2e42;
 }
 
 .pulsate {

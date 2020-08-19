@@ -71,6 +71,9 @@ github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZb
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/schollz/sqlite3dump v1.2.4 h1:b3dgcKLsHZhF6OsB2EK+e/oA77vh4P/45TAh2R35OFI=
 github.com/schollz/sqlite3dump v1.2.4/go.mod h1:SEajZA5udi52Taht5xQYlFfHwr7AIrqPrLDrAoFv17o=
+github.com/sjsafranek/find5 v0.0.0-20200627011116-7bfd64cbde16 h1:PUcc5Tz5R1FQ/R8x3PEfVV26YvtYUH1xenlJ58aWMkA=
+github.com/sjsafranek/gosocialsessions v0.0.0-20200819180300-02f5451a19d2 h1:a8Arc2qKW9QUWuGFGsgm6FQ2KkCnDnU+exVQ9Sz70Vo=
+github.com/sjsafranek/gosocialsessions v0.0.0-20200819180300-02f5451a19d2/go.mod h1:HgzSlRlqra6sfqg+JRnTQdRPOGfhDZI2pktOr4qjLlQ=
 github.com/sjsafranek/lemur v1.1.1 h1:caWo2fEvI5UcS8RS4xd2p7NeREl9jfC4NcALCfQa13E=
 github.com/sjsafranek/lemur v1.1.1/go.mod h1:GjaO8+jIw9sYQi+UMhG9Jrx52c51aAfv5vgFXM58rd8=
 github.com/sjsafranek/ligneous v0.0.0-20190611175755-abc910092808 h1:j03f93QRpmIz01UYkiuvkmhpbDPwHHlXqBjXj1M4VIc=

@@ -4,16 +4,17 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/sjsafranek/gosocialsessions"
 	"github.com/sjsafranek/logger"
 	"github.com/sjsafranek/lemur/middleware"
+
 	"github.com/sjsafranek/find5/findapi/lib/api"
 	"github.com/sjsafranek/find5/findapi/lib/config"
-	"github.com/sjsafranek/find5/findapi/lib/socialsessions"
 	// "github.com/sjsafranek/find5/findapi/lib/clients/eventsource"
 	"github.com/sjsafranek/find5/findapi/lib/clients/websockets"
 )
 
-var sessionManager = socialsessions.New("chocolate-ship", "cookies")
+var sessionManager = gosocialsessions.New("chocolate-ship", "cookies")
 
 type App struct {
 	api *api.Api

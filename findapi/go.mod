@@ -19,6 +19,7 @@ require (
 	github.com/paulmach/orb v0.1.6
 	github.com/pkg/errors v0.9.1
 	github.com/schollz/sqlite3dump v1.2.4 // indirect
+	github.com/sjsafranek/gosocialsessions v0.0.0-20200819180300-02f5451a19d2
 	github.com/sjsafranek/lemur v1.1.1
 	github.com/sjsafranek/ligneous v0.0.0-20190611175755-abc910092808 // indirect
 	github.com/sjsafranek/logger v1.0.3
