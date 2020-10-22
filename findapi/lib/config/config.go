@@ -6,7 +6,6 @@ import (
 
 // Config configures the app
 type Config struct {
-
 	OAuth2 OAuth2
 	Server   Server
 	Database Database
@@ -43,6 +42,12 @@ func (self *Api) IsPublicMethod(method string) bool {
 
 type Server struct {
 	HttpPort int
+	HttpHost string
+	HttpProtocol string
+}
+
+func (self *Server) GetURLString() string {
+	return fmt.Sprintf("%v://%v:%v", self.HttpProtocol, self.HttpHost, self.HttpPort)
 }
 
 type SocialOAuth2 struct {

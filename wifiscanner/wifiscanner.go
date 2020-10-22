@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"flag"
-	// "fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -14,8 +13,10 @@ import (
 	"github.com/sjsafranek/find5/findapi/lib/api"
 )
 
+// sudo apt-get install -y wireless-tools
+
 const (
-	DEFAULT_API_SERVER            = "http://localhost:8080/api/v1/find"
+	DEFAULT_API_SERVER            = "http://localhost:8080/api/v1"
 	DEFAULT_WIFI_INTERFACE string = "wlan0"
 	DEFAULT_SENSOR_ID      string = ""
 	DEFAULT_DEVICE_ID      string = ""
@@ -80,7 +81,6 @@ func scan(wifiInterface string) (map[string]float64, error) {
 }
 
 func init() {
-
 	flag.StringVar(&API_SERVER, "api_server", DEFAULT_API_SERVER, "Api server")
 	flag.StringVar(&WIFI_INTERFACE, "wifi_interface", DEFAULT_WIFI_INTERFACE, "")
 	flag.StringVar(&SENSOR_ID, "sensor_id", DEFAULT_SENSOR_ID, "")
@@ -98,14 +98,16 @@ func main() {
 			panic(err)
 		}
 
+		now := time.Now()
+
 		var apiRequest api.Request
 		apiRequest.Method = "import_measurements"
-		apiRequest.Apikey = APIKEY
-		apiRequest.DeviceId = DEVICE_ID
-		apiRequest.LocationId = LOCATION_ID
-		apiRequest.Data = make(map[string]map[string]float64)
-		apiRequest.Data[SENSOR_ID] = data
-		apiRequest.Timestamp = time.Now()
+		apiRequest.Params.Apikey = APIKEY
+		apiRequest.Params.DeviceId = DEVICE_ID
+		apiRequest.Params.LocationId = LOCATION_ID
+		apiRequest.Params.Data = make(map[string]map[string]float64)
+		apiRequest.Params.Data[SENSOR_ID] = data
+		apiRequest.Params.Timestamp = &now
 
 		result, err := send(apiRequest)
 		if nil != err {

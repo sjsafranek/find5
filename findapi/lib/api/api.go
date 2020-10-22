@@ -270,7 +270,6 @@ func (self *Api) Do(request *Request) (*Response, error) {
 		switch request.Method {
 
 		case "get_database_version":
-			// {"method":"get_database_version"}
 			version, err := self.db.GetVersion()
 			if nil != err {
 				return err
@@ -279,12 +278,10 @@ func (self *Api) Do(request *Request) (*Response, error) {
 			return nil
 
 		case "ping":
-			// {"method":"ping"}
 			response.Message = "pong"
 			return nil
 
 		case "create_user":
-			// {"method":"create_user","params":{"username":"admin_user","email":"admin@email.com","password":"1234"}}
 			logger.Info(request)
 			if "" == request.Params.Username {
 				return errors.New("missing parameters")
@@ -299,7 +296,6 @@ func (self *Api) Do(request *Request) (*Response, error) {
 			return nil
 
 		case "get_users":
-			// {"method":"get_users"}
 			users, err := self.db.GetUsers()
 			if nil != err {
 				return err
@@ -308,8 +304,6 @@ func (self *Api) Do(request *Request) (*Response, error) {
 			return nil
 
 		case "get_user":
-			// {"method":"get_user","params":{"username":"admin_user"}}
-			// {"method":"get_user","params":{"apikey":"<apikey>"}}
 			if "" == request.Params.Username && "" == request.Params.Apikey {
 				return errors.New("missing parameters")
 			}
@@ -319,39 +313,29 @@ func (self *Api) Do(request *Request) (*Response, error) {
 			})
 
 		case "delete_user":
-			// {"method":"delete_user","username":"admin_user"}
-			// {"method":"delete_user","apikey":"<apikey>"}
 			return self.fetchUser(request, func(user *database.User) error {
 				self.cache.Delete("user", user.Apikey)
 				return user.Delete()
 			})
 
 		case "activate_user":
-			// {"method":"activate_user","username":"admin_user"}
-			// {"method":"activate_user","apikey":"<apikey>"}
 			return self.fetchUser(request, func(user *database.User) error {
 				self.cache.Delete("user", user.Apikey)
 				return user.Activate()
 			})
 
 		case "deactivate_user":
-			// {"method":"deactivate_user","username":"admin_user"}
-			// {"method":"deactivate_user","apikey":"<apikey>"}
 			return self.fetchUser(request, func(user *database.User) error {
 				self.cache.Delete("user", user.Apikey)
 				return user.Deactivate()
 			})
 
 		case "set_password":
-			// {"method":"set_password","username":"admin_user","password":"1234"}
-			// {"method":"set_password","apikey":"<apikey>","password":"1234"}
 			return self.fetchUser(request, func(user *database.User) error {
 				return user.SetPassword(request.Params.Password)
 			})
 
 		case "create_device":
-			// {"method":"create_device","username":"admin_user","name":"laptop","type":"computer"}
-			// {"method":"create_device","apikey":"<apikey>","name":"laptop","type":"computer"}
 			return self.fetchUser(request, func(user *database.User) error {
 				device, err := user.CreateDevice(request.Params.Name, request.Params.Type)
 				if nil != err {
@@ -365,8 +349,6 @@ func (self *Api) Do(request *Request) (*Response, error) {
 			})
 
 		case "get_devices":
-			// {"method":"get_devices","username":"admin_user"}
-			// {"method":"get_devices","apikey":"<apikey>"}
 			return self.fetchUser(request, func(user *database.User) error {
 				devices, err := user.GetDevices()
 				if nil != err {
@@ -377,24 +359,18 @@ func (self *Api) Do(request *Request) (*Response, error) {
 			})
 
 		case "get_device":
-			// {"method":"get_device","username":"admin_user","device_id":"<uuid>"}
-			// {"method":"get_device","apikey":"<apikey>","device_id":"<uuid>"}
 			return self.fetchDevice(request, func(device *database.Device) error {
 				response.Data.Device = device
 				return nil
 			})
 
 		case "delete_device":
-			// {"method":"delete_device","username":"admin_user","device_id":"<uuid>"}
-			// {"method":"delete_device","apikey":"<apikey>","device_id":"<uuid>"}
 			return self.fetchDevice(request, func(device *database.Device) error {
 				self.cache.Delete("device", request.Params.DeviceId)
 				return device.Delete()
 			})
 
 		case "activate_device":
-			// {"method":"activate_device","username":"admin_user","device_id":"<uuid>"}
-			// {"method":"activate_device","apikey":"<apikey>","device_id":"<uuid>"}
 			return self.fetchDevice(request, func(device *database.Device) error {
 				err := device.Activate()
 				self.cache.Replace("device", request.Params.DeviceId, device)
@@ -402,8 +378,6 @@ func (self *Api) Do(request *Request) (*Response, error) {
 			})
 
 		case "deactivate_device":
-			// {"method":"deactivate_device","username":"admin_user","device_id":"<uuid>"}
-			// {"method":"deactivate_device","apikey":"<apikey>","device_id":"<uuid>"}
 			return self.fetchDevice(request, func(device *database.Device) error {
 				err := device.Deactivate()
 				self.cache.Replace("device", request.Params.DeviceId, device)
@@ -411,8 +385,6 @@ func (self *Api) Do(request *Request) (*Response, error) {
 			})
 
 		case "create_sensor":
-			// {"method":"create_sensor","username":"admin_user","device_id":"<uuid>","name":"laptop","type":"computer"}
-			// {"method":"create_sensor","apikey":"<apikey>","device_id":"<uuid>","name":"laptop","type":"computer"}
 			return self.fetchDevice(request, func(device *database.Device) error {
 				if !device.IsActive {
 					return errors.New("device is deactivated")
@@ -421,8 +393,6 @@ func (self *Api) Do(request *Request) (*Response, error) {
 			})
 
 		case "get_sensors":
-			// {"method":"get_sensors","username":"admin_user","device_id":"<uuid>"}
-			// {"method":"get_sensors","apikey":"<apikey>","device_id":"<uuid>"}
 			return self.fetchDevice(request, func(device *database.Device) error {
 				sensors, err := device.GetSensors()
 				if nil != err {
@@ -433,24 +403,18 @@ func (self *Api) Do(request *Request) (*Response, error) {
 			})
 
 		case "get_sensor":
-			// {"method":"get_sensor","username":"admin_user","sensor_id":"<uuid>"}
-			// {"method":"get_sensor","apikey":"<apikey>","sensor_id":"<uuid>"}
 			return self.fetchSensor(request, func(sensor *database.Sensor) error {
 				response.Data.Sensor = sensor
 				return nil
 			})
 
 		case "delete_sensor":
-			// {"method":"delete_sensor","username":"admin_user","sensor_id":"<uuid>"}
-			// {"method":"delete_sensor","apikey":"<apikey>","sensor_id":"<uuid>"}
 			return self.fetchSensor(request, func(sensor *database.Sensor) error {
 				self.cache.Delete("sensor", request.Params.SensorId)
 				return sensor.Delete()
 			})
 
 		case "activate_sensor":
-			// {"method":"activate_sensor","username":"admin_user","sensor_id":"<uuid>"}
-			// {"method":"activate_sensor","apikey":"<apikey>","sensor_id":"<uuid>"}
 			return self.fetchSensor(request, func(sensor *database.Sensor) error {
 				err := sensor.Activate()
 				self.cache.Replace("sensor", request.Params.SensorId, sensor)
@@ -458,8 +422,6 @@ func (self *Api) Do(request *Request) (*Response, error) {
 			})
 
 		case "deactivate_sensor":
-			// {"method":"deactivate_sensor","username":"admin_user","sensor_id":"<uuid>"}
-			// {"method":"deactivate_sensor","apikey":"<apikey>","sensor_id":"<uuid>"}
 			return self.fetchSensor(request, func(sensor *database.Sensor) error {
 				err := sensor.Deactivate()
 				self.cache.Replace("sensor", request.Params.SensorId, sensor)
@@ -467,15 +429,11 @@ func (self *Api) Do(request *Request) (*Response, error) {
 			})
 
 		case "create_location":
-			// {"method":"create_location","username":"admin_user","name":"MyHouse","longitude":0.0,"latitude":0.0}
-			// {"method":"create_location","apikey":"<apikey>","name":"MyHouse","longitude":0.0,"latitude":0.0}
 			return self.fetchUser(request, func(user *database.User) error {
 				return user.CreateLocation(request.Params.Name, request.Params.Longitude, request.Params.Latitude)
 			})
 
 		case "get_locations":
-			// {"method":"get_locations","username":"admin_user"}
-			// {"method":"get_locations","apikey":"<apikey>"}
 			return self.fetchUser(request, func(user *database.User) error {
 				locations, err := user.GetLocations()
 				if nil != err {

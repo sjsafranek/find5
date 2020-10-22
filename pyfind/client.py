@@ -25,12 +25,13 @@ class HttpClient(object):
         if self.apikey:
             payload['params']['apikey'] = self.apikey
         print(json.dumps(payload))
-        return requests.post("{0}/api/v1/find".format(self.api_url), json=payload)
+        return requests.post("{0}/api/v1".format(self.api_url), json=payload)
 
     def _login(self, password):
-        resp = requests.post("{0}/login".format(self.api_url), auth=HTTPBasicAuth(self.username, password))
+        resp = requests.post("{0}/login?format=json".format(self.api_url), auth=HTTPBasicAuth(self.username, password))
         if 200 != resp.status_code:
             raise ValueError(resp.text)
+        print(resp.text)
         respData = resp.json()
         self.user = respData['data']['user']
         self.apikey = self.user['apikey']
@@ -39,7 +40,7 @@ class HttpClient(object):
     def createUser(self, username="", password=""):
         return self.do({
             "method": "create_user",
-            "parmas": {
+            "params": {
                 "username": username,
                 "password": password
             }

@@ -53,7 +53,8 @@ func New(findapi *api.Api, conf *config.Config) *App {
 		loginHandler, callbackHandler := sessionManager.GetFacebookLoginHandlers(
 			conf.OAuth2.Facebook.ClientID,
 			conf.OAuth2.Facebook.ClientSecret,
-			"http://localhost:8080/facebook/callback")
+			// "http://localhost:8080/facebook/callback")
+			fmt.Sprintf("%v/facebook/callback", conf.Server.GetURLString()))
 
 		// attach facebook login handlers to mux
 		app.mux.Handle("/facebook/login", middleware.Attach(loginHandler))
@@ -65,7 +66,8 @@ func New(findapi *api.Api, conf *config.Config) *App {
 		loginHandler, callbackHandler := sessionManager.GetGoogleLoginHandlers(
 			conf.OAuth2.Google.ClientID,
 			conf.OAuth2.Google.ClientSecret,
-			"http://localhost:8080/google/callback")
+			// "http://localhost:8080/google/callback")
+			fmt.Sprintf("%v/google/callback", conf.Server.GetURLString()))
 
 		// attach facebook login handlers to mux
 		app.mux.Handle("/google/login", middleware.Attach(loginHandler))

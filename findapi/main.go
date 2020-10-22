@@ -18,6 +18,8 @@ const (
 	PROJECT                   string = "Find"
 	VERSION                   string = "5.0.7"
 	DEFAULT_HTTP_PORT         int    = 8080
+	DEFAULT_HTTP_HOST string = "localhost"
+	DEFAULT_HTTP_PROTOCOL string = "http"
 	DEFAULT_DATABASE_ENGINE   string = "postgres"
 	DEFAULT_DATABASE_DATABASE string = "finddb"
 	DEFAULT_DATABASE_PASSWORD string = "dev"
@@ -32,21 +34,20 @@ const (
 )
 
 var (
-	HTTP_PORT              int    = DEFAULT_HTTP_PORT
 	FACEBOOK_CLIENT_ID     string = os.Getenv("FACEBOOK_CLIENT_ID")
 	FACEBOOK_CLIENT_SECRET string = os.Getenv("FACEBOOK_CLIENT_SECRET")
 	GOOGLE_CLIENT_ID       string = os.Getenv("GOOGLE_CLIENT_ID")
 	GOOGLE_CLIENT_SECRET   string = os.Getenv("GOOGLE_CLIENT_SECRET")
-	DATABASE_ENGINE        string = DEFAULT_DATABASE_ENGINE
-	DATABASE_DATABASE      string = DEFAULT_DATABASE_DATABASE
-	DATABASE_PASSWORD      string = DEFAULT_DATABASE_PASSWORD
-	DATABASE_USERNAME      string = DEFAULT_DATABASE_USERNAME
-	DATABASE_HOST          string = DEFAULT_DATABASE_HOST
-	DATABASE_PORT          int64  = DEFAULT_DATABASE_PORT
-	REDIS_PORT             int64  = DEFAULT_REDIS_PORT
-	REDIS_HOST             string = DEFAULT_REDIS_HOST
-	AI_HOST                string = DEFAULT_AI_HOST
-	AI_PORT                int64  = DEFAULT_AI_PORT
+	// DATABASE_ENGINE        string = DEFAULT_DATABASE_ENGINE
+	// DATABASE_DATABASE      string = DEFAULT_DATABASE_DATABASE
+	// DATABASE_PASSWORD      string = DEFAULT_DATABASE_PASSWORD
+	// DATABASE_USERNAME      string = DEFAULT_DATABASE_USERNAME
+	// DATABASE_HOST          string = DEFAULT_DATABASE_HOST
+	// DATABASE_PORT          int64  = DEFAULT_DATABASE_PORT
+	// REDIS_PORT             int64  = DEFAULT_REDIS_PORT
+	// REDIS_HOST             string = DEFAULT_REDIS_HOST
+	// AI_HOST                string = DEFAULT_AI_HOST
+	// AI_PORT                int64  = DEFAULT_AI_PORT
 	CONFIG_FILE            string = DEFAULT_CONFIG_FILE
 	API_REQUEST            string = ""
 	MODE                   string = "web"
@@ -71,6 +72,8 @@ func init() {
 		},
 		Server: config.Server{
 			HttpPort: DEFAULT_HTTP_PORT,
+			HttpHost: DEFAULT_HTTP_HOST,
+			HttpProtocol: DEFAULT_HTTP_PROTOCOL,
 		},
 		OAuth2: config.OAuth2{
 			Facebook: config.SocialOAuth2{
@@ -83,7 +86,7 @@ func init() {
 			},
 		},
 		Database: config.Database{
-			DatabaseEngine: DATABASE_ENGINE,
+			DatabaseEngine: DEFAULT_DATABASE_ENGINE,
 			DatabaseHost:   DEFAULT_DATABASE_HOST,
 			DatabaseName:   DEFAULT_DATABASE_DATABASE,
 			DatabasePass:   DEFAULT_DATABASE_PASSWORD,

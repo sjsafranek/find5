@@ -51,6 +51,12 @@ func (self *App) getHandlerOptions(r *http.Request) map[string]interface{} {
 
 // welcomeHandler shows a welcome message and login button.
 func (self *App) indexHandler(w http.ResponseWriter, r *http.Request) {
+	// get return format
+	format := "http"
+	formats, ok := r.URL.Query()["format"]
+	if ok {
+		format = formats[0]
+	}
 
 	if sessionManager.IsAuthenticated(r) {
 		http.Redirect(w, r, "/profile", http.StatusFound)
@@ -77,6 +83,13 @@ func (self *App) indexHandler(w http.ResponseWriter, r *http.Request) {
 
 		results, err := self.api.Do(&api.Request{Method: "get_user", Params: &api.RequestParams{Username: username}})
 		if nil != err {
+
+			// Return as api request
+			if "json" == format {
+				apiBasicResponse(w, http.StatusBadRequest, err)
+				return
+			}
+
 			options["error"] = err.Error()
 			self.executeLoginTemplate(w, options)
 			return
@@ -85,6 +98,13 @@ func (self *App) indexHandler(w http.ResponseWriter, r *http.Request) {
 		is_password, _ := results.Data.User.IsPassword(password)
 		if !is_password {
 			err = errors.New("Incorrect password")
+
+			// Return as api request
+			if "json" == format {
+				apiBasicResponse(w, http.StatusBadRequest, err)
+				return
+			}
+
 			options["error"] = err.Error()
 			self.executeLoginTemplate(w, options)
 			return
@@ -96,6 +116,14 @@ func (self *App) indexHandler(w http.ResponseWriter, r *http.Request) {
 		session.Values["useremail"] = results.Data.User.Email
 		session.Values["usertype"] = "find5"
 		session.Save(w)
+
+		// Return as api request
+		if "json" == format {
+			data, _ := results.Marshal()
+			apiJSONResponse(w, []byte(data), http.StatusOK)
+			return
+		}
+
 		http.Redirect(w, r, "/profile", http.StatusFound)
 		return
 	}
