@@ -104,7 +104,7 @@ func init() {
 	}
 
 	flag.IntVar(&conf.Server.HttpPort, "httpport", DEFAULT_HTTP_PORT, "Server port")
-	flag.StringVar(&conf.Server.HttpHost, "httpport", DEFAULT_HTTP_HOST, "Server host")
+	flag.StringVar(&conf.Server.HttpHost, "httphost", DEFAULT_HTTP_HOST, "Server host")
 	flag.StringVar(&conf.Server.HttpProtocol, "httpprotocol", DEFAULT_HTTP_PROTOCOL, "Server protocol")
 
 	flag.StringVar(&conf.OAuth2.Facebook.ClientID, "facebook-client-id", FACEBOOK_CLIENT_ID, "Facebook Client ID")
