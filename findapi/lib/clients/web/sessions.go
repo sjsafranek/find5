@@ -74,6 +74,20 @@ func New(findapi *api.Api, conf *config.Config) *App {
 		app.mux.Handle("/google/callback", middleware.Attach(callbackHandler))
 	}
 
+	if conf.OAuth2.HasGitHub() {
+		// get facebook login handlers
+		loginHandler, callbackHandler := sessionManager.GetGitHubLoginHandlers(
+			conf.OAuth2.GitHub.ClientID,
+			conf.OAuth2.GitHub.ClientSecret,
+			// "http://localhost:8080/google/callback")
+			fmt.Sprintf("%v/github/callback", conf.Server.GetURLString()))
+
+		// attach facebook login handlers to mux
+		app.mux.Handle("/github/login", middleware.Attach(loginHandler))
+		app.mux.Handle("/github/callback", middleware.Attach(callbackHandler))
+	}
+
+
 	// websockets
 	hub, _ := websockets.New(findapi)
 	app.mux.Handle("/ws", middleware.Attach(http.HandlerFunc(hub.WebSocketHandler)))

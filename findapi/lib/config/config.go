@@ -17,6 +17,7 @@ type Config struct {
 type OAuth2 struct {
 	Facebook SocialOAuth2
 	Google SocialOAuth2
+	GitHub SocialOAuth2
 }
 
 func (self *OAuth2) HasFacebook() bool {
@@ -25,6 +26,10 @@ func (self *OAuth2) HasFacebook() bool {
 
 func (self *OAuth2) HasGoogle() bool {
 	return "" != self.Google.ClientID && "" != self.Google.ClientSecret
+}
+
+func (self *OAuth2) HasGitHub() bool {
+	return "" != self.GitHub.ClientID && "" != self.GitHub.ClientSecret
 }
 
 type Api struct {

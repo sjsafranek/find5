@@ -30,6 +30,7 @@ func (self *App) getHandlerOptions(r *http.Request) map[string]interface{} {
 	oauth2Options := make(map[string]bool)
 	oauth2Options["facebook"] = self.config.OAuth2.HasFacebook()
 	oauth2Options["google"] = self.config.OAuth2.HasGoogle()
+	oauth2Options["github"] = self.config.OAuth2.HasGitHub()
 	options["oauth2"] = oauth2Options
 
 	val, _ := sessionManager.Get(r)

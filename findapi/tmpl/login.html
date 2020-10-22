@@ -21,7 +21,7 @@
 
             /*@import url('https://fonts.googleapis.com/css?family=Numans');*/
 
-            html,body {
+            html, body {
                 /*background-image: url('http://getwallpapers.com/wallpaper/full/a/5/d/544750.jpg');*/
                 /*background-image: url('/static/images/splash.gif');*/
                 /*background-size: cover;*/
@@ -176,6 +176,7 @@
         				<div class="d-flex justify-content-end social_icon">
         					<span><i class="fab fa-facebook-square btn-facebook"></i></span>
         					<span><i class="fab fa-google-plus-square btn-google"></i></span>
+                            <span><i class="fab fa-github-square btn-github"></i></span>
         				</div>
         			</div>
         			<div class="card-body">
@@ -262,11 +263,13 @@
             $('.btn-login').attr('disabled', true);
             $('.btn-facebook').attr('disabled', true);
             $('.btn-google').attr('disabled', true);
+            $('.btn-github').attr('disabled', true);
 
             $('.acceptcookies').on('click', function(event) {
                 $('.btn-login').attr('disabled', false);
                 $('.btn-facebook').attr('disabled', false);
                 $('.btn-google').attr('disabled', false);
+                $('.btn-github').attr('disabled', false);
             });
 
             $('.btn-facebook').on('click', function(e){
@@ -277,6 +280,10 @@
                 window.location.href = "google/login";
             });
 
+            $('.btn-github').on('click', function(e){
+                window.location.href = "github/login";
+            });
+
             // TODO HANDLE IN TEMPALTE...
 			var config = {{ index . }};
             if (!config.oauth2.facebook) {
@@ -284,6 +291,9 @@
             }
             if (!config.oauth2.google) {
                 $('.btn-google').remove();
+            }
+            if (!config.oauth2.github) {
+                $('.btn-github').remove();
             }
 
             function capLockIsOn(event) {

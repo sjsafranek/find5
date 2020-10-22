@@ -39,6 +39,8 @@ var (
 	FACEBOOK_CLIENT_SECRET string = os.Getenv("FACEBOOK_CLIENT_SECRET")
 	GOOGLE_CLIENT_ID       string = os.Getenv("GOOGLE_CLIENT_ID")
 	GOOGLE_CLIENT_SECRET   string = os.Getenv("GOOGLE_CLIENT_SECRET")
+	GITHUB_CLIENT_ID       string = os.Getenv("GITHUB_CLIENT_ID")
+	GITHUB_CLIENT_SECRET   string = os.Getenv("GITHUB_CLIENT_SECRET")
 	// DATABASE_ENGINE        string = DEFAULT_DATABASE_ENGINE
 	// DATABASE_DATABASE      string = DEFAULT_DATABASE_DATABASE
 	// DATABASE_PASSWORD      string = DEFAULT_DATABASE_PASSWORD
@@ -114,6 +116,9 @@ func init() {
 	flag.StringVar(&conf.OAuth2.Facebook.ClientSecret, "facebook-client-secret", FACEBOOK_CLIENT_SECRET, "Facebook Client Secret")
 	flag.StringVar(&conf.OAuth2.Google.ClientID, "gmail-client-id", GOOGLE_CLIENT_ID, "Google Client ID")
 	flag.StringVar(&conf.OAuth2.Google.ClientSecret, "gmail-client-secret", GOOGLE_CLIENT_SECRET, "Google Client Secret")
+	flag.StringVar(&conf.OAuth2.GitHub.ClientID, "github-client-id", GITHUB_CLIENT_ID, "GitHub Client ID")
+	flag.StringVar(&conf.OAuth2.GitHub.ClientSecret, "github-client-secret", GITHUB_CLIENT_SECRET, "GitHub Client Secret")
+
 	flag.StringVar(&conf.Database.DatabaseHost, "dbhost", DEFAULT_DATABASE_HOST, "database host")
 	flag.StringVar(&conf.Database.DatabaseName, "dbname", DEFAULT_DATABASE_DATABASE, "database name")
 	flag.StringVar(&conf.Database.DatabasePass, "dbpass", DEFAULT_DATABASE_PASSWORD, "database password")
