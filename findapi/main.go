@@ -20,6 +20,7 @@ const (
 	DEFAULT_HTTP_PORT         int    = 8080
 	DEFAULT_HTTP_HOST string = "localhost"
 	DEFAULT_HTTP_PROTOCOL string = "http"
+	DEFAULT_HTTP_DOMAIN string = ""
 	DEFAULT_DATABASE_ENGINE   string = "postgres"
 	DEFAULT_DATABASE_DATABASE string = "finddb"
 	DEFAULT_DATABASE_PASSWORD string = "dev"
@@ -74,6 +75,7 @@ func init() {
 			HttpPort: DEFAULT_HTTP_PORT,
 			HttpHost: DEFAULT_HTTP_HOST,
 			HttpProtocol: DEFAULT_HTTP_PROTOCOL,
+			HttpDomain: DEFAULT_HTTP_DOMAIN,
 		},
 		OAuth2: config.OAuth2{
 			Facebook: config.SocialOAuth2{
@@ -106,6 +108,7 @@ func init() {
 	flag.IntVar(&conf.Server.HttpPort, "httpport", DEFAULT_HTTP_PORT, "Server port")
 	flag.StringVar(&conf.Server.HttpHost, "httphost", DEFAULT_HTTP_HOST, "Server host")
 	flag.StringVar(&conf.Server.HttpProtocol, "httpprotocol", DEFAULT_HTTP_PROTOCOL, "Server protocol")
+	flag.StringVar(&conf.Server.HttpDomain, "httpdomain", DEFAULT_HTTP_DOMAIN, "Http domain")
 
 	flag.StringVar(&conf.OAuth2.Facebook.ClientID, "facebook-client-id", FACEBOOK_CLIENT_ID, "Facebook Client ID")
 	flag.StringVar(&conf.OAuth2.Facebook.ClientSecret, "facebook-client-secret", FACEBOOK_CLIENT_SECRET, "Facebook Client Secret")

@@ -44,10 +44,14 @@ type Server struct {
 	HttpPort int
 	HttpHost string
 	HttpProtocol string
+	HttpDomain string
 }
 
 func (self *Server) GetURLString() string {
-	return fmt.Sprintf("%v://%v:%v", self.HttpProtocol, self.HttpHost, self.HttpPort)
+	if "" == self.HttpDomain {
+		return fmt.Sprintf("%v://%v:%v", self.HttpProtocol, self.HttpHost, self.HttpPort)
+	}
+	return fmt.Sprintf("%v://%v", self.HttpProtocol, self.HttpDomain)
 }
 
 type SocialOAuth2 struct {
