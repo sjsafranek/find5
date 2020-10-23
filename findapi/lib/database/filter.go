@@ -32,7 +32,7 @@ func (self *Filter) isLogicalBlock() bool {
 	return "" == self.Test && "" != self.Logical
 }
 
-func (self *Filter) ToSQL() (string, error) {
+func (self *Filter) ToSQL(table string) (string, error) {
 	_sql := ""
 
 	if "" == self.Test && "" == self.Logical {
@@ -46,7 +46,7 @@ func (self *Filter) ToSQL() (string, error) {
 	if self.isLogicalBlock() {
 		conditions := []string{}
 		for _, filter := range self.Conditions {
-			fSql, err := filter.ToSQL()
+			fSql, err := filter.ToSQL(table)
 			if nil != err {
 				return _sql, err
 			}
@@ -84,11 +84,11 @@ func (self *Filter) ToSQL() (string, error) {
 		case "range":
 			_sql += fmt.Sprintf(`
 				(
-					places_view.%v >= %v
+					%v.%v >= %v
 					AND
-					places_view.%v <= %v
+					%v.%v <= %v
 				)
-			`, self.ColumnId, self.Min, self.ColumnId, self.Max)
+			`, table, self.ColumnId, self.Min, table, self.ColumnId, self.Max)
 			break
 
 		case "date_range":
@@ -96,47 +96,47 @@ func (self *Filter) ToSQL() (string, error) {
 			// https://stackoverflow.com/questions/15817871/postgresql-filter-a-date-range
 			_sql += fmt.Sprintf(`
 				(
-					places_view.%v >= to_timestamp('%v', 'YYYY-MM-DD HH24:MI:SS')
+					%v.%v >= to_timestamp('%v', 'YYYY-MM-DD HH24:MI:SS')
 					AND
-					places_view.%v <= to_timestamp('%v', 'YYYY-MM-DD HH24:MI:SS')
+					%v.%v <= to_timestamp('%v', 'YYYY-MM-DD HH24:MI:SS')
 				)
-			`, self.ColumnId, self.Start, self.ColumnId, self.End)
+			`, table, self.ColumnId, self.Start, table, self.ColumnId, self.End)
 			break
 
 		case "in":
 			_sql += fmt.Sprintf(`
-				places_view.%v IN ( '%v' )
-			`, self.ColumnId, strings.Join(self.Values, "','"))
+				%v.%v IN ( '%v' )
+			`, table, self.ColumnId, strings.Join(self.Values, "','"))
 			break
 
 		case "not_in":
 			_sql += fmt.Sprintf(`
-				places_view.%v NOT IN ( '%v' )
-			`, self.ColumnId, strings.Join(self.Values, "','"))
+				%v.%v NOT IN ( '%v' )
+			`, table, self.ColumnId, strings.Join(self.Values, "','"))
 			break
 
 		case "is_null":
 			_sql += fmt.Sprintf(`
-				places_view.%v IS NULL
-			`, self.ColumnId)
+				%v.%v IS NULL
+			`, table, self.ColumnId)
 			break
 
 		case "not_null":
 			_sql += fmt.Sprintf(`
-				places_view.%v IS NOT NULL
-			`, self.ColumnId)
+				%v.%v IS NOT NULL
+			`, table, self.ColumnId)
 			break
 
 		case "equals":
 			_sql += fmt.Sprintf(`
-				places_view.%v = '%v'
-			`, self.ColumnId, self.Value)
+				%v.%v = '%v'
+			`, table, self.ColumnId, self.Value)
 			break
 
 		case "not_equals":
 			_sql += fmt.Sprintf(`
-				places_view.%v = '%v'
-			`, self.ColumnId, self.Value)
+				%v.%v != '%v'
+			`, table, self.ColumnId, self.Value)
 			break
 
 		}
