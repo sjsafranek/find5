@@ -19,7 +19,7 @@ require (
 	github.com/lib/pq v1.7.0
 	github.com/paulmach/orb v0.1.6
 	github.com/pkg/errors v0.9.1
-	github.com/sjsafranek/gosocialsessions v0.0.0-20201022224843-b53cc31cef15
+	github.com/sjsafranek/gosocialsessions 0.0.3
 	github.com/sjsafranek/lemur v1.1.1
 	github.com/sjsafranek/logger v1.0.3
 	github.com/sjsafranek/pool v3.0.0+incompatible
